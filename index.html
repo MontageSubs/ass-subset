@@ -160,9 +160,11 @@ h1.brand-title {
   text-decoration: none;
   transition: border-color 0.15s;
   white-space: nowrap;
+  cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.btn-hdr:hover { border-color: var(--ink); }
+.btn-hdr:hover { border-color: var(--ink); background: var(--rule2); }
+.btn-hdr:active { background: var(--rule); border-color: var(--ink); }
 .btn-hdr svg { width: 13px; height: 13px; fill: currentColor; flex-shrink: 0; }
 .main {
   max-width: 720px;
@@ -476,7 +478,8 @@ h2.step-title {
   font-family: var(--mono);
   -webkit-tap-highlight-color: transparent;
 }
-.footer-btn:hover { border-color: var(--ink); color: var(--ink); }
+.footer-btn:hover { border-color: var(--ink); color: var(--ink); background: var(--rule2); }
+.footer-btn:active { background: var(--rule); border-color: var(--ink); color: var(--ink); }
 
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
@@ -712,7 +715,7 @@ function loadDiscuss() {
   script.setAttribute('data-category', 'General');
   script.setAttribute('data-category-id', 'DIC_kwDORnj_wc4C4crU');
   script.setAttribute('data-mapping', 'pathname');
-  script.setAttribute('data-reactions-enabled', '1');
+  script.setAttribute('data-reactions-enabled', '0');
   script.setAttribute('data-emit-metadata', '0');
   script.setAttribute('data-theme', theme);
   script.setAttribute('data-lang', 'zh-CN');
