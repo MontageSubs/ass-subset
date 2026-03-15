@@ -1,0 +1,16 @@
+{
+  "name": "ASS 在线子集化工具",
+  "short_name": "ASS子集化",
+  "description": "基于浏览器实现的 ASS 字幕绘图指令子集化与字体嵌入工具",
+  "start_url": "/ass-subset/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#4a90e2",
+  "icons": [
+    {
+      "src": "https://montagesubs.github.io/assets/images/montagesubs_logo-512.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg"
+    }
+  ]
+}
