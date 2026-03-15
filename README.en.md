@@ -74,17 +74,6 @@ ass-subset/
 └── README.en.md            # English documentation (this file)
 ```
 
-## Maintenance Notice
-
-> **Important: This tool depends on two static asset files hosted on the MontageSubs main site.**
->
-> Please do not move or delete the following files from the main site repository, as doing so will break the browser tab icon and PWA installation functionality of this tool:
->
-> - `https://montagesubs.github.io/assets/images/montagesubs_logo-256.jpg` (browser favicon)
-> - `https://montagesubs.github.io/assets/images/montagesubs_logo-512.jpg` (PWA app icon)
->
-> If the main site asset paths are ever changed, please update `index.html` and `manifest.json` in this repository accordingly.
-
 ## Localization
 
 This tool currently provides a Chinese-language interface only. If you would like to use it in another language, or if you are interested in contributing a localization, please open a thread in [Issues](https://github.com/MontageSubs/ass-subset/issues) or [Discussions](https://github.com/MontageSubs/ass-subset/discussions). Multi-language support is on our future roadmap, and community input is very welcome.
