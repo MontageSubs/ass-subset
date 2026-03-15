@@ -10,6 +10,7 @@
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://montagesubs.github.io/ass-subset/">
 <link rel="icon" type="image/jpeg" href="https://montagesubs.github.io/assets/images/montagesubs_logo-256.jpg">
+<meta name="version" content="1.5">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
 <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯前端本地处理，无需安装。">
@@ -21,7 +22,6 @@
 <meta name="twitter:description" content="浏览器端 ASS/SSA 字幕优化：绘图指令子集化 + 字体子集嵌入，纯前端本地处理，零服务器。">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f2">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13151c">
-
 <link rel="manifest" href="manifest.json">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -457,7 +457,7 @@ h2.step-title {
   flex-direction: column;
   justify-content: space-between;
   align-items: flex-end;
-  gap: 0.5rem;
+  gap: 0.25rem;
 }
 .footer-line { font-size: 0.72rem; color: var(--ink2); }
 .footer-line a { color: var(--ink2); text-decoration: none; }
@@ -684,10 +684,11 @@ h2.step-title {
       <span class="footer-slogan">用爱发电 ❤️ Powered by Love</span>
     </div>
   </div>
-  <div class="footer-right">
+    <div class="footer-right">
     <div class="footer-line">
-      本工具以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 开源，依赖 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
+      以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
     </div>
+    <div class="footer-line"><span id="ver">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
     <div class="footer-btns">
       <a href="https://github.com/MontageSubs/ass-subset/issues" target="_blank" rel="noopener" class="footer-btn">反馈</a>
       <a href="https://github.com/MontageSubs/ass-subset" target="_blank" rel="noopener" class="footer-btn">查看源代码</a>
@@ -1031,7 +1032,10 @@ async function subsetFont(fontBuffer, charSet, fontName, isTTC) {
 
 function rewriteASS(rawContent, opts) {
   const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts } = opts;
-  let content = rawContent.replace(/\n\[Fonts\][\s\S]*?(?=\n\[|$)/i, '').trimEnd();
+  const hasNewFonts = drawTTF || embeddedFonts.size > 0;
+  let content = hasNewFonts
+    ? rawContent.replace(/\n\[Fonts\][\s\S]*?(?=\n\[|$)/i, '').trimEnd()
+    : rawContent.trimEnd();
   if (drawingDataToChar && drawingDataToChar.size > 0) {
     content = content.replace(
       /(\{[^}]*?\\p[1-9][^}]*?\})([\s\S]*?)(\{[^}]*?\\p0[^}]*?\})/gi,
@@ -1043,6 +1047,7 @@ function rewriteASS(rawContent, opts) {
       }
     );
   }
+  if (!hasNewFonts) return content;
   const lines = ['\n\n[Fonts]'];
   const encodeAndAppend = (fontName, ttfData) => {
     lines.push(`fontname: ${fontName}_0.ttf`);
@@ -1052,7 +1057,7 @@ function rewriteASS(rawContent, opts) {
   };
   if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
   for (const [name, ttf] of embeddedFonts) encodeAndAppend(name, ttf);
-  if (lines.length > 1) content += lines.join('\n');
+  content += lines.join('\n');
   return content;
 }
 
@@ -1283,6 +1288,8 @@ async function doConvert() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  const v = document.querySelector('meta[name="version"]');
+  if (v) document.getElementById('ver').textContent += ' v' + v.content;
   const dzASS  = document.getElementById('dz-ass');
   const inpASS = document.getElementById('inp-ass');
   inpASS.addEventListener('change', () => inpASS.files[0] && handleASS(inpASS.files[0]));
