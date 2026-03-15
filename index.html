@@ -9,8 +9,8 @@
 <meta name="author" content="MontageSubs (蒙太奇字幕组)">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://montagesubs.github.io/ass-subset/">
-<link rel="icon" type="image/jpeg" href="https://montagesubs.github.io/assets/images/montagesubs_logo-256.jpg">
-<meta name="version" content="1.5">
+<link rel="icon" type="image/jpeg" href="icons/icon-256.png">
+<meta name="version" content="1.6">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
 <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯前端本地处理，无需安装。">
@@ -23,6 +23,7 @@
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f2">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13151c">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icons/icon-512.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ASS子集化">
@@ -568,7 +569,16 @@ h2.step-title {
     <h1 class="brand-title">ASS 在线子集化工具</h1>
   </a>
   <span class="sub">绘图指令子集化 · 字体子集嵌入</span>
-  <div class="header-right">
+     <div class="header-right">
+     <button class="btn-hdr" id="btn-install-pwa"
+           onclick="triggerPwaInstall()"
+           style="display:none"
+           title="安装为本地应用">
+     <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+       <path d="M12 16l-5-5 1.41-1.41L11 13.17V4h2v9.17l2.59-2.58L17 11zM4 20v-4H2v4a2 2 0 002 2h16a2 2 0 002-2v-4h-2v4z"/>
+     </svg>
+     安装应用
+    </button>
     <button class="btn-hdr" id="btn-discuss" onclick="loadDiscuss()">讨论</button>
     <a href="https://montagesubs.github.io/svg-to-ass/" target="_blank" rel="noopener" class="btn-hdr">SVG 转 ASS 绘图指令</a>
     <a href="https://github.com/MontageSubs/ass-subset" target="_blank" rel="noopener" class="btn-hdr">
@@ -1371,6 +1381,41 @@ async function handleFonts(files) {
 </script>
 
 <script>
+let _pwaPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  _pwaPrompt = e;
+  const btn = document.getElementById('btn-install-pwa');
+  if (btn) btn.style.display = 'inline-flex';
+});
+
+window.addEventListener('appinstalled', () => {
+  _pwaPrompt = null;
+  const btn = document.getElementById('btn-install-pwa');
+  if (btn) btn.style.display = 'none';
+});
+if (window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true) {
+  document.addEventListener('DOMContentLoaded', () => {
+    const btn = document.getElementById('btn-install-pwa');
+    if (btn) btn.style.display = 'none';
+  });
+}
+
+function triggerPwaInstall() {
+  if (_pwaPrompt) {
+    _pwaPrompt.prompt();
+    _pwaPrompt.userChoice.then((result) => {
+      _pwaPrompt = null;
+      if (result.outcome === 'accepted') {
+        const btn = document.getElementById('btn-install-pwa');
+        if (btn) btn.style.display = 'none';
+      }
+    });
+  }
+}
+
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('/ass-subset/sw.js', { scope: '/ass-subset/' }).catch(() => {});
 }
