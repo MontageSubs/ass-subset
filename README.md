@@ -74,17 +74,6 @@ ass-subset/
 └── README.en.md            # 英文说明
 ```
 
-## 维护须知
-
-> **重要：本工具依赖蒙太奇字幕组主站的两个静态资源文件。**
->
-> 请勿在主站仓库中移动或删除以下文件，否则将导致本工具的图标与 PWA 安装功能失效：
->
-> - `https://montagesubs.github.io/assets/images/montagesubs_logo-256.jpg`（浏览器标签页图标）
-> - `https://montagesubs.github.io/assets/images/montagesubs_logo-512.jpg`（PWA 安装图标）
->
-> 如需调整主站资源路径，请同步更新本仓库的 `index.html` 与 `manifest.json`。
-
 ## 本地化
 
 本工具目前仅提供中文界面。如果您希望使用其他语言版本，或有意愿参与本地化贡献，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中提出需求。我们未来有计划考虑添加多语言支持。
