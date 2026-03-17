@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ASS 在线子集化工具 · 蒙太奇字幕组 MontageSubs</title>
-<meta name="description" content="基于浏览器端实现的 ASS/SSA 字幕在线优化工具。支持绘图指令子集化（\p1）与字体子集嵌入，纯前端本地处理，无需上传文件至服务器。由蒙太奇字幕组 MontageSubs 开发。">
-<meta name="keywords" content="ASS字幕,SSA字幕,字幕子集化,ASS字幕子集化,字体嵌入,ASS字幕嵌入字体,ASS字体嵌入,ASS嵌入字体,在线工具,绘图指令,ass-subset,MontageSubs,蒙太奇字幕组,字幕优化,opentype,TTF子集化,Advanced SubStation Alpha,浏览器工具">
+<meta name="description" content="基于浏览器端实现的 ASS/SSA 字幕在线字体子集化工具。支持绘图指令子集化与字体子集嵌入，纯前端本地处理，无需上传文件至服务器。由蒙太奇字幕组 MontageSubs 开发。">
+<meta name="keywords" content="ASS字幕字体嵌入,ASS字幕嵌入字体,ASS字幕字体子集化,ASS字体嵌入,ASS嵌入字体,ASS子集化,特效字幕字体嵌入,特效字幕嵌入字体,特效字幕子集化,字幕字体嵌入,字幕嵌入字体,字幕子集化,ASS字幕,SSA字幕,字体嵌入,嵌入字体,子集化,在线工具,字幕工具,字体工具,,绘图指令,ass-subset,MontageSubs,蒙太奇字幕组,字幕优化,opentype,TTF子集化,Advanced SubStation Alpha,浏览器工具">
 <meta name="author" content="MontageSubs (蒙太奇字幕组)">
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://montagesubs.github.io/ass-subset/">
@@ -13,13 +13,13 @@
 <meta name="version" content="1.7">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
-<meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯前端本地处理，无需安装。">
+<meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
 <meta property="og:url" content="https://montagesubs.github.io/ass-subset/">
 <meta property="og:site_name" content="MontageSubs (蒙太奇字幕组)">
 <meta property="og:locale" content="zh_CN">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="ASS 在线子集化工具 · MontageSubs">
-<meta name="twitter:description" content="浏览器端 ASS/SSA 字幕优化：绘图指令子集化 + 字体子集嵌入，纯前端本地处理，零服务器。">
+<meta name="twitter:description" content="浏览器端 ASS/SSA 字幕优化：绘图指令子集化 + 字体子集嵌入，纯浏览器本地处理。">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f2">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13151c">
 <link rel="manifest" href="manifest.json">
@@ -33,7 +33,7 @@
   "@context": "https://schema.org",
   "@type": "WebApplication",
   "name": "ASS 在线子集化工具",
-  "alternateName": "ASS Subset Tool",
+  "alternateName": "ASS Subset Tool （Online）",
   "url": "https://montagesubs.github.io/ass-subset/",
   "description": "基于浏览器端原生实现的 ASS/SSA 字幕优化工具。支持绘图指令子集化与字体子集化嵌入，所有处理均在本地浏览器完成，无需上传服务器。",
   "applicationCategory": "MultimediaApplication",
@@ -46,10 +46,10 @@
     "url": "https://github.com/MontageSubs"
   },
   "featureList": [
-    "ASS/SSA 绘图指令子集化",
+    "ASS/SSA 字幕绘图指令子集化",
     "字体子集化嵌入",
-    "纯前端处理，文件不离开浏览器",
-    "支持 TTF / OTF / TTC 字体格式"
+    "纯本地处理，文件不离开浏览器",
+    "支持 TTF / OTF / TTC 等字体格式"
   ]
 }
 </script>
@@ -585,7 +585,7 @@ h2.step-title {
     <span class="brand-org">蒙太奇字幕组 · MontageSubs</span>
     <h1 class="brand-title">ASS 在线子集化工具</h1>
   </a>
-  <span class="sub">绘图指令子集化 · 字体子集嵌入</span>
+  <span class="sub">字幕绘图指令子集化 · 字幕字体子集嵌入</span>
   <div class="header-right">
     <button class="btn-hdr" id="btn-install-pwa" onclick="triggerPwaInstall()" style="display:none">安装</button>
     <button class="btn-hdr" id="btn-discuss" onclick="loadDiscuss()">讨论</button>
