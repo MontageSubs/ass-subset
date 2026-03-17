@@ -36,7 +36,7 @@ ASS/SSA 字幕格式支持将字体文件直接嵌入字幕，无需用户单独
 
 **字体子集嵌入**
 
-扫描字幕文件中引用的非系统字体，将上传的字体文件子集化后以 SSA UUEncoding 标准嵌入字幕。仅保留字幕中实际出现的字符，并完整保留字体名称表，确保各播放器正常识别。支持 TTF、OTF、TTC 格式。
+扫描字幕文件中引用的非系统字体，将上传的字体文件子集化后以 UUEncoding 标准嵌入字幕。仅保留字幕中实际出现的字符，并完整保留字体名称表，确保各播放器正常识别。支持 TTF、OTF、TTC 格式。
 
 ## 使用方法
 
@@ -76,7 +76,7 @@ ass-subset/
 
 ## 本地化
 
-本工具目前仅提供中文界面。如果您希望使用其他语言版本，或有意愿参与本地化贡献，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中提出需求。我们未来有计划考虑添加多语言支持。
+本工具目前仅提供中文界面。如果你希望使用其他语言版本，或有意愿参与本地化贡献，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中提出需求。我们未来有计划考虑添加多语言支持。
 
 ## 参与贡献
 
