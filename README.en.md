@@ -36,7 +36,7 @@ Extracts `\p1`…`\p0` vector drawing data from subtitle dialogue lines and conv
 
 **Font Subsetting and Embedding**
 
-Scans the subtitle file for non-system font references, subsets the uploaded font files to include only the characters present in the subtitle, and embeds them using the SSA UUEncoding standard. The full font Name Table is preserved to ensure correct playback across all major media players. Supports TTF, OTF, and TTC formats.
+Scans the subtitle file for non-system font references, subsets the uploaded font files to include only the characters present in the subtitle, and embeds them using the UUEncoding standard. The full font Name Table is preserved to ensure correct playback across all major media players. Supports TTF, OTF, and TTC formats.
 
 ## Usage
 
