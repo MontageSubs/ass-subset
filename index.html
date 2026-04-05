@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.4">
+  <meta name="version" content="2.1.5">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1434,9 +1434,9 @@
         'opt.draw.title': '子集化绘图指令',
         'opt.draw.desc': '将字幕中的 \\p1…\\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积',
         'opt.font.title': '嵌入引用字体',
-        'opt.font.desc': '扫描字幕引用的非系统字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
+        'opt.font.desc': '扫描字幕使用的字体，子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
         'opt.sysfont.title': '嵌入系统字体',
-        'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入（需要通过 Local Font Access 或手动上传获取字体文件）',
+        'opt.sysfont.desc': '将字幕引用的系统字体一并子集化嵌入',
         'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。',
         'notice.drawing': '注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
         'font.upload.title': '上传字体文件',
@@ -1523,9 +1523,9 @@
         'opt.draw.title': 'Subset Drawing Instructions',
         'opt.draw.desc': 'Extract \\p1…\\p0 vector drawing data into embedded TTF font, deduplicate drawings, reduce file size',
         'opt.font.title': 'Embed Referenced Fonts',
-        'opt.font.desc': 'Scan non-system fonts referenced in subtitles, subset and embed; keeps only used characters',
+        'opt.font.desc': 'Scan fonts used in subtitles, subset and embed; keeps only used characters',
         'opt.sysfont.title': 'Embed System Fonts',
-        'opt.sysfont.desc': 'Also subset and embed system fonts referenced in subtitles (requires Local Font Access or manual upload)',
+        'opt.sysfont.desc': 'Also subset and embed system fonts referenced in subtitles',
         'notice.copyright': '⚠ Copyright Notice: Distributing unauthorized font files may constitute infringement. Ensure you have distribution rights for embedded fonts.',
         'notice.drawing': 'Note: After converting drawing instructions, effects may shift slightly. Please check the final result manually.',
         'font.upload.title': 'Upload Font Files',
@@ -1886,6 +1886,7 @@
       cbDraw.checked = hasDrawings;
       rowDraw.classList.toggle('selected', hasDrawings);
       rowDraw.classList.toggle('disabled', !hasDrawings);
+      rowDraw.classList.toggle('hidden', !hasDrawings);
 
       cbFont.disabled = !hasFonts;
       cbFont.checked = hasFonts;
