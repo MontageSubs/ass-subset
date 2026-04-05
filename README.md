@@ -1,100 +1,24 @@
-# ASS 在线子集化工具
-**ASS Subset Tool · MontageSubs**
+# ASS Subset Tool v2.0
 
-<br/>
+基于浏览器端原生实现的 ASS/SSA 字幕优化工具，由 MontageSubs (蒙太奇字幕组) 打造。由于所有计算（字体匹配、子集处理、包内封装等）完全由设备的浏览器与 Web Worker 运算驱动，文件能够实现 100% 不离开终端用户设备的“纯本地处理”，保障您的字幕文件安全私密。
 
-> **在浏览器中完成 ASS/SSA 字幕的绘图指令子集化与字体嵌入，无需安装任何软件。**
->
-> *All processing runs locally in your browser. No files are ever uploaded to a server.*
+## 核心特性
+- **全平台支持**: Windows, macOS, Linux, 以及任何现代浏览器
+- **图形指令去冗余**: 将繁杂冗长的 ASSDraw 指令提取并转换为字符（打包进独立字体中），大幅减小字幕文件体积，显著提升播放器解析性能。
+- **字体级内嵌**: 精确拆解每一行 ASS 中的各个字符与样式（如 bold 粗体字重感知），将全套原始外挂字体重新剪裁后直接嵌入到字幕文件（UUEncode）。
+- **完全本地化**: 所需所有执行库均打包到本地，无需挂载外部 CDN。
 
-<div align="right">
+## 第三方库引用声明 (Third-party Libraries / Vendor)
+此工具使用或内嵌了以下优秀的开源代码库，所有的第三方库实体文已存放于 `vendor/` 目录下，以便于进行无缝的本地无网络离线操作。
 
-**中文 | [English](./README.en.md)**
+**1. opentype.js**
+- **Project URL**: [opentype.js](https://github.com/opentypejs/opentype.js)
+- **License**: MIT License
+- **Purpose**: 用于工具核心中对所上传的 TTF/OTF 文件进行二进制头解析、表级解析以及字符寻址、字形重新剪裁子集打包（Subset）与图形的字体封装等关键任务。
 
-</div><br/>
+**2. JSZip**
+- **Project URL**: [JSZip](https://github.com/Stuk/jszip)
+- **License**: MIT License / Dual licensed
+- **Purpose**: 当使用批处理上传或多个字幕文件队列子集化工作完成后，用于打包生成一个完整的 `.zip` 输出供最终下载。
 
-<div align="center">
-
-| [打开工具](https://subs.js.org/ass-subset/) | [提交反馈](https://github.com/MontageSubs/ass-subset/issues) | [参与讨论](https://github.com/MontageSubs/ass-subset/discussions) |
-| :---: | :---: | :---: |
-
-</div><br/>
-
-## 简介
-
-ASS 在线子集化工具是由蒙太奇字幕组 (MontageSubs) 开发的开源浏览器端工具，用于优化 Advanced SubStation Alpha (.ass) 与 SubStation Alpha (.ssa) 字幕文件。
-
-ASS/SSA 字幕格式支持将字体文件直接嵌入字幕，无需用户单独安装字体即可正常渲染特效。然而，完整字体动辄数 MB，编码后会使字幕体积大幅膨胀。本工具通过子集化技术，仅保留字幕中实际使用的字形，将嵌入字体压缩至最小体积，同时完整保留所有字体名称引用，确保播放器正确识别。
-
-所有处理均在本地浏览器中完成，文件不离开用户设备。
-
-## 功能
-
-**绘图指令子集化**
-
-将字幕中的 `\p1`…`\p0` 矢量绘图数据提取为独立的内嵌 TTF 字体。相同的绘图形状只存储一次，替换全部重复引用，显著减小文件体积，并提升低性能设备（如 Android TV 机顶盒）的渲染兼容性。
-
-**字体子集嵌入**
-
-扫描字幕文件中引用的非系统字体，将上传的字体文件子集化后以 UUEncoding 标准嵌入字幕。仅保留字幕中实际出现的字符，并完整保留字体名称表，确保各播放器正常识别。支持 TTF、OTF、TTC 格式。
-
-## 使用方法
-
-本工具完全基于浏览器运行，无需安装：
-
-1. 打开 [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
-2. 上传 `.ass` 或 `.ssa` 字幕文件
-3. 查看分析结果，确认检测到的绘图指令与外部字体
-4. 如需嵌入字体，上传对应的字体文件（TTF / OTF / TTC）
-5. 点击"开始转换"，下载优化后的字幕文件
-
-转换后的文件名格式为 `原文件名_optimized.ass`。
-
-> **注意：** 绘图指令转换后，特效的大小或位置可能发生轻微偏移，建议手动检查最终效果。
-
-## 技术依赖
-
-| 依赖 | 版本 | 许可证 | 用途 |
-|------|------|--------|------|
-| [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | 字体解析与构建 |
-
-opentype.js 以副本形式托管于本仓库 `vendor/` 目录下，保留其原始版权声明，符合 MIT 许可证要求。
-
-## 仓库结构
-
-```
-ass-subset/
-├── index.html              # 工具主体（单文件，包含全部逻辑）
-├── manifest.json           # PWA 配置
-├── sw.js                   # Service Worker（缓存策略）
-├── vendor/
-│   └── opentype.min.js     # opentype.js 本地副本
-├── LICENSE
-├── README.md               # 中文说明（本文件）
-└── README.en.md            # 英文说明
-```
-
-## 本地化
-
-本工具目前仅提供中文界面。如果你希望使用其他语言版本，或有意愿参与本地化贡献，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中提出需求。我们未来有计划考虑添加多语言支持。
-
-## 参与贡献
-
-欢迎任何形式的贡献，包括但不限于：
-
-- 在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 中提交 Bug 报告或功能请求
-- 在 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中分享使用经验或技术讨论
-- 提交 Pull Request 改进代码或文档
-
-## 许可证
-
-本项目源代码遵循 [MIT License](./LICENSE) 授权。
-
----
-
-<div align="center">
-
-**蒙太奇字幕组 (MontageSubs)**  
-"用爱发电 ❤️ Powered by Love"
-
-</div>
+感谢这些开源库的维护者提供的强力支持！

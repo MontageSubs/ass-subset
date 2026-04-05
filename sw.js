@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'ass-subset-v1.6';
+const CACHE_NAME = 'ass-subset-v2.0.1';
 const PRECACHE = [
   '/ass-subset/',
   '/ass-subset/index.html',
@@ -36,7 +36,7 @@ self.addEventListener('fetch', e => {
         const fetchPromise = fetch(e.request).then(resp => {
           if (resp && resp.status === 200) cache.put(e.request, resp.clone());
           return resp;
-        }).catch(() => {});
+        }).catch(() => { });
         return cached || fetchPromise;
       })
     )

@@ -10,7 +10,7 @@
 <meta name="robots" content="index, follow">
 <link rel="canonical" href="https://subs.js.org/ass-subset/">
 <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-<meta name="version" content="2.0">
+<meta name="version" content="2.0.1">
 <meta property="og:type" content="website">
 <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
 <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -27,7 +27,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="apple-mobile-web-app-title" content="ASS子集化">
-<script src="/ass-subset/vendor/opentype.min.js"></script>
+<script src="vendor/opentype.min.js"></script>
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -786,20 +786,18 @@ h2.step-title {
         </div>
         <span class="opt-tag">TTF / OTF / TTC</span>
       </label>
-      <div class="opt-sub hidden" id="opt-sub-sysfont">
-        <label class="opt-row" id="opt-row-sysfont">
-          <input type="checkbox" id="opt-sysfont">
-          <div class="opt-label">
-            <strong data-i18n="opt.sysfont.title">嵌入系统字体</strong>
-            <span data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入（需要通过 Local Font Access 或手动上传获取字体文件）</span>
-          </div>
-        </label>
-      </div>
+      <label class="opt-row" id="opt-row-sysfont">
+        <input type="checkbox" id="opt-sysfont">
+        <div class="opt-label">
+          <strong data-i18n="opt.sysfont.title">嵌入系统字体</strong>
+          <span data-i18n="opt.sysfont.desc">将字幕引用的系统字体一并子集化嵌入（需手动上传或从本机尝试加载）</span>
+        </div>
+      </label>
       <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">
         <strong>⚠ 版权提示：</strong>分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。
       </div>
-      <div id="drawing-notice" class="notice hidden" data-i18n="notice.drawing">
-        <strong>注意：</strong>绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。
+      <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">
+        <strong>⚠ 注意：</strong>绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。
       </div>
       <div id="font-section" class="hidden">
         <hr class="divider">
@@ -1319,7 +1317,7 @@ function renderAnalysis() {
   document.getElementById('drawing-notice').classList.toggle('hidden', !hasDrawings);
   document.getElementById('copyright-notice').classList.toggle('hidden', !hasFonts);
   document.getElementById('font-section').classList.toggle('hidden', !hasFonts);
-  document.getElementById('opt-sub-sysfont').classList.toggle('hidden', !hasFonts);
+  document.getElementById('opt-row-sysfont').classList.toggle('hidden', !hasFonts);
   if (hasFonts) renderFontList();
 
   if (hasDrawings || hasFonts) {
@@ -1331,11 +1329,19 @@ function renderAnalysis() {
 
 function renderFontList() {
   const allFonts = {};
+  const wantSys = document.getElementById('opt-sysfont').checked;
   for (const entry of S.assFiles) {
     for (const [name, info] of Object.entries(entry.parsed.externalFonts)) {
-      if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0 };
+      if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, isSystem: false };
       allFonts[name].normal += info.normal.length;
       allFonts[name].bold += info.bold.length;
+    }
+    if (wantSys && entry.parsed.systemFontsReferenced) {
+      for (const [name, info] of Object.entries(entry.parsed.systemFontsReferenced)) {
+        if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, isSystem: true };
+        allFonts[name].normal += info.normal.length;
+        allFonts[name].bold += info.bold.length;
+      }
     }
   }
   const list = document.getElementById('font-list');
@@ -1346,21 +1352,31 @@ function renderFontList() {
     const weights = [];
     if (info.normal > 0) weights.push(t('font.weight.normal'));
     if (info.bold > 0) weights.push(t('font.weight.bold'));
+    
+    let statusHtml = '';
+    if (uploaded) {
+      statusHtml = '<span class="fi-status fi-uploaded">' + t('font.uploaded', { name: uploaded.file.name }) + '</span>';
+    } else {
+      statusHtml = '<span class="fi-status fi-missing">' + (info.isSystem ? '[系统字体]需提供' : t('font.missing')) + '</span>';
+    }
+
     const div = document.createElement('div');
-    div.className = 'font-item';
+    div.className = 'font-item' + (info.isSystem ? ' fi-system' : '');
     div.innerHTML = '<span class="fi-name">' + name + '</span>' +
       '<span class="fi-chars">' + t('font.chars', { n: totalChars }) + ' [' + weights.join('+') + ']</span>' +
-      (uploaded
-        ? '<span class="fi-status fi-uploaded">' + t('font.uploaded', { name: uploaded.file.name }) + '</span>'
-        : '<span class="fi-status fi-missing">' + t('font.missing') + '</span>');
+      statusHtml;
     list.appendChild(div);
   }
 }
 
 async function handleFonts(files) {
   const requiredFonts = new Set();
+  const wantSys = document.getElementById('opt-sysfont').checked;
   for (const entry of S.assFiles) {
     for (const name of Object.keys(entry.parsed.externalFonts)) requiredFonts.add(name);
+    if (wantSys && entry.parsed.systemFontsReferenced) {
+      for (const name of Object.keys(entry.parsed.systemFontsReferenced)) requiredFonts.add(name);
+    }
   }
   const reqArr = Array.from(requiredFonts);
   let notMatched = 0;
@@ -1399,8 +1415,12 @@ async function loadLocalFonts() {
   try {
     const localFonts = await window.queryLocalFonts();
     const requiredFonts = new Set();
+    const wantSys = document.getElementById('opt-sysfont').checked;
     for (const entry of S.assFiles) {
       for (const name of Object.keys(entry.parsed.externalFonts)) requiredFonts.add(name.toLowerCase());
+      if (wantSys && entry.parsed.systemFontsReferenced) {
+        for (const name of Object.keys(entry.parsed.systemFontsReferenced)) requiredFonts.add(name.toLowerCase());
+      }
     }
     for (const font of localFonts) {
       const fam = font.family?.toLowerCase();
@@ -1511,7 +1531,7 @@ async function downloadAllZip() {
 
   if (!window.JSZip) {
     const s = document.createElement('script');
-    s.src = 'https://cdn.jsdelivr.net/npm/jszip@3/dist/jszip.min.js';
+    s.src = 'vendor/jszip.min.js';
     document.head.appendChild(s);
     await new Promise((r, j) => { s.onload = r; s.onerror = j; });
   }
@@ -1604,6 +1624,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const cbFont = document.getElementById('opt-font');
   const rowDraw = document.getElementById('opt-row-draw');
   const rowFont = document.getElementById('opt-row-font');
+  const optSysFont = document.getElementById('opt-sysfont');
+  const rowSysFont = document.getElementById('opt-row-sysfont');
+  
   cbDraw.addEventListener('change', () => {
     rowDraw.classList.toggle('selected', cbDraw.checked);
     document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
@@ -1611,8 +1634,12 @@ document.addEventListener('DOMContentLoaded', () => {
   cbFont.addEventListener('change', () => {
     rowFont.classList.toggle('selected', cbFont.checked);
     document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked);
-    document.getElementById('opt-sub-sysfont').classList.toggle('hidden', !cbFont.checked);
+    rowSysFont.classList.toggle('hidden', !cbFont.checked);
     document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked);
+  });
+  optSysFont.addEventListener('change', () => {
+    rowSysFont.classList.toggle('selected', optSysFont.checked);
+    renderFontList();
   });
 
 
@@ -1711,7 +1738,7 @@ function triggerPwaInstall() {
 }
 
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/ass-subset/sw.js', { scope: '/ass-subset/' }).catch(() => {});
+  navigator.serviceWorker.register('sw.js').catch(() => {});
 }
 
 
