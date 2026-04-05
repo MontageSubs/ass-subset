@@ -430,7 +430,7 @@ function buildDrawGlyph(drawStr, charCode) {
   if (hasContent) path.close();
   return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
 }
-function buildDrawingFont(uniqueDrawingsMap, existingFontBuffer, referencedChars, id) {
+function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id) {
   const notdef = new opentype.Glyph({
     name: '.notdef', unicode: 0, advanceWidth: EM, path: new opentype.Path()
   });
@@ -439,10 +439,10 @@ function buildDrawingFont(uniqueDrawingsMap, existingFontBuffer, referencedChars
   const dataToChar = new Map();
   const nextChar = (idx) => getVisibleChar(idx);
 
-  if (existingFontBuffer) {
+  if (existingFontBuffer && existingFontBuffer.byteLength > 0) {
     try {
       const existingFont = opentype.parse(existingFontBuffer);
-      const usedChars = new Set(referencedChars);
+      const usedChars = new Set(referencedCharsArray);
       for (const ch of usedChars) {
         const glyph = existingFont.charToGlyph(ch);
         if (glyph && glyph.index !== 0) {
@@ -464,8 +464,9 @@ function buildDrawingFont(uniqueDrawingsMap, existingFontBuffer, referencedChars
     }
   };
 
-  const sortedSubsets = Array.from(uniqueDrawingsMap.entries()).sort();
-  for (const [data, meta] of sortedSubsets) {
+  const sortedSubsets = Array.from(uniqueDrawingsArray).sort((a,b) => a.data.localeCompare(b.data));
+  for (const item of sortedSubsets) {
+    const data = item.data;
     const tempGlyph = buildDrawGlyph(data, 0);
     const normalizedData = tempGlyph.path.toPathData();
     
@@ -486,7 +487,10 @@ function buildDrawingFont(uniqueDrawingsMap, existingFontBuffer, referencedChars
     descender: -(EM - TARGET),
     glyphs: glyphs
   });
-  return { font, drawingDataToChar };
+  return { 
+    ttf: new Uint8Array(font.toArrayBuffer()), 
+    dataToCharArr: Object.entries(drawingDataToChar).map(([d, c]) => ({ data: d, char: c }))
+  };
 }
 function extractFontNames(fontObj) {
   const names = new Set();
