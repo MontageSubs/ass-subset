@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.1">
+  <meta name="version" content="2.1.2">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -208,7 +208,6 @@
       flex-shrink: 0;
     }
 
-    /* Language dropdown */
     .lang-wrap {
       position: relative;
     }
@@ -815,7 +814,6 @@
       color: var(--warn);
     }
 
-    /* Progress bar */
     .progress-wrap {
       margin-top: 1rem;
       background: var(--rule2);
@@ -844,7 +842,6 @@
       pointer-events: none;
     }
 
-    /* Preview modal */
     .modal-overlay {
       display: none;
       position: fixed;
@@ -907,7 +904,6 @@
       margin-top: 0.75rem;
     }
 
-    /* Font path hint */
     .font-path-hint {
       margin-bottom: 1rem;
     }
@@ -1238,7 +1234,6 @@
   </header>
 
   <main class="main">
-    <!-- Step 1: Upload -->
     <div class="step active" id="step1">
       <div class="step-head">
         <span class="step-num">1</span>
@@ -1255,7 +1250,6 @@
       </div>
     </div>
 
-    <!-- Step 2: Analysis -->
     <div class="step" id="step2" style="display:none">
       <div class="step-head">
         <span class="step-num">2</span>
@@ -1267,7 +1261,6 @@
       </div>
     </div>
 
-    <!-- Step 3: Options -->
     <div class="step" id="step3" style="display:none">
       <div class="step-head">
         <span class="step-num">3</span>
@@ -1321,7 +1314,6 @@
       </div>
     </div>
 
-    <!-- Step 4: Convert & Download -->
     <div class="step" id="step4" style="display:none">
       <div class="step-head">
         <span class="step-num">4</span>
@@ -1346,7 +1338,6 @@
     </div>
   </main>
 
-  <!-- Preview Modal -->
   <div class="modal-overlay" id="preview-modal">
     <div class="modal-box">
       <div class="modal-header">
@@ -1449,7 +1440,7 @@
         'footer.home': '主页',
         'footer.org': '蒙太奇字幕组 · MontageSubs',
         'footer.slogan': '用爱发电 ❤️ Powered by Love',
-        'footer.tool': '用爱打造 · ASS 在线子集化工具 (ass-subset) v2.1.0',
+        'footer.tool': '用爱打造 · ASS 在线子集化工具 (ass-subset)',
         'footer.license_prefix': '以',
         'footer.license_suffix': '开源',
         'stat.drawBlocks': '绘图块',
@@ -1538,7 +1529,7 @@
         'footer.home': 'Home',
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': 'Powered by Love ❤️ 用爱发电',
-        'footer.tool': 'ASS Subset Tool (Online) (ass-subset) v2.1.0',
+        'footer.tool': 'ASS Subset Tool (Online) (ass-subset)',
         'footer.license_prefix': 'Open source under',
         'footer.license_suffix': 'License',
         'stat.drawBlocks': 'Draw Blocks',
@@ -1612,7 +1603,6 @@
       document.getElementById('lang-zh').classList.toggle('active', currentLang === 'zh');
       document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
 
-      // SEO & Meta updates
       const title = t('app.title') + ' · ' + t('footer.org');
       document.title = title;
       const desc = t('app.desc') || document.querySelector('meta[name="description"]').content;
@@ -1642,7 +1632,6 @@
     const pendingCallbacks = new Map();
 
     async function initWorker() {
-      // Local file:// protocol requires Blob URL for importScripts
       if (window.location.protocol === 'file:') {
         try {
           const res = await fetch('worker.js');
@@ -1773,7 +1762,6 @@
         <div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">${t('status.parsing')}</div>
       `;
 
-      // Parse each file via worker
       for (const file of assFiles) {
         const raw = await file.text();
         const content = raw.startsWith('\uFEFF') ? raw.slice(1) : raw;
@@ -1816,7 +1804,6 @@
       const area = document.getElementById('analysis-area');
       area.innerHTML = '';
 
-      // Aggregate stats across all files
       let totalDrawings = 0, totalUnique = 0, totalExtFonts = new Set(), totalChars = 0;
       let hasDrawings = false, hasFonts = false, hasResubset = false;
 
@@ -1864,7 +1851,6 @@
         area.appendChild(notice);
       }
 
-      // Configure options
       const cbDraw = document.getElementById('opt-draw');
       const cbFont = document.getElementById('opt-font');
       const rowDraw = document.getElementById('opt-row-draw');
@@ -1892,7 +1878,6 @@
         updateStep4Visibility();
       }
 
-      // Check for system fonts to enable/disable button
       let hasSysFonts = false;
       for (const entry of S.assFiles) {
         if (entry.parsed.systemFontsReferenced && Object.keys(entry.parsed.systemFontsReferenced).length > 0) {
@@ -1990,13 +1975,11 @@
             for (const match of result.results) {
               const key = match.matchedFor.toLowerCase();
               const existing = S.uploadedFonts.get(key);
-              // Prefer exact family match and closer weight to 400
               if (!existing || (match.isFamilyMatch && !existing.isFamilyMatch)) {
-                // Need fresh buffer since we transferred it
                 const freshBuffer = await file.arrayBuffer();
                 S.uploadedFonts.set(key, {
                   file, buffer: freshBuffer, matchedFor: match.matchedFor,
-                  isTTC: result.isTTC, weight: match.weight, isFamilyMatch: match.isFamilyMatch
+                  isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight, isFamilyMatch: match.isFamilyMatch
                 });
               }
             }
@@ -2035,7 +2018,7 @@
               S.uploadedFonts.set(matchName, {
                 file: { name: font.fullName + ' (system)' },
                 buffer, matchedFor: font.family,
-                isTTC, weight: 400, isFamilyMatch: true, isSystem: true
+                isTTC, ttcIndex: 0, weight: 400, isFamilyMatch: true, isSystem: true
               });
             }
           }
@@ -2070,6 +2053,7 @@
           name: info.file.name,
           buffer: info.buffer,
           isTTC: info.isTTC,
+          ttcIndex: info.ttcIndex,
           matchedFor: info.matchedFor,
           weight: info.weight,
         });
@@ -2152,7 +2136,7 @@
       const buffers = S.fontBuffers;
       if (!buffers || buffers.length === 0) return;
 
-      const fb = buffers[0]; // show first font by default
+      const fb = buffers[0];
       try {
         const font = opentype.parse(fb.buffer instanceof ArrayBuffer ? fb.buffer : fb.buffer.slice(0).buffer);
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -2192,27 +2176,20 @@
     }
 
     document.addEventListener('DOMContentLoaded', () => {
-
       try { const saved = localStorage.getItem('ass-subset-lang'); if (saved) currentLang = saved; }
       catch (_) { }
       if (!localStorage.getItem('ass-subset-lang') && navigator.language && navigator.language.startsWith('en')) currentLang = 'en';
       applyI18n();
-
-
       const v = document.querySelector('meta[name="version"]');
       if (v) document.getElementById('ver').textContent += ' v' + v.content;
 
-
       renderFontPaths();
 
-
       initWorker();
-
 
       if ('queryLocalFonts' in window) {
         document.getElementById('btn-local-font').classList.remove('hidden');
       }
-
 
       const dzASS = document.getElementById('dz-ass');
       const inpASS = document.getElementById('inp-ass');
@@ -2220,7 +2197,6 @@
       dzASS.addEventListener('dragover', e => { e.preventDefault(); dzASS.classList.add('drag-over'); });
       dzASS.addEventListener('dragleave', () => dzASS.classList.remove('drag-over'));
       dzASS.addEventListener('drop', e => { e.preventDefault(); dzASS.classList.remove('drag-over'); if (e.dataTransfer.files.length) handleASSFiles(e.dataTransfer.files); });
-
 
       const cbDraw = document.getElementById('opt-draw');
       const cbFont = document.getElementById('opt-font');
@@ -2246,7 +2222,6 @@
         renderFontList();
       });
 
-
       const dzFont = document.getElementById('dz-font');
       const inpFont = document.getElementById('inp-font');
       inpFont.addEventListener('change', () => handleFonts(Array.from(inpFont.files)));
@@ -2254,18 +2229,14 @@
       dzFont.addEventListener('dragleave', () => dzFont.style.borderColor = '');
       dzFont.addEventListener('drop', e => { e.preventDefault(); dzFont.style.borderColor = ''; handleFonts(Array.from(e.dataTransfer.files)); });
 
-
       document.getElementById('btn-local-font').addEventListener('click', loadLocalFonts);
 
-
       document.getElementById('btn-convert').addEventListener('click', doConvert);
-
 
       document.addEventListener('click', e => {
         const wrap = document.getElementById('lang-wrap');
         if (!wrap.contains(e.target)) wrap.classList.remove('open');
       });
-
 
       document.getElementById('preview-modal').addEventListener('click', e => {
         if (e.target === e.currentTarget) closePreview();

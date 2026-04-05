@@ -84,7 +84,7 @@ function assUUDecode(encodedLines) {
 function extractTTFFromTTC(buffer, index) {
   const view = new DataView(buffer);
   const tag = view.getUint32(0, false);
-  if (tag !== 0x74746366) return buffer; // Not a TTC
+  if (tag !== 0x74746366) return buffer;
   const numFonts = view.getUint32(8, false);
   if (index >= numFonts) throw new Error(`TTC index ${index} out of range (max ${numFonts - 1})`);
   const offsetTablePos = view.getUint32(12 + index * 4, false);
@@ -320,10 +320,9 @@ function parseDialogueText(text, styleInfo, tStart, tEnd,
   }
 }
 function getVisibleChar(index) {
-  if (index < 26) return String.fromCharCode(97 + index); // a-z
-  if (index < 52) return String.fromCharCode(65 + index - 26); // A-Z
-  if (index < 62) return String.fromCharCode(48 + index - 52); // 0-9
-  // Safe symbols excluding ASS sensitive: {}, :, \, -, ,, =
+  if (index < 26) return String.fromCharCode(97 + index);
+  if (index < 52) return String.fromCharCode(65 + index - 26);
+  if (index < 62) return String.fromCharCode(48 + index - 52);
   const symbols = "!#$%&()*+./;<>?@[]^_`|~";
   if (index < 62 + symbols.length) return symbols[index - 62];
   return String.fromCodePoint(0x4E00 + (index - 62 - symbols.length));
