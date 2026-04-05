@@ -70,7 +70,8 @@ opentype.js is used for font file parsing and binary construction. JSZip is used
 ass-subset/
 ├── index.html              # Tool (single-file, all logic included)
 ├── worker.js               # Web Worker (main processing logic)
-├── manifest.json           # PWA manifest
+├── manifest.json           # PWA manifest (Chinese)
+├── manifest-en.json        # PWA manifest (English)
 ├── sw.js                   # Service Worker (caching strategy)
 ├── sitemap.xml             # Sitemap for search engines
 ├── vendor/
