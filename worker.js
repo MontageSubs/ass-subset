@@ -241,7 +241,7 @@ function parseASSText(text, id) {
     externalFonts,
     systemFontsReferenced,
     drawings: drawings.length,
-    uniqueDrawings: serializeUniqueDrawings(uniqueDrawings),
+    uniqueDrawings: Array.from(uniqueDrawings.entries()).map(([data, meta]) => ({ data, ...meta })),
     playResX, playResY,
     lineCount: totalLines,
     hasExistingDrawSubset,
