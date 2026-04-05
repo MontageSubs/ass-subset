@@ -320,14 +320,25 @@ function parseDialogueText(text, styleInfo, tStart, tEnd,
   }
 }
 function getVisibleChar(index) {
+  const skip = new Set([
+    44, 123, 125, 92, 58, 59, // , { } \ : ;
+    32, 45, // space, -
+  ]);
+  const priority = [];
+  for (let i = 65; i <= 90; i++) priority.push(i);
+  for (let i = 97; i <= 122; i++) priority.push(i);
+  if (index < priority.length) return String.fromCharCode(priority[index]);
+
   let charCode = 33;
-  let skipped = 0;
-  while (skipped < index) {
+  let found = priority.length;
+  while (found <= index) {
+    const isPri = (charCode >= 65 && charCode <= 90) || (charCode >= 97 && charCode <= 122);
+    const isCtl = (charCode < 32 || (charCode >= 127 && charCode <= 160));
+    if (!isPri && !isCtl && !skip.has(charCode)) {
+      if (found === index) return String.fromCharCode(charCode);
+      found++;
+    }
     charCode++;
-    const s = String.fromCharCode(charCode);
-    if ([',', '{', '}', '\\'].includes(s)) continue;
-    if (charCode >= 127 && charCode <= 160) continue;
-    skipped++;
   }
   return String.fromCharCode(charCode);
 }

@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.8">
+  <meta name="version" content="2.1.9">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1257,7 +1257,7 @@
           <div class="dz-main" data-i18n="step1.drop">拖拽字幕文件到此，或点击选择</div>
           <div class="dz-hint" data-i18n="step1.hint">ASS / SSA 格式 (.ass / .ssa)，支持多选批量转换</div>
         </label>
-        <input type="file" id="inp-ass" accept=".ass,.ssa" multiple class="file-input-hidden">
+        <input type="file" id="inp-ass" accept=".ass,.ssa,.zip" multiple class="file-input-hidden">
         <div id="ass-badge" class="hidden mt2"></div>
       </div>
     </div>
@@ -1315,7 +1315,7 @@
           <label class="font-upload-zone" id="dz-font" for="inp-font" aria-label="上传字体文件">
             <span data-i18n="font.upload.drop">点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）</span>
           </label>
-          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc" multiple class="file-input-hidden">
+          <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.zip" multiple class="file-input-hidden">
           <details class="font-path-hint">
             <summary data-i18n="font.path.summary">💡 常见字体安装路径</summary>
             <div class="paths" id="font-paths"></div>
@@ -1429,7 +1429,7 @@
         'btn.dl_font': '下载字体',
         'step1.title': '上传字幕文件',
         'step1.drop': '拖拽字幕文件到此，或点击选择',
-        'step1.hint': 'ASS / SSA 格式 (.ass / .ssa)，支持多选批量转换',
+        'step1.hint': 'ASS / SSA 格式 (.ass / .ssa) 或 ZIP 压缩包，支持多选',
         'step2.title': '分析结果',
         'step3.title': '选择操作',
         'step4.title': '转换 & 下载',
@@ -1442,7 +1442,7 @@
         'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。',
         'notice.drawing': '注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
         'font.upload.title': '上传字体文件',
-        'font.upload.drop': '点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
+        'font.upload.drop': '点击选择字体或 ZIP 压缩包，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
         'font.path.summary': '💡 常见字体安装路径',
         'font.local.btn': '从系统自动加载字体',
         'preview.title': '字体预览',
@@ -1492,6 +1492,7 @@
         'log.draw.none': '[draw] 未发现 \\p1 绘图指令，跳过。',
         'log.draw.kept_existing': '[draw] 保留已有绘图子集中的 {count} 个字符',
         'log.draw.decode_fail': '[draw] ⚠ 无法解码已有绘图字体，将重新生成',
+        'log.draw.item': '  - 字符: {char} | 计数: {count} | 时间轴: [{start} -> {end}]',
         'log.font.none_external': '[font] 未发现需嵌入的外部字体。',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
         'log.font.weight_fallback': '[font] ⚠ 「{name}」未找到粗体字体，使用已有字体替代。',
@@ -1518,7 +1519,7 @@
         'btn.dl_font': 'Download Font',
         'step1.title': 'Upload Subtitle File',
         'step1.drop': 'Drag and drop subtitle file here, or click to select',
-        'step1.hint': 'ASS / SSA format (.ass / .ssa), multi-select supported',
+        'step1.hint': 'ASS / SSA format (.ass / .ssa) or ZIP archives, multi-select supported',
         'step2.title': 'Analysis Results',
         'step3.title': 'Choose Operations',
         'step4.title': 'Convert & Download',
@@ -1531,7 +1532,7 @@
         'notice.copyright': '⚠ Copyright Notice: Distributing unauthorized font files may constitute infringement. Ensure you have distribution rights for embedded fonts.',
         'notice.drawing': 'Note: After converting drawing instructions, effects may shift slightly. Please check the final result manually.',
         'font.upload.title': 'Upload Font Files',
-        'font.upload.drop': 'Click to select font files, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
+        'font.upload.drop': 'Click to select font or ZIP archive, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
         'font.path.summary': '💡 Common font installation paths',
         'font.local.btn': 'Load fonts from system automatically',
         'preview.title': 'Font Preview',
@@ -1581,6 +1582,7 @@
         'log.draw.none': '[draw] No \\p1 drawing instructions found, skipping.',
         'log.draw.kept_existing': '[draw] Kept {count} chars from existing drawing subset',
         'log.draw.decode_fail': '[draw] ⚠ Failed to decode existing drawing font, regenerating',
+        'log.draw.item': '  - Character: {char} | Count: {count} | Timeline: [{start} -> {end}]',
         'log.font.none_external': '[font] No external fonts to embed.',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) not uploaded, skipping.',
         'log.font.weight_fallback': '[font] ⚠ Bold variant not found for "{name}", using available font.',
@@ -2156,7 +2158,7 @@
           if (result.detailedDrawings && result.detailedDrawings.length > 0) {
             log(t('log.draw.summary', { count: result.detailedDrawings.length }), 'info');
             result.detailedDrawings.forEach(d => {
-              log(`  - Character: ${d.char} | Count: ${d.count} | Timeline: [${d.firstStart} -> ${d.lastStart}]`, 'info');
+              log(t('log.draw.item', { char: d.char, count: d.count, start: d.firstStart, end: d.lastStart }), 'info');
             });
           }
 
