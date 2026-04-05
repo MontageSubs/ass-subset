@@ -34,7 +34,7 @@ const SYSTEM_FONTS = new Set([
   'liberation sans', 'liberation serif', 'liberation mono',
   'noto sans', 'noto serif', 'noto sans cjk sc', 'noto sans cjk tc', 'noto sans cjk jp',
   'noto sans cjk kr', 'wqy microhei', 'wqy zenhei', 'droid sans', 'droid sans fallback',
-  'assdrawsubset_montagesubs',
+  'assdrawsubset_montagesubs', 'assdrawsubset',
 ]);
 function emitProgress(id, phase, current, total) {
   self.postMessage({ type: 'progress', id, phase, current, total });
