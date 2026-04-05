@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.0.2">
+  <meta name="version" content="2.1.0">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1227,7 +1227,8 @@
       <a href="https://subs.js.org/svg-to-ass/" target="_blank" rel="noopener" class="btn-hdr" data-i18n="btn.svg">SVG 转
         ASS 绘图指令</a>
       <div class="lang-wrap" id="lang-wrap">
-        <button class="btn-hdr" onclick="document.getElementById('lang-wrap').classList.toggle('open')">🌐</button>
+        <button class="btn-hdr" onclick="document.getElementById('lang-wrap').classList.toggle('open')"
+          aria-label="Switch Language">A/文</button>
         <div class="lang-menu">
           <button onclick="setLang('zh')" id="lang-zh" class="active">中文</button>
           <button onclick="setLang('en')" id="lang-en">English</button>
@@ -1367,7 +1368,7 @@
   <footer class="site-footer">
     <div class="footer-left">
       <nav class="footer-nav">
-        <a href="https://subs.js.org/" target="_blank" rel="noopener">主页</a>
+        <a href="https://subs.js.org/" target="_blank" rel="noopener" data-i18n="footer.home">主页</a>
         <span class="footer-sep">|</span>
         <a href="https://t.me/s/MTSubs" target="_blank" rel="noopener">Telegram</a>
         <span class="footer-sep">|</span>
@@ -1378,16 +1379,19 @@
         <a href="https://bsky.app/profile/montagesubs.bsky.social" target="_blank" rel="noopener">BlueSky</a>
       </nav>
       <div class="footer-brand">
-        <span class="footer-org">蒙太奇字幕组 · MontageSubs</span>
-        <span class="footer-slogan">用爱发电 ❤️ Powered by Love</span>
+        <span class="footer-org" data-i18n="footer.org">蒙太奇字幕组 · MontageSubs</span>
+        <span class="footer-slogan" data-i18n="footer.slogan">用爱发电 ❤️ Powered by Love</span>
       </div>
     </div>
     <div class="footer-right">
       <div class="footer-line">
-        以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT
-          License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
+        <span data-i18n="footer.license_prefix">以</span>
+        <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT
+          License</a>
+        <span data-i18n="footer.license_suffix">开源</span>
+        · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
       </div>
-      <div class="footer-line"><span id="ver">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
+      <div class="footer-line"><span id="ver" data-i18n="footer.tool">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
       <div class="footer-btns">
         <a href="https://github.com/MontageSubs/ass-subset/issues" target="_blank" rel="noopener" class="footer-btn"
           data-i18n="footer.feedback">反馈</a>
@@ -1442,6 +1446,12 @@
         'discuss.loading': '加载中…',
         'footer.feedback': '反馈',
         'footer.source': '查看源代码',
+        'footer.home': '主页',
+        'footer.org': '蒙太奇字幕组 · MontageSubs',
+        'footer.slogan': '用爱发电 ❤️ Powered by Love',
+        'footer.tool': '用爱打造 · ASS 在线子集化工具 (ass-subset) v2.1.0',
+        'footer.license_prefix': '以',
+        'footer.license_suffix': '开源',
         'stat.drawBlocks': '绘图块',
         'stat.uniqueShapes': '唯一形状',
         'stat.extFonts': '外部字体',
@@ -1470,8 +1480,8 @@
         'font.weight.normal': '常规',
         'font.weight.bold': '粗体',
         'font.match_fail': '{n} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。',
-        'path.win': 'Windows：C:\\Windows\\Fonts',
-        'path.mac': 'macOS：/Library/Fonts 或 ~/Library/Fonts',
+        'path.win': 'Windows：C:\\Windows\\Fonts (建议先复制到桌面再上传)',
+        'path.mac': 'macOS：/Library/Fonts (建议先复制到桌面再上传)',
         'path.linux': 'Linux：~/.fonts 或 /usr/share/fonts',
         'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体…',
         'log.draw.done': '[draw] 绘图字体生成完毕：{size} KB',
@@ -1491,11 +1501,11 @@
         'leave.confirm': '转换正在进行中，确定要离开吗？',
       },
       en: {
-        'app.title': 'ASS Online Subset Tool',
+        'app.title': 'ASS Subset Tool (Online)',
         'app.subtitle': 'Drawing Subsetting · Font Subset Embedding',
         'btn.install': 'Install',
         'btn.discuss': 'Discuss',
-        'btn.svg': 'SVG to ASS Drawing',
+        'btn.svg': 'SVG to ASS Draw',
         'btn.convert': 'Start Conversion',
         'btn.converting': 'Processing…',
         'btn.download': 'Download Optimized Subtitle',
@@ -1525,6 +1535,12 @@
         'discuss.loading': 'Loading…',
         'footer.feedback': 'Feedback',
         'footer.source': 'Source Code',
+        'footer.home': 'Home',
+        'footer.org': 'MontageSubs · 蒙太奇字幕组',
+        'footer.slogan': 'Powered by Love ❤️ 用爱发电',
+        'footer.tool': 'ASS Subset Tool (Online) (ass-subset) v2.1.0',
+        'footer.license_prefix': 'Open source under',
+        'footer.license_suffix': 'License',
         'stat.drawBlocks': 'Draw Blocks',
         'stat.uniqueShapes': 'Unique Shapes',
         'stat.extFonts': 'External Fonts',
@@ -1553,8 +1569,8 @@
         'font.weight.normal': 'Regular',
         'font.weight.bold': 'Bold',
         'font.match_fail': '{n} font file(s) did not match any referenced font name. Please check.',
-        'path.win': 'Windows: C:\\Windows\\Fonts',
-        'path.mac': 'macOS: /Library/Fonts or ~/Library/Fonts',
+        'path.win': 'Windows: C:\\Windows\\Fonts (Suggest copy to desktop before upload)',
+        'path.mac': 'macOS: /Library/Fonts (Suggest copy to desktop before upload)',
         'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
         'log.draw.building': '[draw] Found {unique} unique shapes, {total} references, building font…',
         'log.draw.done': '[draw] Drawing font generated: {size} KB',
@@ -1595,6 +1611,14 @@
       document.documentElement.lang = currentLang === 'zh' ? 'zh-CN' : 'en';
       document.getElementById('lang-zh').classList.toggle('active', currentLang === 'zh');
       document.getElementById('lang-en').classList.toggle('active', currentLang === 'en');
+
+      // SEO & Meta updates
+      const title = t('app.title') + ' · ' + t('footer.org');
+      document.title = title;
+      const desc = t('app.desc') || document.querySelector('meta[name="description"]').content;
+      document.querySelector('meta[name="description"]').setAttribute('content', desc);
+      document.querySelector('meta[property="og:title"]')?.setAttribute('content', title);
+      document.querySelector('meta[property="og:description"]')?.setAttribute('content', t('app.subtitle'));
     }
 
     function setLang(lang) {
@@ -1617,8 +1641,23 @@
     let msgIdCounter = 0;
     const pendingCallbacks = new Map();
 
-    function initWorker() {
-      worker = new Worker('worker.js');
+    async function initWorker() {
+      // Local file:// protocol requires Blob URL for importScripts
+      if (window.location.protocol === 'file:') {
+        try {
+          const res = await fetch('worker.js');
+          const text = await res.text();
+          const opentypeUrl = document.querySelector('script[src*="opentype"]')?.src || 'vendor/opentype.min.js';
+          const blob = new Blob([`const OPENTYPE_PATH = '${opentypeUrl}';\n` + text], { type: 'application/javascript' });
+          worker = new Worker(URL.createObjectURL(blob));
+        } catch (e) {
+          console.error('Local worker fallback failed:', e);
+          worker = new Worker('worker.js');
+        }
+      } else {
+        worker = new Worker('worker.js');
+      }
+
       worker.onmessage = function (e) {
         const msg = e.data;
         if (msg.type === 'ready') { workerReady = true; return; }
@@ -1646,14 +1685,21 @@
     }
 
     function handleProgress(msg) {
-      const area = document.getElementById('progress-area');
-      const bar = document.getElementById('progress-bar');
-      const txt = document.getElementById('progress-text');
+      const isParse = msg.phase === 'parse';
+      const area = document.getElementById(isParse ? 'analysis-progress-area' : 'progress-area');
+      const bar = document.getElementById(isParse ? 'analysis-progress-bar' : 'progress-bar');
+      const txt = document.getElementById(isParse ? 'analysis-progress-text' : 'progress-text');
+      if (!area || !bar || !txt) return;
+
       area.classList.remove('hidden');
       const pct = msg.total > 0 ? Math.round((msg.current / msg.total) * 100) : 0;
       bar.style.width = pct + '%';
       const phaseKey = { parse: 'status.parsing', subset: 'status.subset', rewrite: 'status.rewrite' }[msg.phase] || '';
       txt.textContent = (phaseKey ? t(phaseKey) + ' ' : '') + pct + '%';
+
+      if (pct === 100 && isParse) {
+        setTimeout(() => area.classList.add('hidden'), 500);
+      }
     }
 
     function handleWorkerLog(msg) {
@@ -1717,7 +1763,15 @@
       document.getElementById('step4').style.display = 'none';
 
       const area = document.getElementById('analysis-area');
-      area.innerHTML = '<div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">' + t('status.parsing') + '</div>';
+      area.innerHTML = `
+        <div id="analysis-progress-area" class="progress-container hidden" style="margin-bottom:1rem;">
+          <div class="progress-info">
+            <span id="analysis-progress-text" class="progress-text"></span>
+          </div>
+          <div class="progress-track"><div id="analysis-progress-bar" class="progress-bar"></div></div>
+        </div>
+        <div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">${t('status.parsing')}</div>
+      `;
 
       // Parse each file via worker
       for (const file of assFiles) {
@@ -1835,7 +1889,41 @@
       if (hasDrawings || hasFonts) {
         document.getElementById('step3').style.display = '';
         document.getElementById('step3').classList.add('active');
-        document.getElementById('step4').style.display = '';
+        updateStep4Visibility();
+      }
+
+      // Check for system fonts to enable/disable button
+      let hasSysFonts = false;
+      for (const entry of S.assFiles) {
+        if (entry.parsed.systemFontsReferenced && Object.keys(entry.parsed.systemFontsReferenced).length > 0) {
+          hasSysFonts = true;
+          break;
+        }
+      }
+      const btnLocal = document.getElementById('btn-local-font');
+      const optSys = document.getElementById('opt-sysfont');
+      if (!hasSysFonts) {
+        btnLocal.disabled = true;
+        optSys.disabled = true;
+        optSys.checked = false;
+        document.getElementById('opt-row-sysfont').classList.add('disabled');
+      } else {
+        btnLocal.disabled = false;
+        optSys.disabled = false;
+        document.getElementById('opt-row-sysfont').classList.remove('disabled');
+      }
+    }
+
+    function updateStep4Visibility() {
+      const wantDraw = document.getElementById('opt-draw').checked;
+      const wantFont = document.getElementById('opt-font').checked;
+      const step4 = document.getElementById('step4');
+      if (wantDraw || wantFont) {
+        step4.style.display = '';
+        step4.classList.add('active');
+      } else {
+        step4.style.display = 'none';
+        step4.classList.remove('active');
       }
     }
 
@@ -1942,10 +2030,12 @@
             if (!S.uploadedFonts.has(matchName)) {
               const blob = await font.blob();
               const buffer = await blob.arrayBuffer();
+              const view = new DataView(buffer);
+              const isTTC = buffer.byteLength > 12 && view.getUint32(0, false) === 0x74746366;
               S.uploadedFonts.set(matchName, {
                 file: { name: font.fullName + ' (system)' },
                 buffer, matchedFor: font.family,
-                isTTC: false, weight: 400, isFamilyMatch: true, isSystem: true
+                isTTC, weight: 400, isFamilyMatch: true, isSystem: true
               });
             }
           }
@@ -2142,12 +2232,14 @@
       cbDraw.addEventListener('change', () => {
         rowDraw.classList.toggle('selected', cbDraw.checked);
         document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
+        updateStep4Visibility();
       });
       cbFont.addEventListener('change', () => {
         rowFont.classList.toggle('selected', cbFont.checked);
         document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked);
         rowSysFont.classList.toggle('hidden', !cbFont.checked);
         document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked);
+        updateStep4Visibility();
       });
       optSysFont.addEventListener('change', () => {
         rowSysFont.classList.toggle('selected', optSysFont.checked);
