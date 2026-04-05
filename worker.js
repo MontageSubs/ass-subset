@@ -641,46 +641,40 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
 }
 function rewriteASS(rawContent, opts, id) {
   const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts } = opts;
-  const lines = rawContent.split(/\r?\n/);
-  const totalLines = lines.length;
-  const sections = [];
-  let currentSection = { header: null, lines: [] };
-  const sectionRegex = /^\[[A-Za-z0-9+ ]+\]$/;
-  for (let i = 0; i < totalLines; i++) {
-    if (i % PROGRESS_INTERVAL === 0) emitProgress(id, 'rewrite', i, totalLines);
-    const line = lines[i];
-    const trimmed = line.trim();
-    if (sectionRegex.test(trimmed)) {
-      if (currentSection.header !== null || currentSection.lines.length > 0) {
-        sections.push(currentSection);
-      }
-      currentSection = { header: trimmed, lines: [] };
-    } else {
-      currentSection.lines.push(line);
-    }
-  }
-  sections.push(currentSection);
+  const blockRegex = /\r?\n(?=\[(?:Script Info|v4\+\s+Styles|v4\s+Styles|Styles|Events|Fonts|Graphics|Aegisub\s+(?:Extradata|Project\s+Garbage))\])/i;
+  const blocks = rawContent.split(blockRegex);
+  const totalBlocks = blocks.length;
+  const processedBlocks = [];
   let fontInsertIndex = -1;
-  const processedSections = [];
-  for (let i = 0; i < sections.length; i++) {
-    const sec = sections[i];
-    const headLower = (sec.header || '').toLowerCase();
-    if (headLower === '[fonts]') {
-      if (fontInsertIndex === -1) fontInsertIndex = processedSections.length;
+
+  for (let i = 0; i < totalBlocks; i++) {
+    if (i % 5 === 0) emitProgress(id, 'rewrite', i, totalBlocks);
+    const block = blocks[i];
+    const trimmed = block.trim();
+    if (!trimmed) continue;
+
+    const header = (trimmed.match(/^\[([^\]]+)\]/i)?.[1] || '').toLowerCase();
+    if (header === 'fonts') {
+      if (fontInsertIndex === -1) fontInsertIndex = processedBlocks.length;
       continue;
     }
-    if (headLower === '[events]') {
-      sec.lines = sec.lines.map(l => {
+
+    if (header === 'events') {
+      const lines = block.split(/\r?\n/);
+      const newLines = lines.map(l => {
         if (/^dialogue\s*:/i.test(l.trim())) {
           return replaceDrawingsInLine(l, drawingDataToChar, drawFontFamily);
         }
         return l;
       });
+      processedBlocks.push(newLines.join('\n'));
+    } else {
+      processedBlocks.push(block);
     }
-    processedSections.push(sec);
   }
+
   if (drawTTF || (embeddedFonts && embeddedFonts.length > 0)) {
-    const newFontLines = [];
+    const newFontLines = ['[Fonts]'];
     const encodeAndAppend = (fontName, ttfData) => {
       newFontLines.push(`fontname: ${fontName}_0.ttf`);
       const enc = assUUEncode(ttfData);
@@ -689,17 +683,20 @@ function rewriteASS(rawContent, opts, id) {
     };
     if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
     if (embeddedFonts) embeddedFonts.forEach(ef => encodeAndAppend(ef.name, ef.ttf));
-    const newSec = { header: '[Fonts]', lines: newFontLines };
-    if (fontInsertIndex !== -1) {
-      processedSections.splice(fontInsertIndex, 0, newSec);
+
+    const newSec = newFontLines.join('\n');
+    if (fontInsertIndex !== -1 && fontInsertIndex < processedBlocks.length) {
+      processedBlocks.splice(fontInsertIndex, 0, newSec);
     } else {
-      processedSections.push(newSec);
+      processedBlocks.push(newSec);
     }
   }
-  emitProgress(id, 'rewrite', totalLines, totalLines);
-  return processedSections.map(s => (s.header ? s.header + '\n' : '') + s.lines.join('\n')).join('\n');
+  emitProgress(id, 'rewrite', totalBlocks, totalBlocks);
+  return processedBlocks.join('\n');
 }
+
 function replaceDrawingsInLine(line, dataToCharArr, fontFamily) {
+  if (!dataToCharArr || dataToCharArr.length === 0) return line;
   return line.replace(
     /(\{[^}]*?\\p[1-9][^}]*?\})([\s\S]*?)(\{[^}]*?\\p0[^}]*?\})/gi,
     (match, startTag, data, endTag) => {
