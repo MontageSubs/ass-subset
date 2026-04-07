@@ -296,7 +296,7 @@ function parseDialogueText(text, styleInfo, tStart, tEnd,
       }
     } else if (seg) {
       if (drawing) {
-        drawData += seg;
+        drawData += (drawData.length > 0 && !drawData.endsWith(' ') ? ' ' : '') + seg;
       } else if (isDrawSubsetFont) {
         for (const ch of seg) {
           if (ch !== '\n' && ch !== '\r' && ch.trim() !== '') {
@@ -740,7 +740,8 @@ function replaceDrawingsInLine(line, dataToCharArr, fontFamily) {
   return line.replace(
     /(\{[^}]*?\\p[1-9][^}]*?\})([\s\S]*?)(\{[^}]*?\\p0[^}]*?\})/gi,
     (match, startTag, data, endTag) => {
-      const clean = data.trim().replace(/\s+/g, ' ');
+      const strippedData = data.replace(/\{[^}]*\}/g, ' ');
+      const clean = strippedData.trim().replace(/\s+/g, ' ');
       const entry = dataToCharArr.find(e => e.data === clean);
       if (!entry) return match;
       const newStart = startTag.replace(/\\p[1-9]/i, `\\fn${fontFamily}\\p0`);
@@ -855,6 +856,7 @@ function doConvert(data, id) {
   for (const ef of embeddedFonts) {
     fontBuffers.push({ name: ef.name, buffer: ef.ttf.buffer, isDrawing: false, weight: ef.weight });
   }
+  const drawMap = new Map((drawingDataToChar || []).map(e => [e.data, e.char]));
   return {
     finalText: '\uFEFF' + finalText,
     origSize, newSize,
@@ -865,7 +867,7 @@ function doConvert(data, id) {
       uniqueDrawings: parsed.uniqueDrawings.length,
     },
     detailedDrawings: Array.from(parsed.uniqueDrawings.values()).map(d => ({
-      char: drawingDataToChar[d.data] || d.char,
+      char: drawMap.get(d.data) || d.char,
       count: d.count,
       firstStart: d.firstStart, firstEnd: d.firstEnd,
       lastStart: d.lastStart, lastEnd: d.lastEnd

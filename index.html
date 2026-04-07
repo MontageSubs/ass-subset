@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.12">
+  <meta name="version" content="2.1.13">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1391,10 +1391,9 @@
     <div class="footer-right">
       <div class="footer-line">
         <span data-i18n="footer.license_prefix">以</span>
-        <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT
-        </a>
-        <span data-i18n="footer.license_suffix">许可证开源</span>
-        · <span data-i18n="footer.based">基于</span> <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
+        <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
+        <span data-i18n="footer.license_suffix">License 开源</span>
+        · <span data-i18n="footer.based_on">基于</span> <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
       </div>
       <div class="footer-line"><span id="ver" data-i18n="footer.tool">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
       <div class="footer-btns">
@@ -1456,8 +1455,8 @@
         'footer.slogan': '用爱发电 ❤️ Powered by Love',
         'footer.tool': '用爱打造 · ASS 在线子集化工具 (ass-subset)',
         'footer.license_prefix': '以',
-        'footer.license_suffix': '许可证开源',
-        'footer.based': '基于',
+        'footer.license_suffix': 'License 开源',
+        'footer.based_on': '基于',
         'stat.drawBlocks': '绘图块',
         'stat.uniqueShapes': '唯一形状',
         'stat.extFonts': '外部字体',
@@ -1472,6 +1471,7 @@
         'err.format': '⚠ 请上传 .ass 或 .ssa 格式的字幕文件。',
         'err.invalid': '⚠ 文件格式验证失败：「{name}」不是有效的 ASS/SSA 字幕文件。',
         'err.no_events': '⚠ 文件格式验证失败：「{name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。',
+        'err.zip_depth': '⚠ ZIP 嵌套层数超过 10 层限制，已停止解压。',
         'status.analyzing': '正在分析… {current}/{total}',
         'status.parsing': '正在解析字幕…',
         'status.subset': '正在子集化…',
@@ -1549,7 +1549,7 @@
         'footer.tool': 'ASS Subset Tool (Online) (ass-subset)',
         'footer.license_prefix': 'Open source under',
         'footer.license_suffix': 'License',
-        'footer.based': 'Based on',
+        'footer.based_on': 'Built on',
         'stat.drawBlocks': 'Draw Blocks',
         'stat.uniqueShapes': 'Unique Shapes',
         'stat.extFonts': 'External Fonts',
@@ -1564,6 +1564,7 @@
         'err.format': '⚠ Please upload .ass or .ssa subtitle files.',
         'err.invalid': '⚠ Format validation failed: "{name}" is not a valid ASS/SSA file.',
         'err.no_events': '⚠ Format validation failed: "{name}" is missing Format or Dialogue lines in [Events].',
+        'err.zip_depth': '⚠ ZIP nesting exceeds 10 levels, extraction stopped.',
         'status.analyzing': 'Analyzing… {current}/{total}',
         'status.parsing': 'Parsing subtitle…',
         'status.subset': 'Subsetting…',
@@ -1766,7 +1767,7 @@
       }
     }
     async function processZipFile(file, type, depth = 0) {
-      if (depth > 3) return [];
+      if (depth >= 10) throw new Error('err.zip_depth');
       const zip = await JSZip.loadAsync(file);
       const results = [];
       for (const [name, entry] of Object.entries(zip.files)) {
@@ -1774,8 +1775,9 @@
         const lowName = name.toLowerCase();
         if (type === 'ass' && (lowName.endsWith('.ass') || lowName.endsWith('.ssa'))) {
           const buf = await entry.async('arraybuffer');
-          const content = await decodeText(buf);
-          results.push({ file: { name: entry.name, size: buf.byteLength }, content });
+          const rawContent = await decodeText(buf);
+          const strippedContent = rawContent.startsWith('\uFEFF') ? rawContent.slice(1) : rawContent;
+          results.push({ file: { name: entry.name, size: buf.byteLength }, content: strippedContent });
         } else if (type === 'font' && (lowName.endsWith('.ttf') || lowName.endsWith('.otf') || lowName.endsWith('.ttc'))) {
           const buf = await entry.async('arraybuffer');
           results.push({ file: { name: entry.name, size: buf.byteLength }, buffer: buf });
@@ -1795,7 +1797,16 @@
           try {
             const extracted = await processZipFile(f, 'ass');
             assEntries.push(...extracted);
-          } catch (e) { }
+          } catch (e) {
+            const errMsg = t(e.message) || e.message;
+            document.getElementById('step1').classList.remove('active');
+            document.getElementById('step1').classList.add('done');
+            document.getElementById('step2').style.display = '';
+            document.getElementById('step2').classList.add('active');
+            document.getElementById('dz-ass').style.display = 'none';
+            document.getElementById('analysis-area').innerHTML = '<div class="upload-error">' + errMsg + '</div>';
+            return;
+          }
         } else if (/\.(ass|ssa)$/i.test(f.name)) {
           const buf = await f.arrayBuffer();
           const text = await decodeText(buf);
@@ -1804,6 +1815,11 @@
         }
       }
       if (assEntries.length === 0) {
+        document.getElementById('step1').classList.remove('active');
+        document.getElementById('step1').classList.add('done');
+        document.getElementById('step2').style.display = '';
+        document.getElementById('step2').classList.add('active');
+        document.getElementById('dz-ass').style.display = 'none';
         document.getElementById('analysis-area').innerHTML = '<div class="upload-error">' + t('err.format') + '</div>';
         return;
       }
