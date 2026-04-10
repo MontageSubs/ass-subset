@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.23">
+  <meta name="version" content="2.1.24">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -2082,7 +2082,7 @@
       let notMatched = 0;
       for (const entry of fontEntries) {
         try {
-          const result = await workerCall('matchFont', { buffer: entry.buffer, requiredFonts: reqArr }, [entry.buffer]);
+          const result = await workerCall('matchFont', { buffer: entry.buffer, requiredFonts: reqArr });
           if (result.results && result.results.length > 0) {
             for (const match of result.results) {
               const key = match.matchedFor.toLowerCase();
@@ -2107,6 +2107,14 @@
     async function loadLocalFonts() {
       if (!('queryLocalFonts' in window)) return;
       try {
+        const SYSTEM_FONT_ALIASES = {
+          "microsoft yahei": ["微软雅黑", "microsoft yahei ui"],
+          "微软雅黑": ["microsoft yahei", "microsoft yahei ui"],
+          "simhei": ["黑体"],
+          "黑体": ["simhei"],
+          "simsun": ["宋体"],
+          "宋体": ["simsun"]
+        };
         const localFonts = await window.queryLocalFonts();
         const requiredFonts = new Set();
         const wantSys = document.getElementById('opt-sysfont').checked;
@@ -2119,8 +2127,17 @@
         for (const font of localFonts) {
           const fam = font.family?.toLowerCase();
           const full = font.fullName?.toLowerCase();
-          if (requiredFonts.has(fam) || requiredFonts.has(full)) {
-            const matchName = requiredFonts.has(fam) ? fam : full;
+          const aliasesFam = SYSTEM_FONT_ALIASES[fam] || [];
+          const aliasesFull = SYSTEM_FONT_ALIASES[full] || [];
+          const isMatch = requiredFonts.has(fam) || requiredFonts.has(full) ||
+            aliasesFam.some(a => requiredFonts.has(a)) ||
+            aliasesFull.some(a => requiredFonts.has(a));
+
+          if (isMatch) {
+            const matchName = requiredFonts.has(fam) ? fam :
+              (requiredFonts.has(full) ? full :
+                (aliasesFam.find(a => requiredFonts.has(a)) ||
+                  aliasesFull.find(a => requiredFonts.has(a))));
             if (!S.uploadedFonts.has(matchName)) {
               const blob = await font.blob();
               const buffer = await blob.arrayBuffer();

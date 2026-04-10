@@ -544,7 +544,6 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     charRemap
   };
 }
-
 function decodeFontName(v, key) {
   if (typeof v === 'string') return v.trim();
   if (v && (Array.isArray(v) || (typeof Uint8Array !== 'undefined' && v instanceof Uint8Array))) {
@@ -558,6 +557,7 @@ function decodeFontName(v, key) {
   }
   return '';
 }
+
 
 function extractFontNames(fontObj) {
   const names = new Set();
