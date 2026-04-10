@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.21">
+  <meta name="version" content="2.1.22">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -32,6 +32,7 @@
   <meta name="apple-mobile-web-app-title" content="ASS子集化">
   <script src="vendor/opentype.min.js"></script>
   <script src="vendor/jszip.min.js"></script>
+  <script src="worker.js"></script>
   <script type="application/ld+json">
 {
   "@context": "https://schema.org",
@@ -1676,34 +1677,28 @@
     const pendingCallbacks = new Map();
 
     async function initWorker() {
-      if (window.location.protocol === 'file:') {
-        try {
-          const res = await fetch('worker.js');
-          const text = await res.text();
-          const opentypeUrl = document.querySelector('script[src*="opentype"]')?.src || 'vendor/opentype.min.js';
-          const blob = new Blob([`const OPENTYPE_PATH = '${opentypeUrl}';\n` + text], { type: 'application/javascript' });
-          worker = new Worker(URL.createObjectURL(blob));
-        } catch (e) {
-          console.error('Local worker fallback failed:', e);
-          worker = new Worker('worker.js');
-        }
+      var isL = window.location.protocol === 'file:';
+      if (isL && typeof runWorker === 'function') {
+        var s = runWorker.toString();
+        var b = s.slice(s.indexOf('{') + 1, s.lastIndexOf('}'));
+        var op = document.querySelector('script[src*="opentype"]')?.src || 'vendor/opentype.min.js';
+        var bl = new Blob([`const OPENTYPE_PATH='${op}';\n` + b], { type: 'application/javascript' });
+        worker = new Worker(URL.createObjectURL(bl));
       } else {
         worker = new Worker('worker.js');
       }
-
       worker.onmessage = function (e) {
-        const msg = e.data;
-        if (msg.type === 'ready') { workerReady = true; return; }
-        if (msg.type === 'progress') { handleProgress(msg); return; }
-        if (msg.type === 'log') { handleWorkerLog(msg); return; }
-        if (msg.type === 'result' || msg.type === 'error') {
-          const cb = pendingCallbacks.get(msg.id);
-          if (cb) { pendingCallbacks.delete(msg.id); cb(msg); }
+        var m = e.data;
+        if (m.type === 'ready') { workerReady = true; return; }
+        if (m.type === 'progress') { handleProgress(m); return; }
+        if (m.type === 'log') { handleWorkerLog(m); return; }
+        if (m.type === 'result' || m.type === 'error') {
+          var cb = pendingCallbacks.get(m.id);
+          if (cb) { pendingCallbacks.delete(m.id); cb(m); }
         }
       };
-      worker.onerror = function (e) { console.error('Worker error:', e); };
-      const opentypePath = document.querySelector('script[src*="opentype"]')?.src || 'vendor/opentype.min.js';
-      worker.postMessage({ type: 'init', id: 0, opentypePath });
+      var opP = document.querySelector('script[src*="opentype"]')?.src || 'vendor/opentype.min.js';
+      worker.postMessage({ type: 'init', id: 0, opentypePath: opP });
     }
 
     function workerCall(type, data, transfer) {

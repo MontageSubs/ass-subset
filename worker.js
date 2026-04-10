@@ -1,4 +1,5 @@
 'use strict';
+function runWorker() {
 const DRAW_FONT_NAME = 'ASSDrawSubset_MontageSubs';
 const EM = 1024;
 const TARGET = 820;
@@ -1079,3 +1080,7 @@ self.onmessage = function (e) {
     self.postMessage({ type: 'error', id, error: err.message + '\n' + (err.stack || '') });
   }
 };
+}
+if (typeof window === 'undefined') {
+runWorker();
+}
