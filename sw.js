@@ -1,6 +1,6 @@
 'use strict';
 
-const CACHE_NAME = 'ass-subset-v2.1.27';
+const CACHE_NAME = 'ass-subset-v2.1.28';
 const PRECACHE = [
   '/ass-subset/',
   '/ass-subset/index.html',

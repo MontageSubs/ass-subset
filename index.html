@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.27">
+  <meta name="version" content="2.1.28">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1970,7 +1970,7 @@
       rowFont.classList.toggle('selected', hasFonts);
       rowFont.classList.toggle('disabled', !hasFonts);
 
-      document.getElementById('drawing-notice').classList.toggle('hidden', !hasDrawings);
+      document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
       document.getElementById('copyright-notice').classList.toggle('hidden', !hasFonts);
       document.getElementById('font-section').classList.toggle('hidden', !hasFonts);
       document.getElementById('opt-row-sysfont').classList.toggle('hidden', !hasFonts);

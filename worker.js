@@ -960,6 +960,8 @@ function doConvert(data, id) {
     } else {
       emitLog(id, 'log.draw.none', 'info', {});
     }
+  } else if (parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
+    drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
   if (options.wantFont) {
     const extFonts = parsed.externalFonts;
