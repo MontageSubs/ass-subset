@@ -442,51 +442,70 @@ function buildDrawGlyph(drawStr, charCode) {
   return new opentype.Glyph({ name: `draw_${charCode}`, unicode: charCode, advanceWidth: EM, path });
 }
 function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCharsArray, id) {
+  const referencedCharsSet = new Set(referencedCharsArray);
+
+  if (uniqueDrawingsArray.length === 0 && existingFontBuffer && existingFontBuffer.byteLength > 0) {
+    try {
+      const existingFont = opentype.parse(existingFontBuffer);
+      const existingChars = new Set();
+      for (let i = 1; i < existingFont.glyphs.length; i++) {
+        const g = existingFont.glyphs.get(i);
+        if (g && g.unicode && g.unicode > 0) existingChars.add(String.fromCodePoint(g.unicode));
+      }
+      const sameChars = existingChars.size === referencedCharsSet.size &&
+        [...referencedCharsSet].every(ch => existingChars.has(ch));
+      if (sameChars) {
+        return {
+          ttf: new Uint8Array(existingFontBuffer),
+          dataToCharArr: []
+        };
+      }
+    } catch (_) { }
+  }
+
   const notdef = new opentype.Glyph({
     name: '.notdef', unicode: 0, advanceWidth: EM, path: new opentype.Path()
   });
   const glyphs = [notdef];
-  const charToData = new Map();
-  const dataToChar = new Map();
-  const nextChar = (idx) => getVisibleChar(idx);
+  const existingCharToGlyph = new Map();
 
   if (existingFontBuffer && existingFontBuffer.byteLength > 0) {
     try {
       const existingFont = opentype.parse(existingFontBuffer);
-      const usedChars = new Set(referencedCharsArray);
-      for (const ch of usedChars) {
-        const glyph = existingFont.charToGlyph(ch);
-        if (glyph && glyph.index !== 0) {
-          const path = existingFont.getPath(ch, 0, 0, existingFont.unitsPerEm);
-          const drawStr = path.toPathData();
-          charToData.set(ch, drawStr);
-          dataToChar.set(drawStr, ch);
-        }
+      for (let i = 1; i < existingFont.glyphs.length; i++) {
+        const g = existingFont.glyphs.get(i);
+        if (!g || !g.unicode || g.unicode === 0) continue;
+        const ch = String.fromCodePoint(g.unicode);
+        if (!referencedCharsSet.has(ch)) continue;
+        existingCharToGlyph.set(ch, g);
+        glyphs.push(new opentype.Glyph({
+          name: g.name || `draw_${g.unicode}`,
+          unicode: g.unicode,
+          advanceWidth: g.advanceWidth || EM,
+          path: g.path
+        }));
       }
     } catch (_) { }
   }
 
   const drawingDataToChar = {};
-  const currentSafeIndex = { val: 0 };
+
+  const usedCodepoints = new Set(glyphs.filter(g => g.unicode > 0).map(g => g.unicode));
+  let safeIdx = 0;
   const getNextSafeChar = () => {
     while (true) {
-      const c = nextChar(currentSafeIndex.val++);
-      if (!charToData.has(c)) return c;
+      const c = getVisibleChar(safeIdx++);
+      if (!usedCodepoints.has(c.codePointAt(0))) return c;
     }
   };
 
   const sortedSubsets = Array.from(uniqueDrawingsArray).sort((a, b) => a.data.localeCompare(b.data));
   for (const item of sortedSubsets) {
     const data = item.data;
-    const tempGlyph = buildDrawGlyph(data, 0);
-    const normalizedData = tempGlyph.path.toPathData();
-
-    let char = dataToChar.get(normalizedData);
-    if (!char) {
-      char = getNextSafeChar();
-    }
-    drawingDataToChar[data] = char;
-    const cp = char.codePointAt(0);
+    const assignedChar = getNextSafeChar();
+    drawingDataToChar[data] = assignedChar;
+    const cp = assignedChar.codePointAt(0);
+    usedCodepoints.add(cp);
     glyphs.push(buildDrawGlyph(data, cp));
   }
 
@@ -503,6 +522,8 @@ function buildDrawingFont(uniqueDrawingsArray, existingFontBuffer, referencedCha
     dataToCharArr: Object.entries(drawingDataToChar).map(([d, c]) => ({ data: d, char: c }))
   };
 }
+
+
 function extractFontNames(fontObj) {
   const names = new Set();
   const raw = fontObj.tables?.name?.names;
@@ -816,7 +837,8 @@ function doConvert(data, id) {
   if (options.wantDraw) {
     const newDrawings = parsed.uniqueDrawings;
     const totalDrawings = newDrawings.length;
-    if (totalDrawings > 0 || parsed.hasExistingDrawSubset) {
+    const hasReferencedChars = parsed.subsetReferencedChars.length > 0;
+    if (totalDrawings > 0 || (parsed.hasExistingDrawSubset && hasReferencedChars)) {
       emitLog(id, 'log.draw.building', 'info', {
         unique: totalDrawings, total: parsed.drawings
       });
