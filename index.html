@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.24">
+  <meta name="version" content="2.1.25">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -2118,10 +2118,11 @@
         const localFonts = await window.queryLocalFonts();
         const requiredFonts = new Set();
         const wantSys = document.getElementById('opt-sysfont').checked;
+        const normReq = new Set();
         for (const entry of S.assFiles) {
-          for (const name of Object.keys(entry.parsed.externalFonts)) requiredFonts.add(name.toLowerCase());
+          for (const name of Object.keys(entry.parsed.externalFonts)) normReq.add(normFont(name).toLowerCase());
           if (wantSys && entry.parsed.systemFontsReferenced) {
-            for (const name of Object.keys(entry.parsed.systemFontsReferenced)) requiredFonts.add(name.toLowerCase());
+            for (const name of Object.keys(entry.parsed.systemFontsReferenced)) normReq.add(normFont(name).toLowerCase());
           }
         }
         for (const font of localFonts) {
