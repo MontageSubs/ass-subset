@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.25">
+  <meta name="version" content="2.1.26">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1615,6 +1615,7 @@
       }
     };
 
+    function normFont(name) { return name.replace(/^@/, '').trim(); }
     let currentLang = 'zh';
 
     function t(key, params) {
@@ -2130,25 +2131,27 @@
           const full = font.fullName?.toLowerCase();
           const aliasesFam = SYSTEM_FONT_ALIASES[fam] || [];
           const aliasesFull = SYSTEM_FONT_ALIASES[full] || [];
-          const isMatch = requiredFonts.has(fam) || requiredFonts.has(full) ||
-            aliasesFam.some(a => requiredFonts.has(a)) ||
-            aliasesFull.some(a => requiredFonts.has(a));
+          const matched = [];
+          [fam, full, ...aliasesFam, ...aliasesFull].forEach(n => {
+            if (n && normReq.has(n)) matched.push(n);
+          });
 
-          if (isMatch) {
-            const matchName = requiredFonts.has(fam) ? fam :
-              (requiredFonts.has(full) ? full :
-                (aliasesFam.find(a => requiredFonts.has(a)) ||
-                  aliasesFull.find(a => requiredFonts.has(a))));
-            if (!S.uploadedFonts.has(matchName)) {
-              const blob = await font.blob();
-              const buffer = await blob.arrayBuffer();
-              const view = new DataView(buffer);
-              const isTTC = buffer.byteLength > 12 && view.getUint32(0, false) === 0x74746366;
-              S.uploadedFonts.set(matchName, {
-                file: { name: font.fullName + ' (system)' },
-                buffer, matchedFor: font.family,
-                isTTC, ttcIndex: 0, weight: 400, isFamilyMatch: true, isSystem: true
-              });
+          if (matched.length > 0) {
+            let buffer = null;
+            for (const matchName of matched) {
+              if (!S.uploadedFonts.has(matchName)) {
+                if (!buffer) {
+                  const blob = await font.blob();
+                  buffer = await blob.arrayBuffer();
+                }
+                const view = new DataView(buffer);
+                const isTTC = buffer.byteLength > 12 && view.getUint32(0, false) === 0x74746366;
+                S.uploadedFonts.set(matchName, {
+                  file: { name: font.fullName + ' (system)' },
+                  buffer, matchedFor: font.family,
+                  isTTC, ttcIndex: 0, weight: 400, isFamilyMatch: true, isSystem: true
+                });
+              }
             }
           }
         }
