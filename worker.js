@@ -737,19 +737,74 @@ function rewriteASS(rawContent, opts, id) {
 
 function replaceDrawingsInLine(line, dataToCharArr, fontFamily) {
   if (!dataToCharArr || dataToCharArr.length === 0) return line;
-  return line.replace(
-    /(\{[^}]*?\\p[1-9][^}]*?\})([\s\S]*?)(\{[^}]*?\\p0[^}]*?\})/gi,
-    (match, startTag, data, endTag) => {
-      const strippedData = data.replace(/\{[^}]*\}/g, ' ');
-      const clean = strippedData.trim().replace(/\s+/g, ' ');
-      const entry = dataToCharArr.find(e => e.data === clean);
-      if (!entry) return match;
-      const newStart = startTag.replace(/\\p[1-9]/i, `\\fn${fontFamily}\\p0`);
-      const cleanEnd = endTag.replace(/\\p0/i, '');
-      const hasOtherTags = cleanEnd.replace(/[{}]/g, '').trim().length > 0;
-      return newStart + entry.char + (hasOtherTags ? cleanEnd : '');
+  const m = line.match(/^([^:]*?:\s*)(.*)$/);
+  if (!m) return line;
+  const prefix = m[1];
+  const content = m[2];
+
+  const segs = content.split(/(\{[^}]*\})/);
+  let drawing = false;
+  let rawSegs = [];
+  let drawDataStr = '';
+  let startTag = '';
+  let result = prefix;
+
+  for (let i = 0; i < segs.length; i++) {
+    const seg = segs[i];
+    if (seg.startsWith('{')) {
+      const pm = seg.match(/\\p(\d+)/i);
+      if (pm) {
+        const lvl = parseInt(pm[1]);
+        if (lvl > 0 && !drawing) {
+          drawing = true;
+          startTag = seg;
+          rawSegs = [];
+          drawDataStr = '';
+          continue;
+        } else if (lvl === 0 && drawing) {
+          drawing = false;
+          const clean = drawDataStr.trim().replace(/\s+/g, ' ');
+          const entry = dataToCharArr.find(e => e.data === clean);
+          if (entry) {
+            const newStart = startTag.replace(/\\p[1-9]/i, `\\fn${fontFamily}\\p0`);
+            const cleanEnd = seg.replace(/\\p0/i, '');
+            const hasOtherTags = cleanEnd.replace(/[{}]/g, '').trim().length > 0;
+            result += newStart + entry.char + (hasOtherTags ? cleanEnd : '');
+          } else {
+            result += startTag + rawSegs.join('') + seg;
+          }
+          continue;
+        }
+      }
+      if (drawing) {
+        rawSegs.push(seg);
+      } else {
+        result += seg;
+      }
+    } else {
+      if (drawing) {
+        rawSegs.push(seg);
+        if (seg.trim() !== '') {
+          drawDataStr += (drawDataStr.length > 0 && !drawDataStr.endsWith(' ') ? ' ' : '') + seg;
+        }
+      } else {
+        result += seg;
+      }
     }
-  );
+  }
+
+  if (drawing) {
+    const clean = drawDataStr.trim().replace(/\s+/g, ' ');
+    const entry = dataToCharArr.find(e => e.data === clean);
+    if (entry) {
+      const newStart = startTag.replace(/\\p[1-9]/i, `\\fn${fontFamily}\\p0`);
+      result += newStart + entry.char;
+    } else {
+      result += startTag + rawSegs.join('');
+    }
+  }
+
+  return result;
 }
 function doConvert(data, id) {
   const { text, fonts, options } = data;

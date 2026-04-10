@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.13">
+  <meta name="version" content="2.1.14">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1393,7 +1393,8 @@
         <span data-i18n="footer.license_prefix">以</span>
         <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT</a>
         <span data-i18n="footer.license_suffix">License 开源</span>
-        · <span data-i18n="footer.based_on">基于</span> <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>
+        · <span data-i18n="footer.based_on">基于</span> <a href="https://opentype.js.org/" target="_blank"
+          rel="noopener">opentype.js</a>
       </div>
       <div class="footer-line"><span id="ver" data-i18n="footer.tool">用爱打造 · ASS 在线子集化工具 (ass-subset)</span></div>
       <div class="footer-btns">
@@ -2264,7 +2265,7 @@
           if (g && g.unicode && g.unicode > 0) glyphs.push(g);
         }
         const cols = Math.ceil(Math.sqrt(glyphs.length));
-        const cellSize = Math.floor(canvas.width / Math.max(cols, 1));
+        const cellSize = Math.floor(Math.min(canvas.width, canvas.height) / Math.max(cols, 1));
         const fontSize = cellSize * 0.7;
 
         glyphs.forEach((g, idx) => {
@@ -2272,7 +2273,7 @@
           const row = Math.floor(idx / cols);
           const x = col * cellSize + cellSize * 0.15;
           const y = row * cellSize + cellSize * 0.8;
-          if (y < canvas.height) {
+          if (y <= canvas.height) {
             const path = font.getPath(String.fromCodePoint(g.unicode), x, y, fontSize);
             path.fill = '#333333';
             path.draw(ctx);
