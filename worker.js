@@ -282,7 +282,8 @@ function parseASSText(text, id) {
     subsetNeedsUpdate,
     existingSubsetFontBuffer,
     subsetReferencedChars: Array.from(subsetReferencedChars.entries()).map(([char, firstSeenMs]) => ({ char, firstSeenMs })),
-    embeddedFontNames: Object.keys(embeddedFonts),
+    embeddedFonts,
+    originalDrawFontName,
   };
 }
 function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
