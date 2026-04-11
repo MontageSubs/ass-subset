@@ -37,6 +37,10 @@ const SYSTEM_FONTS = new Set([
   'noto sans cjk kr', 'wqy microhei', 'wqy zenhei', 'droid sans', 'droid sans fallback',
   'assdrawsubset_montagesubs', 'assdrawsubset',
 ]);
+const isAnyDrawFont = (n) => {
+  const ln = n.toLowerCase();
+  return ln.startsWith('assdrawsubset') || ln.startsWith(DRAW_FONT_NAME.toLowerCase());
+};
 function emitProgress(id, phase, current, total) {
   self.postMessage({ type: 'progress', id, phase, current, total });
 }
@@ -139,7 +143,7 @@ function parseASSText(text, id) {
   const drawings = [];
   let playResX = 0, playResY = 0;
   const embeddedFonts = {};
-  let currentEmbedFont = null;
+  let originalDrawFontName = DRAW_FONT_NAME;
   let hasExistingDrawSubset = false;
   const subsetReferencedChars = new Map();
   for (let li = 0; li < totalLines; li++) {
@@ -178,8 +182,11 @@ function parseASSText(text, id) {
       if (/^fontname:\s*/i.test(t)) {
         currentEmbedFont = t.replace(/^fontname:\s*/i, '').trim();
         embeddedFonts[currentEmbedFont] = [];
-        if (currentEmbedFont.toLowerCase().startsWith(DRAW_FONT_NAME.toLowerCase())) {
+        if (isAnyDrawFont(currentEmbedFont)) {
           hasExistingDrawSubset = true;
+          if (!originalDrawFontName || originalDrawFontName === DRAW_FONT_NAME) {
+            originalDrawFontName = currentEmbedFont.replace(/_\d+\.ttf$/i, '');
+          }
         }
       } else if (currentEmbedFont && t.length > 0 && !t.startsWith('[')) {
         embeddedFonts[currentEmbedFont].push(t);
@@ -236,8 +243,7 @@ function parseASSText(text, id) {
   }
   let existingSubsetFontBuffer = null;
   if (hasExistingDrawSubset) {
-    const key = Object.keys(embeddedFonts).find(
-      k => k.toLowerCase().startsWith(DRAW_FONT_NAME.toLowerCase()));
+    const key = Object.keys(embeddedFonts).find(k => isAnyDrawFont(k));
     if (key && embeddedFonts[key].length > 0) {
       try {
         existingSubsetFontBuffer = assUUDecode(embeddedFonts[key]).buffer;
@@ -278,7 +284,8 @@ function parseASSText(text, id) {
     subsetNeedsUpdate,
     existingSubsetFontBuffer,
     subsetReferencedChars: Array.from(subsetReferencedChars.entries()).map(([char, firstSeenMs]) => ({ char, firstSeenMs })),
-    embeddedFontNames: Object.keys(embeddedFonts),
+    embeddedFonts,
+    originalDrawFontName,
   };
 }
 function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
@@ -287,7 +294,7 @@ function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
   let font = styleInfo.font;
   let bold = styleInfo.bold;
   let drawing = false, drawData = '', drawTag = '';
-  let isDrawSubsetFont = (font.toLowerCase() === DRAW_FONT_NAME.toLowerCase());
+  let isDrawSubsetFont = isAnyDrawFont(font);
   for (const seg of segs) {
     if (seg.startsWith('{')) {
       const inner = seg.slice(1, -1);
@@ -312,7 +319,7 @@ function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
         if (fm) font = normFont(fm[1].trim()) || styleInfo.font;
         const bm = inner.match(/\\b(\d+)/);
         if (bm) bold = parseInt(bm[1]) !== 0;
-        isDrawSubsetFont = (font.toLowerCase() === DRAW_FONT_NAME.toLowerCase());
+        isDrawSubsetFont = isAnyDrawFont(font);
       }
     } else if (seg) {
       if (drawing) {
@@ -740,11 +747,12 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
 }
 function rewriteASS(rawContent, opts, id) {
   const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts, drawCharRemap } = opts;
-  const blockRegex = /\r?\n(?=\[(?:Script Info|v4\+\s+Styles|v4\s+Styles|Styles|Events|Fonts|Graphics|Aegisub\s+(?:Extradata|Project\s+Garbage))\])/i;
+  const blockRegex = /\r?\n(?=\[)/i;
   const blocks = rawContent.split(blockRegex);
   const totalBlocks = blocks.length;
   const processedBlocks = [];
   let fontInsertIndex = -1;
+  let originalFontsBlock = null;
   const subsetStyles = new Set();
   let styleFmt = null;
   let eventFmt = null;
@@ -758,6 +766,7 @@ function rewriteASS(rawContent, opts, id) {
     const header = (trimmed.match(/^\[([^\]]+)\]/i)?.[1] || '').toLowerCase();
     if (header === 'fonts') {
       if (fontInsertIndex === -1) fontInsertIndex = processedBlocks.length;
+      originalFontsBlock = block;
       continue;
     }
 
@@ -806,6 +815,7 @@ function rewriteASS(rawContent, opts, id) {
     }
   }
 
+  let finalSec = null;
   if (drawTTF || (embeddedFonts && embeddedFonts.length > 0)) {
     const newFontLines = ['[Fonts]'];
     const encodeAndAppend = (fontName, ttfData) => {
@@ -816,12 +826,16 @@ function rewriteASS(rawContent, opts, id) {
     };
     if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
     if (embeddedFonts) embeddedFonts.forEach(ef => encodeAndAppend(ef.name, ef.ttf));
+    finalSec = newFontLines.join('\n');
+  } else if (originalFontsBlock) {
+    finalSec = originalFontsBlock;
+  }
 
-    const newSec = newFontLines.join('\n');
+  if (finalSec) {
     if (fontInsertIndex !== -1 && fontInsertIndex < processedBlocks.length) {
-      processedBlocks.splice(fontInsertIndex, 0, newSec);
+      processedBlocks.splice(fontInsertIndex, 0, finalSec);
     } else {
-      processedBlocks.push(newSec);
+      processedBlocks.push(finalSec);
     }
   }
   emitProgress(id, 'rewrite', totalBlocks, totalBlocks);
@@ -935,7 +949,7 @@ function doConvert(data, id) {
   emitLog(id, 'log.convert.start', 'info', {});
   const parsed = parseASSText(text, id);
   let drawTTF = null, drawingDataToChar = null, drawCharRemap = null;
-  const drawFontFamily = DRAW_FONT_NAME;
+  const drawFontFamily = parsed.originalDrawFontName || DRAW_FONT_NAME;
   const embeddedFonts = [];
   if (options.wantDraw) {
     const newDrawings = parsed.uniqueDrawings;
@@ -1018,31 +1032,53 @@ function doConvert(data, id) {
       }
     }
   }
+  const finalEmbeddedFonts = [];
+  const processedNames = new Set();
+  embeddedFonts.forEach(ef => {
+    finalEmbeddedFonts.push(ef);
+    processedNames.add(ef.name.toLowerCase());
+  });
+  if (parsed.embeddedFonts) {
+    for (const [name, lines] of Object.entries(parsed.embeddedFonts)) {
+      const baseName = name.replace(/_\d+\.ttf$/i, '').toLowerCase();
+      if (isAnyDrawFont(baseName)) continue;
+      if (processedNames.has(baseName)) continue;
+      try {
+        const buf = assUUDecode(lines);
+        finalEmbeddedFonts.push({ name: baseName, ttf: buf });
+        processedNames.add(baseName);
+      } catch (_) { }
+    }
+  }
+  if (!drawTTF && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
+    drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
+  }
   emitLog(id, 'log.rewrite.start', 'info', {});
   const finalText = rewriteASS(text, {
     drawingDataToChar: drawingDataToChar,
     drawFontFamily,
     drawTTF,
-    embeddedFonts: embeddedFonts,
+    embeddedFonts: finalEmbeddedFonts,
     drawCharRemap: drawCharRemap
   }, id);
-  const origSize = new Blob([text]).size;
-  const newSize = new Blob(['\uFEFF' + finalText]).size;
+  const reencodedFinal = finalText.replace(/\r?\n/g, '\r\n');
+  const origSize = new Blob([text.replace(/\r?\n/g, '\r\n')]).size;
+  const newSize = new Blob(['\uFEFF' + reencodedFinal]).size;
   const delta = newSize - origSize;
   emitLog(id, 'log.convert.done', 'ok', {
     origKB: (origSize / 1024).toFixed(0),
     newKB: (newSize / 1024).toFixed(0),
     delta: (delta / 1024).toFixed(1),
-    embCount: embeddedFonts.length + (drawTTF ? 1 : 0)
+    embCount: finalEmbeddedFonts.length + (drawTTF ? 1 : 0)
   });
   const fontBuffers = [];
-  if (drawTTF) fontBuffers.push({ name: DRAW_FONT_NAME, buffer: drawTTF.buffer, isDrawing: true });
-  for (const ef of embeddedFonts) {
+  if (drawTTF) fontBuffers.push({ name: drawFontFamily, buffer: drawTTF.buffer, isDrawing: true });
+  for (const ef of finalEmbeddedFonts) {
     fontBuffers.push({ name: ef.name, buffer: ef.ttf.buffer, isDrawing: false, weight: ef.weight });
   }
   const drawMap = new Map((drawingDataToChar || []).map(e => [e.data, e.char]));
   return {
-    finalText: '\uFEFF' + finalText,
+    finalText: '\uFEFF' + reencodedFinal,
     origSize, newSize,
     fontBuffers,
     stats: {
