@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.35">
+  <meta name="version" content="2.1.36">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -195,12 +195,14 @@
 
     .btn-hdr:hover {
       border-color: var(--ink);
+      color: var(--ink);
       background: var(--rule2);
     }
 
     .btn-hdr:active {
       background: var(--rule);
       border-color: var(--ink);
+      color: var(--ink);
     }
 
     .btn-hdr svg {
@@ -731,7 +733,14 @@
 
     .btn-outline:hover {
       border-color: var(--ink);
+      color: var(--ink);
       background: var(--rule2);
+    }
+
+    .btn-outline:active {
+      background: var(--rule);
+      border-color: var(--ink);
+      color: var(--ink);
     }
 
     .log-box {
@@ -1669,9 +1678,14 @@
       uploadedFonts: new Map(),
       outputBlobs: [],
       fontBuffers: [],
+      fileFontBuffers: [],
       converting: false,
+      converted: false,
+      downloaded: false,
     };
 
+    let batchFileIdx = 0;
+    let batchTotal = 0;
     let worker = null;
     let workerReady = false;
     let msgIdCounter = 0;
@@ -1721,13 +1735,21 @@
       if (!area || !bar || !txt) return;
 
       area.classList.remove('hidden');
-      const pct = msg.total > 0 ? Math.round((msg.current / msg.total) * 100) : 0;
+      const localPct = msg.total > 0 ? Math.round((msg.current / msg.total) * 100) : 0;
+
+      let pct = localPct;
+      let prefix = '';
+      if (!isParse && batchTotal > 1) {
+        pct = Math.min(99, Math.round((batchFileIdx + localPct / 100) / batchTotal * 100));
+        prefix = (batchFileIdx + 1) + '/' + batchTotal + ' · ';
+      }
+
       bar.style.width = pct + '%';
       bar.setAttribute('aria-valuenow', pct);
       const phaseKey = { parse: 'status.parsing', subset: 'status.subset', rewrite: 'status.rewrite' }[msg.phase] || '';
-      txt.textContent = (phaseKey ? t(phaseKey) + ' ' : '') + pct + '%';
+      txt.textContent = prefix + (phaseKey ? t(phaseKey) + ' ' : '') + pct + '%';
 
-      if (pct === 100 && isParse) {
+      if (localPct === 100 && isParse) {
         setTimeout(() => area.classList.add('hidden'), 500);
       }
     }
@@ -2206,9 +2228,19 @@
         });
       }
 
+      batchFileIdx = 0;
+      batchTotal = S.assFiles.length;
+      const _convProgressArea = document.getElementById('progress-area');
+      const _convProgressBar = document.getElementById('progress-bar');
+      const _convProgressText = document.getElementById('progress-text');
+      _convProgressArea.classList.remove('hidden');
+      _convProgressBar.style.width = '0%';
+      _convProgressText.textContent = batchTotal > 1 ? '1/' + batchTotal + ' · 0%' : '0%';
+
       try {
         for (let i = 0; i < S.assFiles.length; i++) {
           const entry = S.assFiles[i];
+          batchFileIdx = i;
           if (S.assFiles.length > 1) log('--- ' + entry.file.name + ' ---', 'info');
 
           const p = entry.parsed;
@@ -2237,6 +2269,7 @@
           const blob = result.isDirect ? result.finalBlob : (new Blob([result.finalText], { type: 'text/plain;charset=utf-8' }));
           const outName = entry.file.name.replace(/\.(ass|ssa)$/i, '') + '_optimized.ass';
           S.outputBlobs.push({ name: outName, blob });
+          S.fileFontBuffers[i] = result.fontBuffers || [];
           if (result.fontBuffers) S.fontBuffers = S.fontBuffers.concat(result.fontBuffers);
 
           if (result.detailedDrawings && result.detailedDrawings.length > 0) {
@@ -2270,6 +2303,8 @@
       }
 
       S.converting = false;
+      S.converted = S.outputBlobs.length > 0;
+      S.downloaded = false;
       btnConvert.disabled = false;
       btnConvert.innerHTML = t('btn.convert');
       document.getElementById('progress-area').classList.add('hidden');
@@ -2277,6 +2312,7 @@
     }
 
     function downloadBlob(blob, name) {
+      S.downloaded = true;
       const a = document.createElement('a');
       a.href = URL.createObjectURL(blob);
       a.download = name;
@@ -2286,6 +2322,7 @@
 
     async function downloadAllZip() {
 
+      S.downloaded = true;
       if (!window.JSZip) {
         const s = document.createElement('script');
         s.src = 'vendor/jszip.min.js';
@@ -2309,7 +2346,7 @@
 
       if (!listContainer) return;
       listContainer.innerHTML = '';
-      const buffers = S.fontBuffers;
+      const buffers = (S.fileFontBuffers && S.fileFontBuffers[fileIdx]) || [];
       if (!buffers || buffers.length === 0) return;
 
       const dpr = window.devicePixelRatio || 1;
@@ -2514,7 +2551,7 @@
 
 
     window.addEventListener('beforeunload', e => {
-      if (S.converting) {
+      if (S.converting || (S.converted && !S.downloaded)) {
         e.preventDefault();
         e.returnValue = t('leave.confirm');
       }
