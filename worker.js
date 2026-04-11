@@ -159,6 +159,10 @@ function parseASSText(text, id, forceHasBOM) {
     const t = lines[li].trim();
     if (!t) continue;
     if (t.startsWith('[')) {
+      if (section === '[fonts]' && currentEmbedFont && !/^\[(?:Script Info|v4[^\]]*Styles|Styles|Events|Fonts|Graphics|Aegisub)/i.test(t)) {
+        embeddedFonts[currentEmbedFont].push(t);
+        continue;
+      }
       section = t.toLowerCase();
       currentEmbedFont = null;
       continue;
@@ -196,7 +200,7 @@ function parseASSText(text, id, forceHasBOM) {
             originalDrawFontName = currentEmbedFont.replace(/_\d+\.ttf$/i, '');
           }
         }
-      } else if (currentEmbedFont && t.length > 0 && !t.startsWith('[')) {
+      } else if (currentEmbedFont && t.length > 0) {
         embeddedFonts[currentEmbedFont].push(t);
       }
     }
@@ -1052,13 +1056,14 @@ function doConvert(data, id) {
   });
   if (parsed.embeddedFonts) {
     for (const [name, lines] of Object.entries(parsed.embeddedFonts)) {
-      const baseName = name.replace(/_\d+\.ttf$/i, '').toLowerCase();
-      if (isAnyDrawFont(baseName)) continue;
-      if (processedNames.has(baseName)) continue;
+      const baseName = name.replace(/_\d+\.ttf$/i, '');
+      const baseNameLower = baseName.toLowerCase();
+      if (isAnyDrawFont(baseNameLower)) continue;
+      if (processedNames.has(baseNameLower)) continue;
       try {
         const buf = assUUDecode(lines);
         finalEmbeddedFonts.push({ name: baseName, ttf: buf });
-        processedNames.add(baseName);
+        processedNames.add(baseNameLower);
       } catch (_) { }
     }
   }
