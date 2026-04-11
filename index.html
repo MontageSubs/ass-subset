@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.33">
+  <meta name="version" content="2.1.34">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1783,8 +1783,15 @@
         if (type === 'ass' && (lowName.endsWith('.ass') || lowName.endsWith('.ssa'))) {
           const buf = await entry.async('arraybuffer');
           const rawContent = await decodeText(buf);
+          const uint8 = new Uint8Array(buf);
+          const hasBOM = (uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF);
           const strippedContent = rawContent.startsWith('\uFEFF') ? rawContent.slice(1) : rawContent;
-          results.push({ file: { name: entry.name, size: buf.byteLength }, content: strippedContent });
+          results.push({
+            file: { name: entry.name, size: buf.byteLength },
+            content: strippedContent,
+            rawBuffer: buf,
+            hasBOM: hasBOM
+          });
         } else if (type === 'font' && (lowName.endsWith('.ttf') || lowName.endsWith('.otf') || lowName.endsWith('.ttc'))) {
           const buf = await entry.async('arraybuffer');
           results.push({ file: { name: entry.name, size: buf.byteLength }, buffer: buf });
@@ -1816,9 +1823,11 @@
           }
         } else if (/\.(ass|ssa)$/i.test(f.name)) {
           const buf = await f.arrayBuffer();
+          const uint8 = new Uint8Array(buf);
+          const hasBOM = (uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF);
           const text = await decodeText(buf);
           const content = text.startsWith('\uFEFF') ? text.slice(1) : text;
-          assEntries.push({ file: f, content });
+          assEntries.push({ file: f, content, rawBuffer: buf, hasBOM: hasBOM });
         }
       }
       if (assEntries.length === 0) {
@@ -1875,7 +1884,13 @@
         }
         try {
           const result = await workerCall('parseASS', { text: content });
-          S.assFiles.push({ file: entry.file, content, parsed: result });
+          S.assFiles.push({
+            file: entry.file,
+            content,
+            hasBOM: entry.hasBOM,
+            rawBuffer: entry.rawBuffer,
+            parsed: result
+          });
         } catch (e) {
           area.innerHTML = '<div class="upload-error">⚠ ' + e.message + '</div>';
           return;
@@ -2196,13 +2211,30 @@
           const entry = S.assFiles[i];
           if (S.assFiles.length > 1) log('--- ' + entry.file.name + ' ---', 'info');
 
-          const result = await workerCall('convert', {
-            text: entry.content,
-            fonts,
-            options: { wantDraw, wantFont, wantSystemFont },
-          });
+          const p = entry.parsed;
+          const needDraw = wantDraw && (p.subsetNeedsUpdate || (p.drawings > 0 && !p.hasExistingDrawSubset) || (p.drawings === 0 && p.hasExistingDrawSubset));
+          const needFont = wantFont && ((p.systemFontsReferenced && p.systemFontsReferenced.length > 0) || (p.externalFonts && Object.keys(p.externalFonts).length > 0));
 
-          const blob = new Blob([result.finalText], { type: 'text/plain;charset=utf-8' });
+          let result;
+          if (!needDraw && !needFont) {
+            result = {
+              isDirect: true,
+              finalBlob: new Blob([entry.rawBuffer]),
+              origSize: entry.rawBuffer.byteLength,
+              newSize: entry.rawBuffer.byteLength,
+              fontBuffers: [],
+              stats: { embeddedCount: (p.embeddedFonts ? Object.keys(p.embeddedFonts).length : 0) }
+            };
+          } else {
+            result = await workerCall('convert', {
+              text: entry.content,
+              forceHasBOM: entry.hasBOM,
+              fonts,
+              options: { wantDraw, wantFont, wantSystemFont },
+            });
+          }
+
+          const blob = result.isDirect ? result.finalBlob : (new Blob([result.finalText], { type: 'text/plain;charset=utf-8' }));
           const outName = entry.file.name.replace(/\.(ass|ssa)$/i, '') + '_optimized.ass';
           S.outputBlobs.push({ name: outName, blob });
           if (result.fontBuffers) S.fontBuffers = S.fontBuffers.concat(result.fontBuffers);

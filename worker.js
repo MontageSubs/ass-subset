@@ -131,8 +131,16 @@ function assTimeToMs(s) {
   return (parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseFloat(m[3])) * 1000;
 }
 function normFont(name) { return name.replace(/^@/, '').trim(); }
-function parseASSText(text, id) {
-  const lines = text.split(/\r?\n/);
+function parseASSText(text, id, forceHasBOM) {
+  const hasBOM = forceHasBOM || text.startsWith('\uFEFF');
+  const pureText = hasBOM ? (text.startsWith('\uFEFF') ? text.slice(1) : text) : text;
+
+  const crlfMatches = pureText.match(/\r\n/g) || [];
+  const crlfCount = crlfMatches.length;
+  const lfCount = (pureText.split('\n').length - 1) - crlfCount;
+  const detectedNewline = crlfCount >= lfCount ? '\r\n' : '\n';
+
+  const lines = pureText.split(/\r?\n/);
   const totalLines = lines.length;
   let section = '';
   let evtFmt = null;
@@ -250,9 +258,7 @@ function parseASSText(text, id) {
   }
   let subsetNeedsUpdate = false;
   if (hasExistingDrawSubset) {
-    if (uniqueDrawings.size > 0) {
-      subsetNeedsUpdate = true;
-    } else if (existingSubsetFontBuffer) {
+    if (existingSubsetFontBuffer) {
       try {
         const existingFont = opentype.parse(existingSubsetFontBuffer);
         const existingChars = new Set();
@@ -284,6 +290,8 @@ function parseASSText(text, id) {
     subsetReferencedChars: Array.from(subsetReferencedChars.entries()).map(([char, firstSeenMs]) => ({ char, firstSeenMs })),
     embeddedFonts,
     originalDrawFontName,
+    hasBOM,
+    detectedNewline,
   };
 }
 function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
@@ -744,7 +752,8 @@ function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcInd
   };
 }
 function rewriteASS(rawContent, opts, id) {
-  const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts, drawCharRemap } = opts;
+  const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts, drawCharRemap, targetNewline } = opts;
+  const nl = targetNewline || '\n';
   const blockRegex = /\r?\n(?=\[(?:Script Info|v4\+\s+Styles|v4\s+Styles|Styles|Events|Fonts|Graphics|Aegisub\s+(?:Extradata|Project\s+Garbage))\])/i;
   const blocks = rawContent.split(blockRegex);
   const totalBlocks = blocks.length;
@@ -785,6 +794,10 @@ function rewriteASS(rawContent, opts, id) {
       }
       processedBlocks.push(block);
     } else if (header === 'events') {
+      if (!drawingDataToChar || drawingDataToChar.length === 0) {
+        processedBlocks.push(block);
+        continue;
+      }
       const lines = block.split(/\r?\n/);
       const newLines = lines.map(l => {
         if (/^format\s*:/i.test(l)) {
@@ -807,7 +820,7 @@ function rewriteASS(rawContent, opts, id) {
         }
         return l;
       });
-      processedBlocks.push(newLines.join('\n'));
+      processedBlocks.push(newLines.join(nl));
     } else {
       processedBlocks.push(block);
     }
@@ -824,7 +837,7 @@ function rewriteASS(rawContent, opts, id) {
     };
     if (drawTTF) encodeAndAppend(drawFontFamily, drawTTF);
     if (embeddedFonts) embeddedFonts.forEach(ef => encodeAndAppend(ef.name, ef.ttf));
-    finalSec = newFontLines.join('\n');
+    finalSec = newFontLines.join(nl);
   } else if (originalFontsBlock) {
     finalSec = originalFontsBlock;
   }
@@ -837,7 +850,7 @@ function rewriteASS(rawContent, opts, id) {
     }
   }
   emitProgress(id, 'rewrite', totalBlocks, totalBlocks);
-  return processedBlocks.join('\n');
+  return processedBlocks.join(nl);
 }
 
 function renameSubsetCharsInLine(line, charRemap, fontFamily, initialIsSubset) {
@@ -943,9 +956,9 @@ function replaceDrawingsInLine(line, dataToCharArr, fontFamily) {
   return result;
 }
 function doConvert(data, id) {
-  const { text, fonts, options } = data;
+  const { text, fonts, options, forceHasBOM } = data;
   emitLog(id, 'log.convert.start', 'info', {});
-  const parsed = parseASSText(text, id);
+  const parsed = parseASSText(text, id, forceHasBOM);
   let drawTTF = null, drawingDataToChar = null, drawCharRemap = null;
   const drawFontFamily = parsed.originalDrawFontName || DRAW_FONT_NAME;
   const embeddedFonts = [];
@@ -1052,18 +1065,23 @@ function doConvert(data, id) {
   if (!drawTTF && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
+  const pureOriginalText = text.startsWith('\uFEFF') ? text.slice(1) : text;
   emitLog(id, 'log.rewrite.start', 'info', {});
-  const finalText = rewriteASS(text, {
+  const finalText = rewriteASS(pureOriginalText, {
     drawingDataToChar: drawingDataToChar,
     drawFontFamily,
     drawTTF,
     embeddedFonts: finalEmbeddedFonts,
-    drawCharRemap: drawCharRemap
+    drawCharRemap: drawCharRemap,
+    targetNewline: parsed.detectedNewline
   }, id);
-  const reencodedFinal = finalText.replace(/\r?\n/g, '\r\n');
-  const origSize = new Blob([text.replace(/\r?\n/g, '\r\n')]).size;
-  const newSize = new Blob(['\uFEFF' + reencodedFinal]).size;
+
+  const finalOutput = parsed.hasBOM ? '\uFEFF' + finalText : finalText;
+
+  const origSize = new Blob([text]).size;
+  const newSize = new Blob([finalOutput]).size;
   const delta = newSize - origSize;
+
   emitLog(id, 'log.convert.done', 'ok', {
     origKB: (origSize / 1024).toFixed(0),
     newKB: (newSize / 1024).toFixed(0),
@@ -1077,7 +1095,7 @@ function doConvert(data, id) {
   }
   const drawMap = new Map((drawingDataToChar || []).map(e => [e.data, e.char]));
   return {
-    finalText: '\uFEFF' + reencodedFinal,
+    finalText: finalOutput,
     origSize, newSize,
     fontBuffers,
     stats: {
