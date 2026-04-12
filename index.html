@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.3">
+  <meta name="version" content="2.2.4">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -2513,7 +2513,7 @@
 
       const langAttrMap = { zh: 'zh-CN', 'zh-TW': 'zh-TW', en: 'en-US', ja: 'ja', ko: 'ko', es: 'es-419' };
       document.documentElement.lang = langAttrMap[currentLang] || currentLang;
-      ['zh', 'zh-TW', 'en', 'ja', 'ko', 'es'].forEach(l => {
+      ['zh', 'zh-TW', 'en', 'ja', 'ko', 'ar', 'pt-BR', 'ru', 'es', 'tr'].forEach(l => {
         document.getElementById('lang-' + l)?.classList.toggle('active', currentLang === l);
       });
 
