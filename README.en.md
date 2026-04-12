@@ -1,11 +1,11 @@
 # ASS Online Subsetter
-**ASS 在线子集化工具 · MontageSubs**
+**Powered by Love ❤️ MontageSubs**
 
 <br/>
 
-> **Subset and embed fonts in ASS/SSA subtitles, entirely in your browser — no installation required.**
+> **Subset and embed fonts in ASS/SSA subtitles, entirely in your browser — all processing happens locally.**
 >
-> *All processing runs locally. No files are ever uploaded to a server.*
+> *Draw Command Subsetting · Font Subset Embedding*
 
 <div align="right">
 
@@ -43,14 +43,14 @@ Scans the subtitle file for non-system font references, subsets the uploaded fon
 This tool runs entirely in the browser. No installation is needed:
 
 1. Open [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
-2. Upload your `.ass` or `.ssa` subtitle file
+2. Upload `.ass` or `.ssa` files, with batch processing and ZIP support
 3. Review the analysis results, which show detected drawing commands and external font references
 4. If font embedding is needed, upload the corresponding font files (TTF / OTF / TTC)
 5. Click "开始转换" (Start Conversion) and download the optimized subtitle file
 
 The output file will be named `original_filename_optimized.ass`.
 
-> **Note:** Drawing command conversion may cause minor size or position shifts in typeset effects. Manual review of the output is recommended.
+> **Note:** converting draw commands may cause minor position or scale shifts. Always verify the final render.
 
 ## Dependencies
 
@@ -59,7 +59,7 @@ The output file will be named `original_filename_optimized.ass`.
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | Font parsing and construction |
 | [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / Dual licensed | Batch output packaging |
 
-Both dependencies are bundled as local copies in the `vendor/` directory of this repository. Their original copyright notices are preserved in accordance with their respective licenses.
+The above dependencies are included as local copies in the `vendor/` directory of this repository and are licensed under MIT.
 
 opentype.js is used for font file parsing and binary construction. JSZip is used to package batch processing results into a .zip file for download after subtitle files have been processed through the subsetting queue.
 
@@ -84,7 +84,7 @@ ass-subset/
 
 ## Localization
 
-This tool currently supports **Chinese and English** interfaces. If you would like to use it in another language or are interested in contributing a localization, please open a thread in [Issues](https://github.com/MontageSubs/ass-subset/issues) or [Discussions](https://github.com/MontageSubs/ass-subset/discussions). Multi-language support is on our roadmap, and we welcome community contributions.
+This tool fully supports **Chinese and English**, with partial support for Japanese, Korean, and Spanish. If you need another language or want to help with localization, please open an issue or discussion [here](https://github.com/MontageSubs/ass-subset/issues) or [here](https://github.com/MontageSubs/ass-subset/discussions). We're actively expanding language support and welcome community contributions.
 
 ## Contributing
 
