@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.1.38">
+  <meta name="version" content="2.1.39">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -3132,7 +3132,8 @@
       script.setAttribute('data-reactions-enabled', '0');
       script.setAttribute('data-emit-metadata', '0');
       script.setAttribute('data-theme', theme);
-      script.setAttribute('data-lang', currentLang === 'en' ? 'en' : 'zh-CN');
+      const langMap = {'zh': 'zh-CN', 'zh-TW': 'zh-TW', 'en': 'en', 'ja': 'ja', 'ko': 'ko', 'es': 'es'};
+      script.setAttribute('data-lang', langMap[currentLang] || 'zh-CN');
       script.crossOrigin = 'anonymous';
       script.async = true;
       script.onload = () => { const el = document.getElementById('discuss-loading'); if (el) el.remove(); };
