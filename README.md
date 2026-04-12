@@ -1,5 +1,5 @@
 # ASS 在线子集化工具
-**ASS Subset Tool · MontageSubs**
+**ASS Online Subsetter · MontageSubs**
 
 <br/>
 
@@ -43,7 +43,7 @@ ASS/SSA 字幕格式支持将字体文件直接嵌入字幕，无需用户单独
 本工具完全基于浏览器运行，无需安装：
 
 1. 打开 [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
-2. 上传 `.ass` 或 `.ssa` 字幕文件
+2. 上传 `.ass` 或 `.ssa` 字幕文件、支持批量转换和上传和 `ZIP` 文件
 3. 查看分析结果，确认检测到的绘图指令与外部字体
 4. 如需嵌入字体，上传对应的字体文件（TTF / OTF / TTC）
 5. 点击"开始转换"，下载优化后的字幕文件
@@ -59,7 +59,7 @@ ASS/SSA 字幕格式支持将字体文件直接嵌入字幕，无需用户单独
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | 字体解析与构建 |
 | [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / 双许可证 | 批处理输出打包 |
 
-上述依赖以副本形式托管于本仓库 `vendor/` 目录下，保留其原始版权声明，符合各自许可证要求。
+上述依赖以副本形式托管于本仓库 `vendor/` 目录下，采用相同 MIT 许可。
 
 opentype.js 用于字体文件的解析与二进制构建；JSZip 用于在批处理上传或多个字幕文件队列子集化完成后，将处理结果打包生成 .zip 文件供用户下载。
 
@@ -84,7 +84,7 @@ ass-subset/
 
 ## 本地化
 
-本工具目前仅提供**中文和英文**界面。如果你希望使用其他语言版本或有意愿参与本地化贡献，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中提出需求。我们正在规划添加更多语言支持，欢迎社区贡献。
+本工具目前提供**中文和英文**完整支持，部分支持日语、韩语和西班牙语。如果需要其他语言版本或想参与本地化，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中告诉我们。我们正积极规划添加更多语言，欢迎社区参与！
 
 ## 参与贡献
 
