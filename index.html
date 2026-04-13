@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.13">
+  <meta name="version" content="2.2.14">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -2681,9 +2681,7 @@
           }
         }
       }
-      // Re-render ass-badge (error messages, change button, loading label) in the new language
       renderAssBadge();
-      // Re-render font-upload error in the new language
       renderFontError();
       document.getElementById('lang-wrap').classList.remove('open');
       document.getElementById('btn-lang-toggle').setAttribute('aria-expanded', 'false');
@@ -2767,7 +2765,6 @@
       downloaded: false,
     };
 
-    // Tracks the current ass-badge UI state so it can be re-rendered on language switch
     let _assBadgeState = null;
 
     function renderAssBadge() {
@@ -2799,7 +2796,6 @@
       }
     }
 
-    // Tracks the current font-upload error so it can be re-rendered on language switch
     let _fontErrState = null;
 
     function renderFontError() {
