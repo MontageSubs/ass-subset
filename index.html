@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.11">
+  <meta name="version" content="2.2.12">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1463,7 +1463,7 @@
         'btn.convert': '开始转换',
         'btn.converting': '处理中…',
         'btn.discuss': '讨论',
-        'btn.dl_font': '下载字体',
+
         'btn.download': '下载优化后的字幕',
         'btn.download_zip': '下载全部 (ZIP)',
         'btn.install': '安装',
@@ -1475,7 +1475,11 @@
         'err.format': '⚠ 请上传 .ass 或 .ssa 格式的字幕文件。',
         'err.invalid': '⚠ 格式验证失败：「{name}」不是有效的 ASS/SSA 字幕文件。',
         'err.no_events': '⚠ 格式验证失败：「{name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。',
-        'err.zip_depth': '⚠ ZIP 嵌套层数超过 10 层限制，已停止解压。',
+        'err.zip_depth': '⚠ ZIP 嵌套层数超过 {limit} 层限制，已停止解压。',
+        'err.zip_corrupt': '⚠ ZIP 文件已损坏或格式不受支持，无法读取。',
+        'err.zip_too_large': '⚠ 文件过大，浏览器无法处理。请拆分后分批上传。',
+        'err.file_too_large': '⚠ 单个文件超过 2 GB，浏览器内存限制无法处理，请拆分后上传。',
+        'ass.loading': '正在读取字幕文件，请稍候…',
         'font.chars': '{n} 字符',
         'font.local.btn': '从系统自动加载字体',
         'font.match_fail': '[font] ⚠ {n} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。',
@@ -1487,7 +1491,6 @@
         'font.missing': '待上传',
         'font.path.summary': '💡 常见字体安装路径',
         'font.skipped': '缺失',
-        'font.system': '✓ 系统字体',
         'font.system.missing': '[系统字体] 需提供',
         'font.upload.drop': '点击选择字体或 ZIP 压缩包，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
         'font.upload.title': '上传字体文件',
@@ -1508,11 +1511,9 @@
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
         'log.convert.start': '[convert] 开始转换…',
         'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体…',
-        'log.draw.decode_fail': '[draw] ⚠ 无法解码已有绘图字体，将重新生成',
         'log.draw.detail.expand': '[draw] {count} 个字形详情（点击展开）',
         'log.draw.done': '[draw] 绘图字体生成完毕：{size} KB',
         'log.draw.item': '  - 字符: {char} | 计数: {count} | 时间轴: [{start} -> {end}]',
-        'log.draw.kept_existing': '[draw] 保留已有绘图子集中的 {count} 个字符',
         'log.draw.none': '[draw] 未发现 \\p1 绘图指令，跳过。',
         'log.draw.summary': '[draw] 绘图指令关系分析完成，共计 {count} 个独立字形映射：',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
@@ -1521,7 +1522,6 @@
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（缩减 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」处理失败: {error}',
         'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字符)…',
-        'log.font.weight_fallback': '[font] ⚠ 「{name}」未找到粗体字体，使用已有字体替代。',
         'log.rewrite.start': '[ass] 重写字幕文件…',
         'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保您拥有所嵌入字体的分发权利。',
         'notice.drawing': '⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
@@ -1545,7 +1545,7 @@
         'stat.drawBlocks': '绘图块',
         'stat.extFonts': '外部字体',
         'stat.uniqueShapes': '唯一形状',
-        'status.analyzing': '正在分析… {current}/{total}',
+
         'status.draw': '正在生成绘图字体…',
         'status.parsing': '正在解析字幕…',
         'status.rewrite': '正在重写字幕…',
@@ -1577,7 +1577,6 @@
         'btn.convert': '開始轉換',
         'btn.converting': '處理中…',
         'btn.discuss': '討論',
-        'btn.dl_font': '下載字型',
         'btn.download': '下載優化後的字幕',
         'btn.download_zip': '下載全部 (ZIP)',
         'btn.install': '安裝',
@@ -1589,7 +1588,11 @@
         'err.format': '⚠ 請上傳 .ass 或 .ssa 格式的字幕檔。',
         'err.invalid': '⚠ 格式驗證失敗：「{name}」不是有效的 ASS/SSA 字幕檔。',
         'err.no_events': '⚠ 格式驗證失敗：「{name}」的 [Events] 區塊缺少 Format 或 Dialogue 行，無法解析。',
-        'err.zip_depth': '⚠ ZIP 嵌套層數超過 10 層限制，已停止解壓。',
+        'err.zip_depth': '⚠ ZIP 嵌套層數超過 {limit} 層限制，已停止解壓。',
+        'err.zip_corrupt': '⚠ ZIP 檔案已損毀或格式不受支援，無法讀取。',
+        'err.zip_too_large': '⚠ 檔案過大，瀏覽器無法處理。請拆分後分批上傳。',
+        'err.file_too_large': '⚠ 單一檔案超過 2 GB，瀏覽器記憶體限制無法處理，請拆分後上傳。',
+        'ass.loading': '正在讀取字幕檔，請稍候…',
         'font.chars': '{n} 字元',
         'font.local.btn': '從系統自動載入字型',
         'font.match_fail': '[font] ⚠ {n} 個字型檔未能匹配到字幕中的引用字型名，請確認字型是否正確。',
@@ -1601,7 +1604,6 @@
         'font.missing': '待上傳',
         'font.path.summary': '💡 常見字型安裝路徑',
         'font.skipped': '缺失',
-        'font.system': '✓ 系統字型',
         'font.system.missing': '[系統字型] 需提供',
         'font.upload.drop': '點擊選擇字型或 ZIP 壓縮包，或拖曳到此處（支援 TTF / OTF / TTC，可多選；不支援可變字型）',
         'font.upload.title': '上傳字型檔',
@@ -1622,11 +1624,9 @@
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
         'log.convert.start': '[convert] 開始轉換…',
         'log.draw.building': '[draw] 發現 {unique} 個唯一繪圖形狀，共 {total} 處引用，正在建構字型…',
-        'log.draw.decode_fail': '[draw] ⚠ 無法解碼已有繪圖字型，將重新生成',
         'log.draw.detail.expand': '[draw] {count} 個字形詳情（點擊展開）',
         'log.draw.done': '[draw] 繪圖字型生成完畢：{size} KB',
         'log.draw.item': '  - 字元: {char} | 計數: {count} | 時間軸: [{start} -> {end}]',
-        'log.draw.kept_existing': '[draw] 保留已有繪圖子集中的 {count} 個字元',
         'log.draw.none': '[draw] 未發現 \\p1 繪圖指令，跳過。',
         'log.draw.summary': '[draw] 繪圖指令關係分析完成，共計 {count} 個獨立字形映射：',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上傳，跳過。',
@@ -1635,7 +1635,6 @@
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（縮減 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」處理失敗: {error}',
         'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字元)…',
-        'log.font.weight_fallback': '[font] ⚠ 「{name}」未找到粗體字型，使用已有字型替代。',
         'log.rewrite.start': '[ass] 重寫字幕檔…',
         'notice.copyright': '⚠ 版權提示：分發未授權的字型檔可能構成侵權。請確保您擁有所嵌入字型的分發權利。',
         'notice.drawing': '⚠ 注意：繪圖指令轉換後，特效的大小和位置可能發生輕微偏移，請手動確認最終效果。',
@@ -1659,7 +1658,6 @@
         'stat.drawBlocks': '繪圖塊',
         'stat.extFonts': '外部字型',
         'stat.uniqueShapes': '唯一形狀',
-        'status.analyzing': '正在分析… {current}/{total}',
         'status.draw': '正在生成繪圖字型…',
         'status.parsing': '正在解析字幕…',
         'status.rewrite': '正在重寫字幕…',
@@ -1691,7 +1689,7 @@
         'btn.convert': 'Run Subsetter',
         'btn.converting': 'Processing…',
         'btn.discuss': 'Discussion',
-        'btn.dl_font': 'Download Font',
+
         'btn.download': 'Download Output',
         'btn.download_zip': 'Download All (ZIP)',
         'btn.install': 'Install',
@@ -1703,7 +1701,11 @@
         'err.format': '⚠ Please upload a valid .ass or .ssa subtitle script.',
         'err.invalid': '⚠ Validation failed: "{name}" is not a valid ASS/SSA script.',
         'err.no_events': '⚠ Validation failed: "{name}" has no valid Format/Dialogue lines in [Events].',
-        'err.zip_depth': '⚠ ZIP nesting exceeds 10 levels — extraction stopped.',
+        'err.zip_depth': '⚠ ZIP nesting exceeds {limit} levels — extraction stopped.',
+        'err.zip_corrupt': '⚠ The ZIP file is corrupted or in an unsupported format and cannot be read.',
+        'err.zip_too_large': '⚠ The file is too large for the browser to handle. Please split it into smaller parts.',
+        'err.file_too_large': '⚠ This file exceeds 2 GB — the browser cannot process files this large. Please split it before uploading.',
+        'ass.loading': 'Reading subtitle files, please wait…',
         'font.chars': '{n} chars',
         'font.local.btn': 'Load System Fonts',
         'font.match_fail': '[font] ⚠ {n} font file(s) could not be matched to any referenced font name. Please verify font names.',
@@ -1715,7 +1717,6 @@
         'font.missing': 'Upload required',
         'font.path.summary': '💡 Common font directories',
         'font.skipped': 'skipped',
-        'font.system': '✓ System font',
         'font.system.missing': '[System font] Upload required',
         'font.upload.drop': 'Click to select fonts or a ZIP archive, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
         'font.upload.title': 'Font Files',
@@ -1736,11 +1737,9 @@
         'log.convert.done': '[done] Finished. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Starting…',
         'log.draw.building': '[draw] {unique} unique shapes, {total} references — building font…',
-        'log.draw.decode_fail': '[draw] ⚠ Failed to decode existing draw font; rebuilding from scratch.',
         'log.draw.detail.expand': '[draw] {count} glyph mappings (click to expand)',
         'log.draw.done': '[draw] Draw font built: {size} KB',
         'log.draw.item': '  - Char: {char} | Count: {count} | Timeline: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] Kept {count} chars from existing draw subset',
         'log.draw.none': '[draw] No \\p1 draw commands found, skipping.',
         'log.draw.summary': '[draw] Draw analysis complete — {count} unique glyph mappings:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) not provided, skipping.',
@@ -1749,7 +1748,6 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" failed: {error}',
         'log.font.subsetting': '[font] Subsetting "{name}" ({weight}, {chars} chars)…',
-        'log.font.weight_fallback': '[font] ⚠ Bold variant not found for "{name}"; falling back to available weight.',
         'log.rewrite.start': '[ass] Rewriting script…',
         'notice.copyright': '⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.',
         'notice.drawing': '⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.',
@@ -1773,7 +1771,6 @@
         'stat.drawBlocks': 'Draw Blocks',
         'stat.extFonts': 'Ext. Fonts',
         'stat.uniqueShapes': 'Unique Shapes',
-        'status.analyzing': 'Analyzing… {current}/{total}',
         'status.draw': 'Building draw font…',
         'status.parsing': 'Parsing script…',
         'status.rewrite': 'Rewriting script…',
@@ -1805,7 +1802,7 @@
         'btn.convert': '変換開始',
         'btn.converting': '処理中…',
         'btn.discuss': 'ディスカッション',
-        'btn.dl_font': 'フォントをダウンロード',
+
         'btn.download': '最適化済み字幕をダウンロード',
         'btn.download_zip': 'すべてダウンロード (ZIP)',
         'btn.install': 'インストール',
@@ -1817,7 +1814,11 @@
         'err.format': '⚠ .ass または .ssa 形式の字幕ファイルをアップロードしてください。',
         'err.invalid': '⚠ 検証エラー：「{name}」は有効な ASS/SSA ファイルではありません。',
         'err.no_events': '⚠ 検証エラー：「{name}」の [Events] セクションに Format または Dialogue 行がありません。',
-        'err.zip_depth': '⚠ ZIP のネストが 10 層を超えました。解凍を停止しました。',
+        'err.zip_depth': '⚠ ZIP のネストが {limit} 層を超えました。解凍を停止しました。',
+        'err.zip_corrupt': '⚠ ZIP ファイルが破損しているか、サポートされていない形式です。',
+        'err.zip_too_large': '⚠ ファイルが大きすぎてブラウザで処理できません。分割してからアップロードしてください。',
+        'err.file_too_large': '⚠ ファイルが 2 GB を超えており、ブラウザのメモリ制限により処理できません。分割してアップロードしてください。',
+        'ass.loading': '字幕ファイルを読み込んでいます。しばらくお待ちください…',
         'font.chars': '{n} 文字',
         'font.local.btn': 'システムフォントを自動読み込み',
         'font.match_fail': '[font] ⚠ {n} 個のフォントファイルが字幕内の参照フォント名と一致しませんでした。フォント名を確認してください。',
@@ -1829,7 +1830,6 @@
         'font.missing': 'アップロード待ち',
         'font.path.summary': '💡 よく使われるフォントディレクトリ',
         'font.skipped': 'スキップ',
-        'font.system': '✓ システムフォント',
         'font.system.missing': '[システムフォント] アップロードが必要',
         'font.upload.drop': 'フォントまたは ZIP ファイルを選択、またはここにドラッグ（TTF / OTF / TTC 対応；可変フォント非対応）',
         'font.upload.title': 'フォントファイル',
@@ -1850,11 +1850,9 @@
         'log.convert.done': '[done] 完了。{origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] 変換を開始…',
         'log.draw.building': '[draw] {unique} 個のユニーク形状、{total} 件の参照を検出 — フォントを構築中…',
-        'log.draw.decode_fail': '[draw] ⚠ 既存の描画フォントのデコードに失敗しました。再生成します。',
         'log.draw.detail.expand': '[draw] {count} 件のグリフマッピング（クリックで展開）',
         'log.draw.done': '[draw] 描画フォントを生成しました：{size} KB',
         'log.draw.item': '  - 文字: {char} | 数: {count} | タイムライン: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] 既存の描画サブセットから {count} 文字を保持',
         'log.draw.none': '[draw] \\p1 描画コマンドが見つかりません。スキップします。',
         'log.draw.summary': '[draw] 描画分析完了 — {count} 件のユニークグリフマッピング：',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) がアップロードされていません。スキップします。',
@@ -1863,7 +1861,6 @@
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] 「{name}」の処理に失敗しました: {error}',
         'log.font.subsetting': '[font] 「{name}」({weight}、{chars} 文字) をサブセット化中…',
-        'log.font.weight_fallback': '[font] ⚠ 「{name}」のボールドが見つかりません。利用可能なフォントで代替します。',
         'log.rewrite.start': '[ass] スクリプトを書き換え中…',
         'notice.copyright': '⚠ 著作権注意：未許諾フォントの配布は権利侵害となる場合があります。埋め込むフォントの配布権利をご確認ください。',
         'notice.drawing': '⚠ 注意：描画コマンドの変換後、エフェクトの位置やサイズがわずかにずれることがあります。最終的な表示を必ず確認してください。',
@@ -1887,7 +1884,6 @@
         'stat.drawBlocks': '描画ブロック',
         'stat.extFonts': '外部フォント',
         'stat.uniqueShapes': 'ユニーク形状',
-        'status.analyzing': '分析中… {current}/{total}',
         'status.draw': '描画フォントを構築中…',
         'status.parsing': 'スクリプトを解析中…',
         'status.rewrite': 'スクリプトを書き換え中…',
@@ -1919,7 +1915,7 @@
         'btn.convert': '변환 시작',
         'btn.converting': '처리 중…',
         'btn.discuss': '토론',
-        'btn.dl_font': '폰트 다운로드',
+
         'btn.download': '최적화된 자막 다운로드',
         'btn.download_zip': '전체 다운로드 (ZIP)',
         'btn.install': '설치',
@@ -1931,7 +1927,11 @@
         'err.format': '⚠ .ass 또는 .ssa 형식의 자막 파일을 업로드해 주세요.',
         'err.invalid': '⚠ 검증 실패: "{name}"은(는) 유효한 ASS/SSA 파일이 아닙니다.',
         'err.no_events': '⚠ 검증 실패: "{name}"의 [Events] 섹션에 Format 또는 Dialogue 줄이 없습니다.',
-        'err.zip_depth': '⚠ ZIP 중첩이 10단계를 초과했습니다 — 압축 해제를 중단했습니다.',
+        'err.zip_depth': '⚠ ZIP 중첩이 {limit}단계를 초과했습니다 — 압축 해제를 중단했습니다.',
+        'err.zip_corrupt': '⚠ ZIP 파일이 손상되었거나 지원되지 않는 형식입니다.',
+        'err.zip_too_large': '⚠ 파일이 너무 커서 브라우저에서 처리할 수 없습니다. 분할 후 업로드해 주세요.',
+        'err.file_too_large': '⚠ 파일이 2 GB를 초과하여 브라우저 메모리 한계로 처리할 수 없습니다. 분할 후 업로드해 주세요.',
+        'ass.loading': '자막 파일을 읽는 중입니다. 잠시 기다려 주세요…',
         'font.chars': '{n}자',
         'font.local.btn': '시스템 폰트 자동 로드',
         'font.match_fail': '[font] ⚠ {n}개의 폰트 파일이 참조된 폰트 이름과 일치하지 않습니다. 폰트 이름을 확인하세요.',
@@ -1943,7 +1943,6 @@
         'font.missing': '업로드 필요',
         'font.path.summary': '💡 주요 폰트 디렉터리',
         'font.skipped': '건너뜀',
-        'font.system': '✓ 시스템 폰트',
         'font.system.missing': '[시스템 폰트] 업로드 필요',
         'font.upload.drop': '폰트 또는 ZIP 파일을 선택하거나 여기에 드래그하세요 (TTF / OTF / TTC; 가변 폰트 미지원)',
         'font.upload.title': '폰트 파일',
@@ -1964,11 +1963,9 @@
         'log.convert.done': '[done] 완료. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] 변환 시작…',
         'log.draw.building': '[draw] {unique}개의 고유 도형, {total}개의 참조 발견 — 폰트 구축 중…',
-        'log.draw.decode_fail': '[draw] ⚠ 기존 드로우 폰트 디코딩 실패. 재생성합니다.',
         'log.draw.detail.expand': '[draw] {count}개의 글리프 매핑 (클릭하여 펼치기)',
         'log.draw.done': '[draw] 드로우 폰트 생성 완료: {size} KB',
         'log.draw.item': '  - 문자: {char} | 횟수: {count} | 타임라인: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] 기존 드로우 서브셋에서 {count}개의 문자를 유지',
         'log.draw.none': '[draw] \\p1 드로우 명령어가 없습니다. 건너뜁니다.',
         'log.draw.summary': '[draw] 드로우 분석 완료 — {count}개의 고유 글리프 매핑:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) 업로드되지 않음, 건너뜁니다.',
@@ -1977,7 +1974,6 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" 처리 실패: {error}',
         'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 서브셋화 중…',
-        'log.font.weight_fallback': '[font] ⚠ "{name}"의 굵은 글씨체를 찾을 수 없어 사용 가능한 폰트로 대체합니다.',
         'log.rewrite.start': '[ass] 자막 스크립트 재작성 중…',
         'notice.copyright': '⚠ 저작권 주의: 허가 없이 폰트를 배포하면 저작권 침해가 될 수 있습니다. 삽입하는 폰트의 배포 권한이 있는지 확인하세요.',
         'notice.drawing': '⚠ 주의: 드로우 명령어 변환 후 효과의 위치나 크기가 약간 변경될 수 있습니다. 항상 최종 결과를 확인하세요.',
@@ -2001,7 +1997,6 @@
         'stat.drawBlocks': '드로우 블록',
         'stat.extFonts': '외부 폰트',
         'stat.uniqueShapes': '고유 도형',
-        'status.analyzing': '분석 중… {current}/{total}',
         'status.draw': '드로우 폰트 구축 중…',
         'status.parsing': '스크립트 파싱 중…',
         'status.rewrite': '스크립트 재작성 중…',
@@ -2033,7 +2028,7 @@
         'btn.convert': 'Iniciar conversión',
         'btn.converting': 'Procesando…',
         'btn.discuss': 'Discusión',
-        'btn.dl_font': 'Descargar fuente',
+
         'btn.download': 'Descargar subtítulo optimizado',
         'btn.download_zip': 'Descargar todo (ZIP)',
         'btn.install': 'Instalar',
@@ -2045,7 +2040,11 @@
         'err.format': '⚠ Por favor subí un archivo de subtítulos .ass o .ssa.',
         'err.invalid': '⚠ Validación fallida: "{name}" no es un archivo ASS/SSA válido.',
         'err.no_events': '⚠ Validación fallida: "{name}" no tiene líneas Format/Dialogue en [Events].',
-        'err.zip_depth': '⚠ El ZIP tiene más de 10 niveles de anidación — extracción detenida.',
+        'err.zip_depth': '⚠ El ZIP tiene más de {limit} niveles de anidación — extracción detenida.',
+        'err.zip_corrupt': '⚠ El archivo ZIP está dañado o en un formato no compatible.',
+        'err.zip_too_large': '⚠ El archivo es demasiado grande para que el navegador lo procese. Por favor divisalo en partes más pequeñas.',
+        'err.file_too_large': '⚠ Este archivo supera los 2 GB — el navegador no puede procesar archivos tan grandes. Por favor divisalo antes de subir.',
+        'ass.loading': 'Leyendo archivos de subtítulos, por favor esperá…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Cargar fuentes del sistema',
         'font.match_fail': '[font] ⚠ {n} archivo(s) de fuente no pudieron coincidir con ninguna fuente referenciada. Verificá los nombres.',
@@ -2057,7 +2056,6 @@
         'font.missing': 'Pendiente de subir',
         'font.path.summary': '💡 Directorios de fuentes comunes',
         'font.skipped': 'omitida',
-        'font.system': '✓ Fuente del sistema',
         'font.system.missing': '[Fuente del sistema] Requiere subir',
         'font.upload.drop': 'Hacé clic para seleccionar fuentes o un ZIP, o arrastrá aquí (TTF / OTF / TTC; fuentes variables no compatibles)',
         'font.upload.title': 'Archivos de fuentes',
@@ -2078,11 +2076,9 @@
         'log.convert.done': '[done] Completado. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Iniciando…',
         'log.draw.building': '[draw] {unique} formas únicas, {total} referencias — construyendo fuente…',
-        'log.draw.decode_fail': '[draw] ⚠ No se pudo decodificar la fuente de dibujo existente; regenerando.',
         'log.draw.detail.expand': '[draw] {count} mapeos de glifos (clic para expandir)',
         'log.draw.done': '[draw] Fuente de dibujo generada: {size} KB',
         'log.draw.item': '  - Carácter: {char} | Conteo: {count} | Línea de tiempo: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] Se conservaron {count} caracteres del subconjunto de dibujo existente',
         'log.draw.none': '[draw] No se encontraron comandos de dibujo \\p1, omitiendo.',
         'log.draw.summary': '[draw] Análisis completo — {count} mapeos de glifos únicos:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) no fue subida, omitiendo.',
@@ -2091,7 +2087,6 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falló: {error}',
         'log.font.subsetting': '[font] Creando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
-        'log.font.weight_fallback': '[font] ⚠ No se encontró variante negrita de "{name}"; usando peso disponible.',
         'log.rewrite.start': '[ass] Reescribiendo el script…',
         'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegurate de tener permiso para distribuir las fuentes que incrustes.',
         'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores. Siempre verificá el resultado final.',
@@ -2115,7 +2110,6 @@
         'stat.drawBlocks': 'Bloques de dibujo',
         'stat.extFonts': 'Fuentes ext.',
         'stat.uniqueShapes': 'Formas únicas',
-        'status.analyzing': 'Analizando… {current}/{total}',
         'status.draw': 'Construyendo fuente de dibujo…',
         'status.parsing': 'Parseando el script…',
         'status.rewrite': 'Reescribiendo el script…',
@@ -2147,7 +2141,7 @@
         'btn.convert': 'Запустить субсеттер',
         'btn.converting': 'Обработка…',
         'btn.discuss': 'Обсуждение',
-        'btn.dl_font': 'Скачать шрифт',
+
         'btn.download': 'Скачать результат',
         'btn.download_zip': 'Скачать всё (ZIP)',
         'btn.install': 'Установить',
@@ -2159,7 +2153,11 @@
         'err.format': '⚠ Пожалуйста, загрузите файл субтитров в формате .ass или .ssa.',
         'err.invalid': '⚠ Ошибка проверки: «{name}» не является корректным файлом ASS/SSA.',
         'err.no_events': '⚠ Ошибка проверки: в секции [Events] файла «{name}» отсутствуют строки Format или Dialogue.',
-        'err.zip_depth': '⚠ Вложенность ZIP превышает 10 уровней — извлечение остановлено.',
+        'err.zip_depth': '⚠ Вложенность ZIP превышает {limit} уровней — извлечение остановлено.',
+        'err.zip_corrupt': '⚠ ZIP-файл повреждён или имеет неподдерживаемый формат.',
+        'err.zip_too_large': '⚠ Файл слишком большой для обработки в браузере. Пожалуйста, разделите его на части.',
+        'err.file_too_large': '⚠ Файл превышает 2 ГБ — браузер не может его обработать. Пожалуйста, разделите его перед загрузкой.',
+        'ass.loading': 'Чтение файлов субтитров, пожалуйста подождите…',
         'font.chars': '{n} симв.',
         'font.local.btn': 'Загрузить системные шрифты',
         'font.match_fail': '[font] ⚠ {n} файл(ов) шрифтов не удалось сопоставить с именами в скрипте. Проверьте правильность имён.',
@@ -2171,7 +2169,6 @@
         'font.missing': 'Требует загрузки',
         'font.path.summary': '💡 Стандартные папки шрифтов',
         'font.skipped': 'пропущен',
-        'font.system': '✓ Системный шрифт',
         'font.system.missing': '[Системный шрифт] Требует загрузки',
         'font.upload.drop': 'Нажмите для выбора шрифтов или ZIP-архива, или перетащите сюда (TTF / OTF / TTC; вариативные шрифты не поддерживаются)',
         'font.upload.title': 'Файлы шрифтов',
@@ -2192,11 +2189,9 @@
         'log.convert.done': '[done] Готово. {origKB} КБ → {newKB} КБ ({delta} КБ)',
         'log.convert.start': '[convert] Запуск обработки…',
         'log.draw.building': '[draw] {unique} уникальных форм, {total} ссылок — строим шрифт…',
-        'log.draw.decode_fail': '[draw] ⚠ Не удалось декодировать существующий шрифт рисования; пересборка с нуля.',
         'log.draw.detail.expand': '[draw] {count} глиф-маппингов (нажмите для раскрытия)',
         'log.draw.done': '[draw] Шрифт рисования создан: {size} КБ',
         'log.draw.item': '  - Символ: {char} | Кол-во: {count} | Тайм-код: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] Сохранено {count} символов из существующего подмножества',
         'log.draw.none': '[draw] Команды рисования \\p1 не найдены, пропуск.',
         'log.draw.summary': '[draw] Анализ рисования завершён — {count} уникальных глиф-маппингов:',
         'log.font.missing': '[font] ⚠ «{name}» ({weight}) не загружен, пропуск.',
@@ -2205,7 +2200,6 @@
         'log.font.subset_done': '[font] «{name}» ({weight}): {origKB} КБ → {newKB} КБ (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] Ошибка обработки «{name}»: {error}',
         'log.font.subsetting': '[font] Создание подмножества «{name}» ({weight}, {chars} симв.)…',
-        'log.font.weight_fallback': '[font] ⚠ Жирное начертание «{name}» не найдено; используется доступное.',
         'log.rewrite.start': '[ass] Перезапись скрипта…',
         'notice.copyright': '⚠ Авторские права: распространение шрифтов без лицензии может нарушать авторские права. Убедитесь в наличии прав на распространение встраиваемых шрифтов.',
         'notice.drawing': '⚠ Внимание: после конвертации команд рисования возможны незначительные смещения позиций и размеров эффектов. Обязательно проверьте конечный результат.',
@@ -2229,7 +2223,6 @@
         'stat.drawBlocks': 'Блоки рисования',
         'stat.extFonts': 'Внеш. шрифты',
         'stat.uniqueShapes': 'Уник. формы',
-        'status.analyzing': 'Анализ… {current}/{total}',
         'status.draw': 'Построение шрифта рисования…',
         'status.parsing': 'Разбор скрипта…',
         'status.rewrite': 'Перезапись скрипта…',
@@ -2261,7 +2254,7 @@
         'btn.convert': 'Executar Subsetter',
         'btn.converting': 'Processando…',
         'btn.discuss': 'Discussão',
-        'btn.dl_font': 'Baixar fonte',
+
         'btn.download': 'Baixar legenda otimizada',
         'btn.download_zip': 'Baixar tudo (ZIP)',
         'btn.install': 'Instalar',
@@ -2273,7 +2266,11 @@
         'err.format': '⚠ Por favor, envie um arquivo de legenda .ass ou .ssa.',
         'err.invalid': '⚠ Validação falhou: "{name}" não é um arquivo ASS/SSA válido.',
         'err.no_events': '⚠ Validação falhou: "{name}" não possui linhas Format/Dialogue em [Events].',
-        'err.zip_depth': '⚠ O ZIP possui mais de 10 níveis de aninhamento — extração interrompida.',
+        'err.zip_depth': '⚠ O ZIP possui mais de {limit} níveis de aninhamento — extração interrompida.',
+        'err.zip_corrupt': '⚠ O arquivo ZIP está corrompido ou em um formato não suportado.',
+        'err.zip_too_large': '⚠ O arquivo é grande demais para o navegador processar. Por favor, divida-o em partes menores.',
+        'err.file_too_large': '⚠ Este arquivo supera 2 GB — o navegador não consegue processá-lo. Por favor, divida-o antes de enviar.',
+        'ass.loading': 'Lendo arquivos de legenda, aguarde…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Carregar fontes do sistema',
         'font.match_fail': '[font] ⚠ {n} arquivo(s) de fonte não corresponderam a nenhuma fonte referenciada. Verifique os nomes.',
@@ -2285,7 +2282,6 @@
         'font.missing': 'Aguardando envio',
         'font.path.summary': '💡 Diretórios de fontes comuns',
         'font.skipped': 'ignorada',
-        'font.system': '✓ Fonte do sistema',
         'font.system.missing': '[Fonte do sistema] Envio necessário',
         'font.upload.drop': 'Clique para selecionar fontes ou um ZIP, ou arraste aqui (TTF / OTF / TTC; fontes variáveis não suportadas)',
         'font.upload.title': 'Arquivos de fonte',
@@ -2306,11 +2302,9 @@
         'log.convert.done': '[done] Concluído. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Iniciando…',
         'log.draw.building': '[draw] {unique} formas únicas, {total} referências — construindo fonte…',
-        'log.draw.decode_fail': '[draw] ⚠ Falha ao decodificar fonte de desenho existente; reconstruindo do zero.',
         'log.draw.detail.expand': '[draw] {count} mapeamentos de glifos (clique para expandir)',
         'log.draw.done': '[draw] Fonte de desenho criada: {size} KB',
         'log.draw.item': '  - Caractere: {char} | Contagem: {count} | Timeline: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] Mantidos {count} caracteres do subconjunto de desenho existente',
         'log.draw.none': '[draw] Nenhum comando de desenho \\p1 encontrado, pulando.',
         'log.draw.summary': '[draw] Análise de desenho concluída — {count} mapeamentos de glifos únicos:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) não foi enviado, pulando.',
@@ -2319,7 +2313,6 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falhou: {error}',
         'log.font.subsetting': '[font] Criando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
-        'log.font.weight_fallback': '[font] ⚠ Variante negrito não encontrada para "{name}"; usando peso disponível.',
         'log.rewrite.start': '[ass] Reescrevendo script…',
         'notice.copyright': '⚠ Direitos autorais: redistribuir fontes sem licença adequada pode constituir infração. Certifique-se de ter permissão para distribuir as fontes que incorporar.',
         'notice.drawing': '⚠ Atenção: a conversão de comandos de desenho pode causar pequenos deslocamentos de posição ou escala. Sempre verifique o resultado final.',
@@ -2343,7 +2336,6 @@
         'stat.drawBlocks': 'Blocos de desenho',
         'stat.extFonts': 'Fontes ext.',
         'stat.uniqueShapes': 'Formas únicas',
-        'status.analyzing': 'Analisando… {current}/{total}',
         'status.draw': 'Construindo fonte de desenho…',
         'status.parsing': 'Analisando script…',
         'status.rewrite': 'Reescrevendo script…',
@@ -2375,7 +2367,7 @@
         'btn.convert': 'تشغيل المُقلِّص',
         'btn.converting': 'جارٍ المعالجة…',
         'btn.discuss': 'نقاش',
-        'btn.dl_font': 'تحميل الخط',
+
         'btn.download': 'تحميل الناتج',
         'btn.download_zip': 'تحميل الكل (ZIP)',
         'btn.install': 'تثبيت',
@@ -2387,7 +2379,11 @@
         'err.format': '⚠ يرجى رفع ملف ترجمة بصيغة .ass أو .ssa.',
         'err.invalid': '⚠ فشل التحقق: "{name}" ليس ملف ASS/SSA صحيحاً.',
         'err.no_events': '⚠ فشل التحقق: لا توجد أسطر Format/Dialogue في قسم [Events] بالملف "{name}".',
-        'err.zip_depth': '⚠ يتجاوز تداخل ZIP 10 مستويات — توقف الاستخراج.',
+        'err.zip_depth': '⚠ يتجاوز تداخل ZIP {limit} مستويات — توقف الاستخراج.',
+        'err.zip_corrupt': '⚠ ملف ZIP تالف أو بتنسيق غير مدعوم.',
+        'err.zip_too_large': '⚠ الملف كبير جداً ليعالجه المتصفح. يرجى تقسيمه إلى أجزاء أصغر.',
+        'err.file_too_large': '⚠ يتجاوز هذا الملف 2 GB — لا يستطيع المتصفح معالجته. يرجى تقسيمه قبل الرفع.',
+        'ass.loading': 'جارٍ قراءة ملفات الترجمة، يرجى الانتظار…',
         'font.chars': '{n} حرف',
         'font.local.btn': 'تحميل خطوط النظام',
         'font.match_fail': '[font] ⚠ تعذّر مطابقة {n} ملف خط مع الخطوط المشار إليها في النص. تحقق من الأسماء.',
@@ -2399,7 +2395,6 @@
         'font.missing': 'في انتظار الرفع',
         'font.path.summary': '💡 مسارات الخطوط الشائعة',
         'font.skipped': 'تم التخطي',
-        'font.system': '✓ خط النظام',
         'font.system.missing': '[خط النظام] يلزم الرفع',
         'font.upload.drop': 'انقر لاختيار الخطوط أو ملف ZIP، أو اسحب هنا (TTF / OTF / TTC؛ الخطوط المتغيرة غير مدعومة)',
         'font.upload.title': 'ملفات الخطوط',
@@ -2420,11 +2415,9 @@
         'log.convert.done': '[done] اكتمل. {origKB} كيلوبايت → {newKB} كيلوبايت ({delta} كيلوبايت)',
         'log.convert.start': '[convert] بدء المعالجة…',
         'log.draw.building': '[draw] {unique} شكل فريد، {total} إحالة — جارٍ بناء الخط…',
-        'log.draw.decode_fail': '[draw] ⚠ فشل فك ترميز خط الرسم الموجود؛ سيتم إعادة البناء من الصفر.',
         'log.draw.detail.expand': '[draw] {count} تعيين غليف (انقر للتوسيع)',
         'log.draw.done': '[draw] تم بناء خط الرسم: {size} كيلوبايت',
         'log.draw.item': '  - الحرف: {char} | العدد: {count} | التوقيت: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] تم الاحتفاظ بـ {count} حرف من المجموعة الفرعية الموجودة',
         'log.draw.none': '[draw] لم يتم العثور على أوامر رسم \\p1، جارٍ التخطي.',
         'log.draw.summary': '[draw] اكتمل تحليل الرسم — {count} تعيين غليف فريد:',
         'log.font.missing': '[font] ⚠ لم يتم رفع "{name}" ({weight})، جارٍ التخطي.',
@@ -2433,7 +2426,6 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} كيلوبايت → {newKB} كيلوبايت (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] فشلت معالجة "{name}": {error}',
         'log.font.subsetting': '[font] جارٍ تقليص "{name}" ({weight}، {chars} حرف)…',
-        'log.font.weight_fallback': '[font] ⚠ لم يتم العثور على النسخة العريضة من "{name}"؛ استخدام الوزن المتاح.',
         'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص…',
         'notice.copyright': '⚠ حقوق الملكية: قد يُشكّل توزيع الخطوط دون ترخيص انتهاكاً لحقوق النشر. تأكد من امتلاكك حق توزيع الخطوط التي تضمّنها.',
         'notice.drawing': '⚠ ملاحظة: قد يتسبب تحويل أوامر الرسم في انزياحات طفيفة في المواضع والأحجام. تحقق دائماً من النتيجة النهائية.',
@@ -2457,7 +2449,6 @@
         'stat.drawBlocks': 'كتل الرسم',
         'stat.extFonts': 'خطوط خارجية',
         'stat.uniqueShapes': 'أشكال فريدة',
-        'status.analyzing': 'جارٍ التحليل… {current}/{total}',
         'status.draw': 'جارٍ بناء خط الرسم…',
         'status.parsing': 'جارٍ تحليل النص…',
         'status.rewrite': 'جارٍ إعادة الكتابة…',
@@ -2489,7 +2480,7 @@
         'btn.convert': 'Alt Kümelemeyi Çalıştır',
         'btn.converting': 'İşleniyor…',
         'btn.discuss': 'Tartışma',
-        'btn.dl_font': 'Fontu indir',
+
         'btn.download': 'Çıktıyı indir',
         'btn.download_zip': 'Tümünü indir (ZIP)',
         'btn.install': 'Yükle',
@@ -2501,7 +2492,11 @@
         'err.format': '⚠ Lütfen .ass veya .ssa formatında bir altyazı dosyası yükleyin.',
         'err.invalid': '⚠ Doğrulama hatası: "{name}" geçerli bir ASS/SSA dosyası değil.',
         'err.no_events': '⚠ Doğrulama hatası: "{name}" dosyasının [Events] bölümünde Format veya Dialogue satırı yok.',
-        'err.zip_depth': '⚠ ZIP iç içe geçme 10 seviyeyi aşıyor — çıkarma durduruldu.',
+        'err.zip_depth': '⚠ ZIP iç içe geçme {limit} seviyeyi aşıyor — çıkarma durduruldu.',
+        'err.zip_corrupt': '⚠ ZIP dosyası bozuk veya desteklenmeyen bir formatta.',
+        'err.zip_too_large': '⚠ Dosya tarayıcının işleyemeyeceği kadar büyük. Lütfen daha küçük parçalara bölün.',
+        'err.file_too_large': '⚠ Bu dosya 2 GB\'ı aşıyor — tarayıcı bu kadar büyük dosyaları işleyemiyor. Lütfen yüklemeden önce bölün.',
+        'ass.loading': 'Altyazı dosyaları okunuyor, lütfen bekleyin…',
         'font.chars': '{n} karakter',
         'font.local.btn': 'Sistem fontlarını yükle',
         'font.match_fail': '[font] ⚠ {n} font dosyası altyazıdaki font adlarıyla eşleştirilemedi. Adları kontrol edin.',
@@ -2513,7 +2508,6 @@
         'font.missing': 'Yükleme bekleniyor',
         'font.path.summary': '💡 Yaygın font dizinleri',
         'font.skipped': 'atlandı',
-        'font.system': '✓ Sistem fontu',
         'font.system.missing': '[Sistem fontu] Yükleme gerekli',
         'font.upload.drop': 'Font veya ZIP seçmek için tıklayın ya da buraya sürükleyin (TTF / OTF / TTC; değişken fontlar desteklenmez)',
         'font.upload.title': 'Font dosyaları',
@@ -2534,11 +2528,9 @@
         'log.convert.done': '[done] Tamamlandı. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Başlatılıyor…',
         'log.draw.building': '[draw] {unique} benzersiz şekil, {total} referans — font oluşturuluyor…',
-        'log.draw.decode_fail': '[draw] ⚠ Mevcut çizim fontu çözümlenemedi; sıfırdan yeniden oluşturuluyor.',
         'log.draw.detail.expand': '[draw] {count} glif eşlemesi (genişletmek için tıkla)',
         'log.draw.done': '[draw] Çizim fontu oluşturuldu: {size} KB',
         'log.draw.item': '  - Karakter: {char} | Sayı: {count} | Zaman çizelgesi: [{start} → {end}]',
-        'log.draw.kept_existing': '[draw] Mevcut çizim alt kümesinden {count} karakter korundu',
         'log.draw.none': '[draw] \\p1 çizim komutu bulunamadı, atlanıyor.',
         'log.draw.summary': '[draw] Çizim analizi tamamlandı — {count} benzersiz glif eşlemesi:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) yüklenmedi, atlanıyor.',
@@ -2547,7 +2539,6 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" başarısız: {error}',
         'log.font.subsetting': '[font] "{name}" alt kümeleniyor ({weight}, {chars} karakter)…',
-        'log.font.weight_fallback': '[font] ⚠ "{name}" için kalın varyant bulunamadı; mevcut ağırlık kullanılıyor.',
         'log.rewrite.start': '[ass] Script yeniden yazılıyor…',
         'notice.copyright': '⚠ Telif hakkı: Lisanssız font dağıtımı telif hakkı ihlali sayılabilir. Gömdüğünüz fontları dağıtma hakkınız olduğundan emin olun.',
         'notice.drawing': '⚠ Dikkat: çizim komutlarının dönüştürülmesi efektlerde küçük konum veya boyut farklılıklarına yol açabilir. Sonucu mutlaka kontrol edin.',
@@ -2571,7 +2562,6 @@
         'stat.drawBlocks': 'Çizim blokları',
         'stat.extFonts': 'Harici fontlar',
         'stat.uniqueShapes': 'Benzersiz şekiller',
-        'status.analyzing': 'Analiz ediliyor… {current}/{total}',
         'status.draw': 'Çizim fontu oluşturuluyor…',
         'status.parsing': 'Script ayrıştırılıyor…',
         'status.rewrite': 'Script yeniden yazılıyor…',
@@ -2889,9 +2879,18 @@
         return gbk.decode(buffer);
       }
     }
+    const ZIP_MAX_DEPTH = 10;
+    function classifyZipError() {
+      return 'err.zip_corrupt';
+    }
     async function processZipFile(file, type, depth = 0) {
-      if (depth >= 10) throw new Error('err.zip_depth');
-      const zip = await JSZip.loadAsync(file);
+      if (depth >= ZIP_MAX_DEPTH) throw new Error('err.zip_depth');
+      let zip;
+      try {
+        zip = await JSZip.loadAsync(file);
+      } catch (e) {
+        throw new Error(classifyZipError(e));
+      }
       const results = [];
       for (const [name, entry] of Object.entries(zip.files)) {
         if (entry.dir) continue;
@@ -2921,23 +2920,44 @@
     }
 
     async function handleASSFiles(files) {
+      const FILE_SIZE_LIMIT = 2 * 1024 * 1024 * 1024;
       const assEntries = [];
+      const dzAss = document.getElementById('dz-ass');
+      const badge = document.getElementById('ass-badge');
+      const showAssError = (fileName, errMsg) => {
+        badge.classList.remove('hidden');
+        badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
+          '<span class="fb-name">' + fileName + '</span>' +
+          '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
+          '</div><div class="upload-error">' + errMsg + '</div>';
+        dzAss.style.display = 'none';
+      };
       for (const f of Array.from(files)) {
+        if (f.size > FILE_SIZE_LIMIT) {
+          showAssError(f.name, t('err.file_too_large'));
+          return;
+        }
         if (f.name.toLowerCase().endsWith('.zip')) {
+          dzAss.style.display = 'none';
+          badge.classList.remove('hidden');
+          badge.innerHTML = '<div class="file-badge" style="border-color:var(--rule)">' +
+            '<span class="fb-name">' + f.name + '</span>' +
+            '<span class="fb-size" id="ass-loading-label">' + t('ass.loading') + '</span>' +
+            '</div>';
           try {
             const extracted = await processZipFile(f, 'ass');
             assEntries.push(...extracted);
-        } catch (e) {
-            const errMsg = t(e.message) || e.message;
-            const badge = document.getElementById('ass-badge');
-            badge.classList.remove('hidden');
-            badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
-              '<span class="fb-name">' + f.name + '</span>' +
-              '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
-              '</div><div class="upload-error">' + errMsg + '</div>';
-            document.getElementById('dz-ass').style.display = 'none';
+          } catch (e) {
+            const key = e.message;
+            const errMsg = key === 'err.zip_depth'
+              ? t('err.zip_depth', { limit: ZIP_MAX_DEPTH })
+              : (I18N[currentLang] && I18N[currentLang][key] ? t(key) : t('err.zip_corrupt'));
+            showAssError(f.name, errMsg);
             return;
           }
+          badge.innerHTML = '';
+          badge.classList.add('hidden');
+          dzAss.style.display = '';
         } else if (/\.(ass|ssa)$/i.test(f.name)) {
           const buf = await f.arrayBuffer();
           const uint8 = new Uint8Array(buf);
@@ -2948,13 +2968,7 @@
         }
       }
       if (assEntries.length === 0) {
-        const badge = document.getElementById('ass-badge');
-        badge.classList.remove('hidden');
-        badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
-          '<span class="fb-name">' + Array.from(files).map(f => f.name).join(', ') + '</span>' +
-          '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
-          '</div><div class="upload-error">' + t('err.format') + '</div>';
-        document.getElementById('dz-ass').style.display = 'none';
+        showAssError(Array.from(files).map(f => f.name).join(', '), t('err.format'));
         return;
       }
       S.assFiles = [];
@@ -2962,8 +2976,7 @@
       S.outputBlobs = [];
       S.fontBuffers = [];
 
-      document.getElementById('dz-ass').style.display = 'none';
-      const badge = document.getElementById('ass-badge');
+      dzAss.style.display = 'none';
       badge.classList.remove('hidden');
       badge.innerHTML = assEntries.map(e =>
         '<div class="file-badge"><span class="fb-name">' + e.file.name + '</span>' +
@@ -3240,17 +3253,44 @@
         }
       }
       const reqArr = Array.from(requiredFonts);
+      const FILE_SIZE_LIMIT_FONT = 2 * 1024 * 1024 * 1024;
       const fontEntries = [];
+      let fontLoadError = null;
       for (const f of Array.from(files)) {
+        if (f.size > FILE_SIZE_LIMIT_FONT) {
+          fontLoadError = t('err.file_too_large');
+          break;
+        }
         if (f.name.toLowerCase().endsWith('.zip')) {
-          const extracted = await processZipFile(f, 'font');
-          fontEntries.push(...extracted);
+          try {
+            const extracted = await processZipFile(f, 'font');
+            fontEntries.push(...extracted);
+          } catch (e) {
+            const key = e.message;
+            fontLoadError = key === 'err.zip_depth'
+              ? t('err.zip_depth', { limit: ZIP_MAX_DEPTH })
+              : (I18N[currentLang] && I18N[currentLang][key] ? t(key) : t('err.zip_corrupt'));
+            break;
+          }
         } else {
           try {
             const buf = await f.arrayBuffer();
             fontEntries.push({ file: f, buffer: buf });
           } catch (_) { }
         }
+      }
+      if (fontLoadError) {
+        notice.classList.add('hidden');
+        dz.style.display = '';
+        const errDiv = document.createElement('div');
+        errDiv.className = 'upload-error';
+        errDiv.style.marginBottom = '0.75rem';
+        errDiv.textContent = fontLoadError;
+        const fontSection = document.getElementById('font-section');
+        const existing = fontSection.querySelector('.upload-error');
+        if (existing) existing.remove();
+        dz.insertAdjacentElement('afterend', errDiv);
+        return;
       }
       const totalEntries = fontEntries.length;
 
