@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.5">
+  <meta name="version" content="2.2.6">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -596,6 +596,38 @@
       border: none;
       border-top: 1px solid var(--rule2);
       margin: 1.25rem 0;
+    }
+
+    .font-loading-notice {
+      display: flex;
+      flex-direction: column;
+      gap: 0.625rem;
+      padding: 1rem 1.25rem;
+      border: 1.5px solid var(--rule);
+      border-radius: var(--r);
+      background: var(--paper);
+      margin-bottom: 1rem;
+    }
+
+    .font-loading-notice .fln-label {
+      font-size: 0.85rem;
+      color: var(--ink2);
+      font-family: var(--mono);
+    }
+
+    .font-loading-notice .progress-track {
+      height: 4px;
+      background: var(--rule2);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .font-loading-notice .progress-bar {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      border-radius: 2px;
+      transition: width 0.15s linear;
     }
 
     .font-upload-zone {
@@ -1324,6 +1356,12 @@
           <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="上传字体文件">
             <span data-i18n="font.upload.drop">点击选择字体文件，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）</span>
           </label>
+          <div id="font-loading-notice" class="font-loading-notice hidden" role="status" aria-live="polite" aria-label="">
+            <span id="fln-label" class="fln-label"></span>
+            <div class="progress-track" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="fln-progressbar">
+              <div class="progress-bar" id="fln-bar"></div>
+            </div>
+          </div>
           <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.zip" multiple class="file-input-hidden" data-i18n-aria="aria.dz_font" aria-label="上传字体文件">
           <details class="font-path-hint">
             <summary data-i18n="font.path.summary">💡 常见字体安装路径</summary>
@@ -1465,6 +1503,9 @@
         'font.system.missing': '[系统字体] 需提供',
         'font.upload.drop': '点击选择字体或 ZIP 压缩包，或拖拽到此处（支持 TTF / OTF / TTC，可多选；不支持可变字体）',
         'font.upload.title': '上传字体文件',
+        'font.loading.label': '正在读取字体文件，请稍候…',
+        'font.loading.matching': '正在识别字体 {current} / {total}',
+        'font.loading.aria': '字体文件读取中，请勿关闭页面',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': '粗体',
         'font.weight.normal': '常规',
@@ -1576,6 +1617,9 @@
         'font.system.missing': '[系統字型] 需提供',
         'font.upload.drop': '點擊選擇字型或 ZIP 壓縮包，或拖曳到此處（支援 TTF / OTF / TTC，可多選；不支援可變字型）',
         'font.upload.title': '上傳字型檔',
+        'font.loading.label': '正在讀取字型檔，請稍候…',
+        'font.loading.matching': '正在識別字型 {current} / {total}',
+        'font.loading.aria': '字型檔讀取中，請勿關閉頁面',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': '粗體',
         'font.weight.normal': '常規',
@@ -1687,6 +1731,9 @@
         'font.system.missing': '[System font] Upload required',
         'font.upload.drop': 'Click to select fonts or a ZIP archive, or drag here (TTF / OTF / TTC, multi-select; variable fonts not supported)',
         'font.upload.title': 'Font Files',
+        'font.loading.label': 'Reading font files, please wait…',
+        'font.loading.matching': 'Identifying font {current} / {total}',
+        'font.loading.aria': 'Font files are being read, do not close this page',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Bold',
         'font.weight.normal': 'Regular',
@@ -1798,6 +1845,9 @@
         'font.system.missing': '[システムフォント] アップロードが必要',
         'font.upload.drop': 'フォントまたは ZIP ファイルを選択、またはここにドラッグ（TTF / OTF / TTC 対応；可変フォント非対応）',
         'font.upload.title': 'フォントファイル',
+        'font.loading.label': 'フォントファイルを読み込んでいます。しばらくお待ちください…',
+        'font.loading.matching': 'フォントを識別中 {current} / {total}',
+        'font.loading.aria': 'フォントファイル読み込み中。ページを閉じないでください',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'ボールド',
         'font.weight.normal': 'レギュラー',
@@ -1909,6 +1959,9 @@
         'font.system.missing': '[시스템 폰트] 업로드 필요',
         'font.upload.drop': '폰트 또는 ZIP 파일을 선택하거나 여기에 드래그하세요 (TTF / OTF / TTC; 가변 폰트 미지원)',
         'font.upload.title': '폰트 파일',
+        'font.loading.label': '폰트 파일을 읽는 중입니다. 잠시 기다려 주세요…',
+        'font.loading.matching': '폰트 식별 중 {current} / {total}',
+        'font.loading.aria': '폰트 파일 읽는 중입니다. 페이지를 닫지 마세요',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': '굵게',
         'font.weight.normal': '보통',
@@ -2020,6 +2073,9 @@
         'font.system.missing': '[Fuente del sistema] Requiere subir',
         'font.upload.drop': 'Hacé clic para seleccionar fuentes o un ZIP, o arrastrá aquí (TTF / OTF / TTC; fuentes variables no compatibles)',
         'font.upload.title': 'Archivos de fuentes',
+        'font.loading.label': 'Leyendo archivos de fuentes, por favor esperá…',
+        'font.loading.matching': 'Identificando fuente {current} / {total}',
+        'font.loading.aria': 'Leyendo archivos de fuentes, no cierres la página',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Negrita',
         'font.weight.normal': 'Regular',
@@ -2131,6 +2187,9 @@
         'font.system.missing': '[Системный шрифт] Требует загрузки',
         'font.upload.drop': 'Нажмите для выбора шрифтов или ZIP-архива, или перетащите сюда (TTF / OTF / TTC; вариативные шрифты не поддерживаются)',
         'font.upload.title': 'Файлы шрифтов',
+        'font.loading.label': 'Чтение файлов шрифтов, пожалуйста подождите…',
+        'font.loading.matching': 'Идентификация шрифта {current} / {total}',
+        'font.loading.aria': 'Идёт чтение файлов шрифтов, не закрывайте страницу',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Жирный',
         'font.weight.normal': 'Обычный',
@@ -2242,6 +2301,9 @@
         'font.system.missing': '[Fonte do sistema] Envio necessário',
         'font.upload.drop': 'Clique para selecionar fontes ou um ZIP, ou arraste aqui (TTF / OTF / TTC; fontes variáveis não suportadas)',
         'font.upload.title': 'Arquivos de fonte',
+        'font.loading.label': 'Lendo arquivos de fonte, aguarde…',
+        'font.loading.matching': 'Identificando fonte {current} / {total}',
+        'font.loading.aria': 'Lendo arquivos de fonte, não feche a página',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Negrito',
         'font.weight.normal': 'Regular',
@@ -2353,6 +2415,9 @@
         'font.system.missing': '[خط النظام] يلزم الرفع',
         'font.upload.drop': 'انقر لاختيار الخطوط أو ملف ZIP، أو اسحب هنا (TTF / OTF / TTC؛ الخطوط المتغيرة غير مدعومة)',
         'font.upload.title': 'ملفات الخطوط',
+        'font.loading.label': 'جارٍ قراءة ملفات الخطوط، يرجى الانتظار…',
+        'font.loading.matching': 'جارٍ التعرف على الخط {current} / {total}',
+        'font.loading.aria': 'جارٍ قراءة ملفات الخطوط، لا تغلق الصفحة',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'عريض',
         'font.weight.normal': 'عادي',
@@ -2464,6 +2529,9 @@
         'font.system.missing': '[Sistem fontu] Yükleme gerekli',
         'font.upload.drop': 'Font veya ZIP seçmek için tıklayın ya da buraya sürükleyin (TTF / OTF / TTC; değişken fontlar desteklenmez)',
         'font.upload.title': 'Font dosyaları',
+        'font.loading.label': 'Font dosyaları okunuyor, lütfen bekleyin…',
+        'font.loading.matching': 'Font tanımlanıyor {current} / {total}',
+        'font.loading.aria': 'Font dosyaları okunuyor, sayfayı kapatmayın',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Kalın',
         'font.weight.normal': 'Normal',
@@ -3097,6 +3165,17 @@
     }
 
     async function handleFonts(files) {
+      const dz = document.getElementById('dz-font');
+      const loadingNotice = document.getElementById('font-loading-notice');
+      const flnLabel = document.getElementById('fln-label');
+      const flnBar = document.getElementById('fln-bar');
+
+      dz.style.display = 'none';
+      loadingNotice.classList.remove('hidden');
+      loadingNotice.setAttribute('aria-label', t('font.loading.aria'));
+      flnLabel.textContent = t('font.loading.label');
+      flnBar.style.width = '0%';
+
       const requiredFonts = new Set();
       const wantSys = document.getElementById('opt-sysfont').checked;
       for (const entry of S.assFiles) {
@@ -3123,6 +3202,8 @@
       let notMatched = 0;
       let matched = 0;
       const itemLines = [];
+      let _flnRafPending = false;
+      let _flnLastUpdate = 0;
       for (let ei = 0; ei < totalEntries; ei++) {
         const entry = fontEntries[ei];
         try {
@@ -3149,6 +3230,19 @@
           itemLines.push(t('font.upload.item.skip', { name: entry.file.name }));
           notMatched++;
         }
+        const now = performance.now();
+        if (totalEntries > 0 && now - _flnLastUpdate > 100 && !_flnRafPending) {
+          _flnRafPending = true;
+          const _ei = ei;
+          requestAnimationFrame(() => {
+            const pct = Math.round((_ei + 1) / totalEntries * 100);
+            flnBar.style.width = pct + '%';
+            document.getElementById('fln-progressbar').setAttribute('aria-valuenow', pct);
+            flnLabel.textContent = t('font.loading.matching', { current: _ei + 1, total: totalEntries });
+            _flnRafPending = false;
+            _flnLastUpdate = performance.now();
+          });
+        }
       }
 
       const box = document.getElementById('log-box');
@@ -3174,6 +3268,11 @@
       log(t('font.upload.done', { matched }), 'ok');
       if (notMatched > 0) log(t('font.match_fail', { n: notMatched }), 'warn');
       box.scrollTop = box.scrollHeight;
+
+      flnBar.style.width = '100%';
+      loadingNotice.classList.add('hidden');
+      dz.style.display = '';
+
       renderFontList();
     }
 
