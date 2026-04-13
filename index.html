@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.8">
+  <meta name="version" content="2.2.9">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -3096,7 +3096,7 @@
       cbDraw.checked = hasDrawings && shouldDraw;
       rowDraw.classList.toggle('selected', hasDrawings && shouldDraw);
       rowDraw.classList.toggle('disabled', !hasDrawings || !shouldDraw);
-      rowDraw.classList.remove('hidden');
+      rowDraw.classList.toggle('hidden', !hasDrawings);
 
       cbFont.disabled = !hasFonts;
       cbFont.checked = hasFonts;
@@ -3307,6 +3307,12 @@
       log(t('font.upload.done', { matched }), 'ok');
       if (notMatched > 0) log(t('font.match_fail', { n: notMatched }), 'warn');
       box.scrollTop = box.scrollHeight;
+
+      const requiredKeys = new Set(Array.from(requiredFonts).map(n => n.toLowerCase()));
+      for (const key of S.uploadedFonts.keys()) {
+        if (!requiredKeys.has(key)) S.uploadedFonts.delete(key);
+      }
+
       renderFontList();
     }
 
