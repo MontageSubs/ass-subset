@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.2.12">
+  <meta name="version" content="2.2.12-debug">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -2920,7 +2920,7 @@
     }
 
     async function handleASSFiles(files) {
-      const FILE_SIZE_LIMIT = 2 * 1024 * 1024 * 1024;
+      const FILE_SIZE_LIMIT = 4 * 1024 * 1024 * 1024;
       const assEntries = [];
       const dzAss = document.getElementById('dz-ass');
       const badge = document.getElementById('ass-badge');
@@ -3253,7 +3253,7 @@
         }
       }
       const reqArr = Array.from(requiredFonts);
-      const FILE_SIZE_LIMIT_FONT = 2 * 1024 * 1024 * 1024;
+      const FILE_SIZE_LIMIT_FONT = 4 * 1024 * 1024 * 1024;
       const fontEntries = [];
       let fontLoadError = null;
       for (const f of Array.from(files)) {
