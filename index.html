@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4">
+  <meta name="version" content="2.4.1">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -3966,7 +3966,7 @@
           if (S.assFiles.length > 1) log('--- ' + entry.file.name + ' ---', 'info');
 
           const p = entry.parsed;
-          const needDraw = wantDraw && (p.subsetNeedsUpdate || (p.drawings > 0 && !p.hasExistingDrawSubset) || (p.drawings === 0 && p.hasExistingDrawSubset));
+          const needDraw = wantDraw && (p.subsetNeedsUpdate || p.drawings > 0 || p.hasExistingDrawSubset);
           const needFont = (wantFont && p.externalFonts && Object.keys(p.externalFonts).length > 0) || (wantSystemFont && p.systemFontsReferenced && Object.keys(p.systemFontsReferenced).length > 0);
           const needStrip = wantStrip;
 
