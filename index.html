@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.4">
+  <meta name="version" content="2.4.5">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -856,12 +856,16 @@
     .result-box .rb-title {
       font-weight: 600;
       margin-bottom: 0.2rem;
+      word-break: break-all;
+      overflow-wrap: break-word;
     }
 
     .result-box .rb-detail {
       font-size: 0.8rem;
       color: var(--ink2);
       font-family: var(--mono);
+      word-break: break-all;
+      overflow-wrap: break-word;
     }
 
     .result-box .rb-actions {
@@ -1562,13 +1566,13 @@
         'change': '更换文件',
         'discuss.header': '讨论 · Discussion',
         'discuss.loading': '加载中…',
-        'err.format': '⚠ 请上传 .ass 或 .ssa 格式的字幕文件。',
-        'err.invalid': '⚠ 格式验证失败：「{name}」不是有效的 ASS/SSA 字幕文件。',
-        'err.no_events': '⚠ 格式验证失败：「{name}」的 [Events] 区块缺少 Format 或 Dialogue 行，无法解析。',
-        'err.zip_depth': '⚠ ZIP 嵌套层数超过 {limit} 层限制，已停止解压。',
-        'err.folder_depth': '⚠ 文件夹嵌套层数超过 {limit} 层限制，已停止遍历。',
-        'err.zip_corrupt': '⚠ ZIP 文件已损坏或格式不受支持，无法读取。',
-        'err.file_too_large': '⚠ 单个文件超过 2 GB，浏览器内存限制无法处理，请拆分后上传。',
+        'err.format': '请上传 .ass 或 .ssa 格式的字幕文件。',
+        'err.invalid': '不是有效的 ASS/SSA 字幕文件',
+        'err.no_events': '[Events] 区块缺少 Format 或 Dialogue 行，无法解析',
+        'err.zip_depth': 'ZIP 嵌套层数超过 {limit} 层限制，已停止解压。',
+        'err.folder_depth': '文件夹嵌套层数超过 {limit} 层限制，已停止遍历。',
+        'err.zip_corrupt': 'ZIP 文件已损坏或格式不受支持，无法读取',
+        'err.file_too_large': '文件超过 2 GB，浏览器内存限制，请拆分后上传',
         'ass.loading': '正在读取字幕文件，请稍候…',
         'font.chars': '{n} 字符',
         'font.local.btn': '从系统自动加载字体',
@@ -1692,13 +1696,13 @@
         'change': '更換檔案',
         'discuss.header': '討論 · Discussion',
         'discuss.loading': '載入中…',
-        'err.format': '⚠ 請上傳 .ass 或 .ssa 格式的字幕檔。',
-        'err.invalid': '⚠ 格式驗證失敗：「{name}」不是有效的 ASS/SSA 字幕檔。',
-        'err.no_events': '⚠ 格式驗證失敗：「{name}」的 [Events] 區塊缺少 Format 或 Dialogue 行，無法解析。',
-        'err.zip_depth': '⚠ ZIP 嵌套層數超過 {limit} 層限制，已停止解壓。',
-        'err.folder_depth': '⚠ 資料夾嵌套層數超過 {limit} 層限制，已停止遍歷。',
-        'err.zip_corrupt': '⚠ ZIP 檔案已損毀或格式不受支援，無法讀取。',
-        'err.file_too_large': '⚠ 單一檔案超過 2 GB，瀏覽器記憶體限制無法處理，請拆分後上傳。',
+        'err.format': '請上傳 .ass 或 .ssa 格式的字幕檔',
+        'err.invalid': '不是有效的 ASS/SSA 字幕檔',
+        'err.no_events': '[Events] 區塊缺少 Format 或 Dialogue 行，無法解析',
+        'err.zip_depth': 'ZIP 嵌套層數超過 {limit} 層限制，已停止解壓。',
+        'err.folder_depth': '資料夾嵌套層數超過 {limit} 層限制，已停止遍歷。',
+        'err.zip_corrupt': 'ZIP 檔案已損毀或格式不受支援，無法讀取',
+        'err.file_too_large': '檔案超過 2 GB，瀏覽器記憶體限制，請拆分後上傳',
         'ass.loading': '正在讀取字幕檔，請稍候…',
         'font.chars': '{n} 字元',
         'font.local.btn': '從系統自動載入字型',
@@ -1822,13 +1826,13 @@
         'change': 'Change',
         'discuss.header': 'Discussion',
         'discuss.loading': 'Loading…',
-        'err.format': '⚠ Please upload a valid .ass or .ssa subtitle script.',
-        'err.invalid': '⚠ Validation failed: "{name}" is not a valid ASS/SSA script.',
-        'err.no_events': '⚠ Validation failed: "{name}" has no valid Format/Dialogue lines in [Events].',
-        'err.zip_depth': '⚠ ZIP nesting exceeds {limit} levels — extraction stopped.',
-        'err.folder_depth': '⚠ Folder nesting exceeds {limit} levels — traversal stopped.',
-        'err.zip_corrupt': '⚠ The ZIP file is corrupted or in an unsupported format and cannot be read.',
-        'err.file_too_large': '⚠ This file exceeds 2 GB — the browser cannot process files this large. Please split it before uploading.',
+        'err.format': 'Please upload a valid .ass or .ssa subtitle script',
+        'err.invalid': 'Not a valid ASS/SSA script',
+        'err.no_events': 'No valid Format/Dialogue lines in [Events]',
+        'err.zip_depth': 'ZIP nesting exceeds {limit} levels — extraction stopped.',
+        'err.folder_depth': 'Folder nesting exceeds {limit} levels — traversal stopped.',
+        'err.zip_corrupt': 'ZIP file is corrupted or unsupported format',
+        'err.file_too_large': 'File exceeds 2 GB — browser limit. Please split before uploading',
         'ass.loading': 'Reading subtitle files, please wait…',
         'font.chars': '{n} chars',
         'font.local.btn': 'Load System Fonts',
@@ -1952,13 +1956,13 @@
         'change': 'ファイルを変更',
         'discuss.header': 'ディスカッション · Discussion',
         'discuss.loading': '読み込み中…',
-        'err.format': '⚠ .ass または .ssa 形式の字幕ファイルをアップロードしてください。',
-        'err.invalid': '⚠ 検証エラー：「{name}」は有効な ASS/SSA ファイルではありません。',
-        'err.no_events': '⚠ 検証エラー：「{name}」の [Events] セクションに Format または Dialogue 行がありません。',
-        'err.zip_depth': '⚠ ZIP のネストが {limit} 層を超えました。解凍を停止しました。',
-        'err.folder_depth': '⚠ フォルダのネストが {limit} 層を超えました。トラバーサルを停止しました。',
-        'err.zip_corrupt': '⚠ ZIP ファイルが破損しているか、サポートされていない形式です。',
-        'err.file_too_large': '⚠ ファイルが 2 GB を超えており、ブラウザのメモリ制限により処理できません。分割してアップロードしてください。',
+        'err.format': '.ass または .ssa 形式の字幕ファイルをアップロードしてください',
+        'err.invalid': '有効な ASS/SSA ファイルではありません',
+        'err.no_events': '[Events] セクションに Format または Dialogue 行がありません',
+        'err.zip_depth': 'ZIP のネストが {limit} 層を超えました。解凍を停止しました',
+        'err.folder_depth': 'フォルダのネストが {limit} 層を超えました',
+        'err.zip_corrupt': 'ZIP ファイルが破損しているか、サポートされていない形式です',
+        'err.file_too_large': 'ファイルが 2 GB を超えており、処理できません。分割してください',
         'ass.loading': '字幕ファイルを読み込んでいます。しばらくお待ちください…',
         'font.chars': '{n} 文字',
         'font.local.btn': 'システムフォントを自動読み込み',
@@ -2082,13 +2086,13 @@
         'change': '파일 변경',
         'discuss.header': '토론 · Discussion',
         'discuss.loading': '로딩 중…',
-        'err.format': '⚠ .ass 또는 .ssa 형식의 자막 파일을 업로드해 주세요.',
-        'err.invalid': '⚠ 검증 실패: "{name}"은(는) 유효한 ASS/SSA 파일이 아닙니다.',
-        'err.no_events': '⚠ 검증 실패: "{name}"의 [Events] 섹션에 Format 또는 Dialogue 줄이 없습니다.',
-        'err.zip_depth': '⚠ ZIP 중첩이 {limit}단계를 초과했습니다 — 압축 해제를 중단했습니다.',
-        'err.folder_depth': '⚠ 폴더 중첩이 {limit}단계를 초과했습니다 — 탐색을 중단했습니다.',
-        'err.zip_corrupt': '⚠ ZIP 파일이 손상되었거나 지원되지 않는 형식입니다.',
-        'err.file_too_large': '⚠ 파일이 2 GB를 초과하여 브라우저 메모리 한계로 처리할 수 없습니다. 분할 후 업로드해 주세요.',
+        'err.format': '.ass 또는 .ssa 형식의 자막 파일을 업로드해 주세요',
+        'err.invalid': '유효한 ASS/SSA 파일이 아닙니다',
+        'err.no_events': '[Events] 섹션에 Format 또는 Dialogue 줄이 없습니다',
+        'err.zip_depth': 'ZIP 중첩이 {limit}단계를 초과했습니다',
+        'err.folder_depth': '폴더 중첩이 {limit}단계를 초과했습니다',
+        'err.zip_corrupt': 'ZIP 파일이 손상되었거나 지원되지 않는 형식입니다',
+        'err.file_too_large': '파일이 2 GB를 초과합니다. 분할 후 업로드해 주세요',
         'ass.loading': '자막 파일을 읽는 중입니다. 잠시 기다려 주세요…',
         'font.chars': '{n}자',
         'font.local.btn': '시스템 폰트 자동 로드',
@@ -2212,13 +2216,13 @@
         'change': 'Cambiar archivo',
         'discuss.header': 'Discusión · Discussion',
         'discuss.loading': 'Cargando…',
-        'err.format': '⚠ Por favor subí un archivo de subtítulos .ass o .ssa.',
-        'err.invalid': '⚠ Validación fallida: "{name}" no es un archivo ASS/SSA válido.',
-        'err.no_events': '⚠ Validación fallida: "{name}" no tiene líneas Format/Dialogue en [Events].',
-        'err.zip_depth': '⚠ El ZIP tiene más de {limit} niveles de anidación — extracción detenida.',
-        'err.folder_depth': '⚠ La carpeta tiene más de {limit} niveles de anidación — recorrido detenido.',
-        'err.zip_corrupt': '⚠ El archivo ZIP está dañado o en un formato no compatible.',
-        'err.file_too_large': '⚠ Este archivo supera los 2 GB — el navegador no puede procesar archivos tan grandes. Por favor divisalo antes de subir.',
+        'err.format': 'Por favor subí un archivo de subtítulos .ass o .ssa',
+        'err.invalid': 'No es un archivo ASS/SSA válido',
+        'err.no_events': 'Sin líneas Format/Dialogue válidas en [Events]',
+        'err.zip_depth': 'El ZIP tiene más de {limit} niveles de anidación',
+        'err.folder_depth': 'La carpeta tiene más de {limit} niveles de anidación',
+        'err.zip_corrupt': 'El archivo ZIP está dañado o en un formato no compatible',
+        'err.file_too_large': 'El archivo supera 2 GB — divídalo antes de subir',
         'ass.loading': 'Leyendo archivos de subtítulos, por favor esperá…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Cargar fuentes del sistema',
@@ -2342,13 +2346,13 @@
         'change': 'Сменить файл',
         'discuss.header': 'Обсуждение · Discussion',
         'discuss.loading': 'Загрузка…',
-        'err.format': '⚠ Пожалуйста, загрузите файл субтитров в формате .ass или .ssa.',
-        'err.invalid': '⚠ Ошибка проверки: «{name}» не является корректным файлом ASS/SSA.',
-        'err.no_events': '⚠ Ошибка проверки: в секции [Events] файла «{name}» отсутствуют строки Format или Dialogue.',
-        'err.zip_depth': '⚠ Вложенность ZIP превышает {limit} уровней — извлечение остановлено.',
-        'err.folder_depth': '⚠ Вложенность папки превышает {limit} уровней — обход остановлен.',
-        'err.zip_corrupt': '⚠ ZIP-файл повреждён или имеет неподдерживаемый формат.',
-        'err.file_too_large': '⚠ Файл превышает 2 ГБ — браузер не может его обработать. Пожалуйста, разделите его перед загрузкой.',
+        'err.format': 'Загрузите файл субтитров в формате .ass или .ssa',
+        'err.invalid': 'Не является корректным файлом ASS/SSA',
+        'err.no_events': 'В секции [Events] отсутствуют строки Format или Dialogue',
+        'err.zip_depth': 'Вложенность ZIP превышает {limit} уровней',
+        'err.folder_depth': 'Вложенность папки превышает {limit} уровней',
+        'err.zip_corrupt': 'ZIP-файл повреждён или имеет неподдерживаемый формат',
+        'err.file_too_large': 'Файл превышает 2 ГБ — разделите его перед загрузкой',
         'ass.loading': 'Чтение файлов субтитров, пожалуйста подождите…',
         'font.chars': '{n} симв.',
         'font.local.btn': 'Загрузить системные шрифты',
@@ -2472,13 +2476,13 @@
         'change': 'Trocar arquivo',
         'discuss.header': 'Discussão · Discussion',
         'discuss.loading': 'Carregando…',
-        'err.format': '⚠ Por favor, envie um arquivo de legenda .ass ou .ssa.',
-        'err.invalid': '⚠ Validação falhou: "{name}" não é um arquivo ASS/SSA válido.',
-        'err.no_events': '⚠ Validação falhou: "{name}" não possui linhas Format/Dialogue em [Events].',
-        'err.zip_depth': '⚠ O ZIP possui mais de {limit} níveis de aninhamento — extração interrompida.',
-        'err.folder_depth': '⚠ A pasta possui mais de {limit} níveis de aninhamento — travessia interrompida.',
-        'err.zip_corrupt': '⚠ O arquivo ZIP está corrompido ou em um formato não suportado.',
-        'err.file_too_large': '⚠ Este arquivo supera 2 GB — o navegador não consegue processá-lo. Por favor, divida-o antes de enviar.',
+        'err.format': 'Por favor, envie um arquivo de legenda .ass ou .ssa',
+        'err.invalid': 'Não é um arquivo ASS/SSA válido',
+        'err.no_events': 'Sem linhas Format/Dialogue válidas em [Events]',
+        'err.zip_depth': 'O ZIP possui mais de {limit} níveis de aninhamento',
+        'err.folder_depth': 'A pasta possui mais de {limit} níveis de aninhamento',
+        'err.zip_corrupt': 'O arquivo ZIP está corrompido ou em um formato não suportado',
+        'err.file_too_large': 'Arquivo supera 2 GB — divida-o antes de enviar',
         'ass.loading': 'Lendo arquivos de legenda, aguarde…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Carregar fontes do sistema',
@@ -2602,13 +2606,13 @@
         'change': 'تغيير الملف',
         'discuss.header': 'نقاش · Discussion',
         'discuss.loading': 'جارٍ التحميل…',
-        'err.format': '⚠ يرجى رفع ملف ترجمة بصيغة .ass أو .ssa.',
-        'err.invalid': '⚠ فشل التحقق: "{name}" ليس ملف ASS/SSA صحيحاً.',
-        'err.no_events': '⚠ فشل التحقق: لا توجد أسطر Format/Dialogue في قسم [Events] بالملف "{name}".',
-        'err.zip_depth': '⚠ يتجاوز تداخل ZIP {limit} مستويات — توقف الاستخراج.',
-        'err.folder_depth': '⚠ يتجاوز تداخل المجلد {limit} مستويات — توقف الاجتياز.',
-        'err.zip_corrupt': '⚠ ملف ZIP تالف أو بتنسيق غير مدعوم.',
-        'err.file_too_large': '⚠ يتجاوز هذا الملف 2 GB — لا يستطيع المتصفح معالجته. يرجى تقسيمه قبل الرفع.',
+        'err.format': 'يرجى رفع ملف ترجمة بصيغة .ass أو .ssa',
+        'err.invalid': 'ليس ملف ASS/SSA صحيحاً',
+        'err.no_events': 'لا توجد أسطر Format/Dialogue في قسم [Events]',
+        'err.zip_depth': 'يتجاوز تداخل ZIP {limit} مستويات',
+        'err.folder_depth': 'يتجاوز تداخل المجلد {limit} مستويات',
+        'err.zip_corrupt': 'ملف ZIP تالف أو بتنسيق غير مدعوم',
+        'err.file_too_large': 'يتجاوز هذا الملف 2 GB — يرجى تقسيمه قبل الرفع',
         'ass.loading': 'جارٍ قراءة ملفات الترجمة، يرجى الانتظار…',
         'font.chars': '{n} حرف',
         'font.local.btn': 'تحميل خطوط النظام',
@@ -2732,13 +2736,13 @@
         'change': 'Dosyayı değiştir',
         'discuss.header': 'Tartışma · Discussion',
         'discuss.loading': 'Yükleniyor…',
-        'err.format': '⚠ Lütfen .ass veya .ssa formatında bir altyazı dosyası yükleyin.',
-        'err.invalid': '⚠ Doğrulama hatası: "{name}" geçerli bir ASS/SSA dosyası değil.',
-        'err.no_events': '⚠ Doğrulama hatası: "{name}" dosyasının [Events] bölümünde Format veya Dialogue satırı yok.',
-        'err.zip_depth': '⚠ ZIP iç içe geçme {limit} seviyeyi aşıyor — çıkarma durduruldu.',
-        'err.folder_depth': '⚠ Klasör iç içe geçme {limit} seviyeyi aşıyor — tarama durduruldu.',
-        'err.zip_corrupt': '⚠ ZIP dosyası bozuk veya desteklenmeyen bir formatta.',
-        'err.file_too_large': '⚠ Bu dosya 2 GB\'ı aşıyor — tarayıcı bu kadar büyük dosyaları işleyemiyor. Lütfen yüklemeden önce bölün.',
+        'err.format': 'Lütfen .ass veya .ssa formatında bir altyazı dosyası yükleyin',
+        'err.invalid': 'Geçerli bir ASS/SSA dosyası değil',
+        'err.no_events': '[Events] bölümünde Format veya Dialogue satırı yok',
+        'err.zip_depth': 'ZIP iç içe geçme {limit} seviyeyi aşıyor',
+        'err.folder_depth': 'Klasör iç içe geçme {limit} seviyeyi aşıyor',
+        'err.zip_corrupt': 'ZIP dosyası bozuk veya desteklenmeyen bir formatta',
+        'err.file_too_large': 'Dosya 2 GB\'ı aşıyor — lütfen yüklemeden önce bölün',
         'ass.loading': 'Altyazı dosyaları okunuyor, lütfen bekleyin…',
         'font.chars': '{n} karakter',
         'font.local.btn': 'Sistem fontlarını yükle',
@@ -2931,6 +2935,7 @@
         }
       }
       renderAssBadge();
+      renderAssErrors();
       renderFontError();
       document.getElementById('lang-wrap').classList.remove('open');
       document.getElementById('btn-lang-toggle').setAttribute('aria-expanded', 'false');
@@ -3016,6 +3021,35 @@
     };
 
     let _assBadgeState = null;
+    let _assFileErrors = null;
+
+    function truncateName(name, max) {
+      if (!name || name.length <= max) return name;
+      const ext = name.lastIndexOf('.');
+      const stem = ext > 0 ? name.slice(0, ext) : name;
+      const suffix = ext > 0 ? name.slice(ext) : '';
+      const keep = max - 3 - suffix.length;
+      return keep > 0 ? stem.slice(0, keep) + '…' + suffix : name.slice(0, max - 1) + '…';
+    }
+
+    function renderAssErrors() {
+      const errBox = document.querySelector('#step1 .upload-error');
+      if (!errBox) return;
+      if (_assFileErrors && _assFileErrors.length > 0) {
+        errBox.textContent = _assFileErrors.map(e => {
+          const msg = e.message || t(e.key, e.params || {});
+          if (e.name) {
+            const shortName = truncateName(e.name, 30);
+            return `⚠ ${shortName}: ${msg}`;
+          }
+          return `⚠ ${msg}`;
+        }).join('\n');
+        errBox.classList.remove('hidden');
+      } else {
+        errBox.textContent = '';
+        errBox.classList.add('hidden');
+      }
+    }
 
     function renderAssBadge() {
       const badge = document.getElementById('ass-badge');
@@ -3049,11 +3083,25 @@
     let _fontErrState = null;
 
     function renderFontError() {
-      if (!_fontErrState) return;
+      if (!_fontErrState || !_fontErrState.length) return;
       const fontSection = document.getElementById('font-section');
       if (!fontSection) return;
-      const existing = fontSection.querySelector('.upload-error');
-      if (existing) existing.textContent = t(_fontErrState.errKey, _fontErrState.errParams);
+      let errDiv = fontSection.querySelector('.font-upload-error');
+      if (!errDiv) {
+        errDiv = document.createElement('div');
+        errDiv.className = 'upload-error font-upload-error';
+        errDiv.style.marginBottom = '0.75rem';
+        const dz = document.getElementById('dz-font');
+        if (dz) dz.insertAdjacentElement('afterend', errDiv);
+        else fontSection.prepend(errDiv);
+      }
+      errDiv.textContent = _fontErrState.map(e => {
+        if (e.name) {
+          const shortName = truncateName(e.name, 30);
+          return `⚠ ${shortName}: ${t(e.key, e.params || {})}`;
+        }
+        return `⚠ ${t(e.key, e.params || {})}`;
+      }).join('\n');
     }
 
     let batchFileIdx = 0;
@@ -3251,14 +3299,10 @@
       const assEntries = [];
       const dzAss = document.getElementById('dz-ass');
       const badge = document.getElementById('ass-badge');
-      const showAssError = (fileName, errKey, errParams) => {
-        _assBadgeState = { type: 'error', fileName, errKey, errParams: errParams || null };
-        renderAssBadge();
-      };
-      const errors = [];
+      const fileErrors = [];
       for (const f of Array.from(files)) {
         if (f.size > FILE_SIZE_LIMIT) {
-          errors.push({ name: f.name, key: 'err.file_too_large' });
+          fileErrors.push({ name: f.name, key: 'err.file_too_large' });
           continue;
         }
         if (f.name.toLowerCase().endsWith('.zip')) {
@@ -3269,7 +3313,7 @@
             assEntries.push(...extracted);
           } catch (e) {
             const key = e.message;
-            errors.push({
+            fileErrors.push({
               name: f.name,
               key: key === 'err.zip_depth' ? 'err.zip_depth' : 'err.zip_corrupt',
               params: key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null
@@ -3288,28 +3332,38 @@
             const content = text.startsWith('\uFEFF') ? text.slice(1) : text;
             assEntries.push({ file: f, content, rawBuffer: buf, hasBOM: hasBOM });
           } catch (e) {
-            errors.push({ name: f.name, key: 'err.zip_corrupt' });
+            fileErrors.push({ name: f.name, key: 'err.zip_corrupt' });
           }
         } else {
-          errors.push({ name: f.name, key: 'err.format' });
+          fileErrors.push({ name: f.name, key: 'err.format' });
         }
       }
 
-      const errBox = document.querySelector('#step1 .upload-error');
-      if (errBox) {
-        if (errors.length > 0) {
-          errBox.textContent = errors.map(e => `⚠ ${e.name}: ${t(e.key, e.params)}`).join('\n');
-          errBox.classList.remove('hidden');
-        } else {
-          errBox.textContent = '';
-          errBox.classList.add('hidden');
+      const validEntries = [];
+      for (const entry of assEntries) {
+        const content = entry.content;
+        if (!/^\[Script Info\]/im.test(content) || !/^\[Events\]/im.test(content)) {
+          fileErrors.push({ name: entry.file.name, key: 'err.invalid' });
+          continue;
         }
+        if (!/^Format\s*:/im.test(content) || !/^Dialogue\s*:/im.test(content)) {
+          fileErrors.push({ name: entry.file.name, key: 'err.no_events' });
+          continue;
+        }
+        validEntries.push(entry);
       }
 
-      if (assEntries.length === 0) {
-        if (errors.length === 0) showAssError(Array.from(files).map(f => f.name).join(', '), 'err.format');
+      _assFileErrors = fileErrors.length > 0 ? fileErrors : null;
+      renderAssErrors();
+
+      if (validEntries.length === 0) {
+        if (fileErrors.length === 0) {
+          _assFileErrors = [{ name: Array.from(files).map(f => f.name).join(', '), key: 'err.format' }];
+        }
+        renderAssErrors();
         return;
       }
+
       S.assFiles = [];
       S.uploadedFonts.clear();
       S.outputBlobs = [];
@@ -3318,7 +3372,7 @@
       dzAss.style.display = 'none';
       _assBadgeState = {
         type: 'success',
-        entries: assEntries.map(e => ({ name: e.file.name, sizeKB: (e.file.size / 1024).toFixed(0) }))
+        entries: validEntries.map(e => ({ name: e.file.name, sizeKB: (e.file.size / 1024).toFixed(0) }))
       };
       renderAssBadge();
 
@@ -3341,30 +3395,28 @@
         <div style="color:var(--ink2);font-family:var(--mono);font-size:0.83rem;">${t('status.parsing')}</div>
       `;
 
-      for (const entry of assEntries) {
-        const content = entry.content;
-        if (!/^\[Script Info\]/im.test(content) || !/^\[Events\]/im.test(content)) {
-          area.innerHTML = '<div class="upload-error">' + t('err.invalid', { name: entry.file.name }) + '</div>';
-          return;
-        }
-        if (!/^Format\s*:/im.test(content) || !/^Dialogue\s*:/im.test(content)) {
-          area.innerHTML = '<div class="upload-error">' + t('err.no_events', { name: entry.file.name }) + '</div>';
-          return;
-        }
+      const parseErrors = [];
+      for (const entry of validEntries) {
         try {
-          const result = await workerCall('parseASS', { text: content });
+          const result = await workerCall('parseASS', { text: entry.content });
           S.assFiles.push({
             file: entry.file,
-            content,
+            content: entry.content,
             hasBOM: entry.hasBOM,
             rawBuffer: entry.rawBuffer,
             parsed: result
           });
         } catch (e) {
-          area.innerHTML = '<div class="upload-error">⚠ ' + e.message + '</div>';
-          return;
+          parseErrors.push({ name: entry.file.name, message: e.message });
         }
       }
+
+      if (parseErrors.length > 0) {
+        _assFileErrors = _assFileErrors ? _assFileErrors.concat(parseErrors) : parseErrors;
+        renderAssErrors();
+      }
+
+      if (S.assFiles.length === 0) return;
 
       renderAnalysis(false);
       updateStepStatus();
@@ -3406,6 +3458,11 @@
       S.converted = false;
       S.downloaded = false;
       _assBadgeState = null;
+      _assFileErrors = null;
+      _fontErrState = null;
+
+      const errBox = document.querySelector('#step1 .upload-error');
+      if (errBox) { errBox.textContent = ''; errBox.classList.add('hidden'); }
 
       updateStepStatus();
     }
@@ -3782,19 +3839,12 @@
       }
 
       if (errors.length > 0) {
-        const errLines = errors.map(e => `⚠ ${e.name}: ${t(e.key, e.params)}`).join('\n');
-        const fontSection = document.getElementById('font-section');
-        let errDiv = fontSection.querySelector('.font-upload-error');
-        if (!errDiv) {
-          errDiv = document.createElement('div');
-          errDiv.className = 'upload-error font-upload-error';
-          errDiv.style.marginBottom = '0.75rem';
-          dz.insertAdjacentElement('afterend', errDiv);
-        }
-        errDiv.textContent = errLines;
+        _fontErrState = errors;
+        renderFontError();
       } else {
+        _fontErrState = null;
         const fontSection = document.getElementById('font-section');
-        const errDiv = fontSection.querySelector('.font-upload-error');
+        const errDiv = fontSection ? fontSection.querySelector('.font-upload-error') : null;
         if (errDiv) errDiv.remove();
       }
       const totalEntries = fontEntries.length;
@@ -4494,15 +4544,8 @@
           }
         } catch (err) {
           if (err.message === 'err.folder_depth') {
-            const dz = document.getElementById('dz-font');
-            const fontSection = document.getElementById('font-section');
-            const existing = fontSection.querySelector('.upload-error');
-            if (existing) existing.remove();
-            const errDiv = document.createElement('div');
-            errDiv.className = 'upload-error';
-            errDiv.style.marginBottom = '0.75rem';
-            errDiv.textContent = t('err.folder_depth', { limit: 10 });
-            dz.insertAdjacentElement('afterend', errDiv);
+            _fontErrState = [{ name: '', key: 'err.folder_depth', params: { limit: 10 } }];
+            renderFontError();
           }
         }
       });
