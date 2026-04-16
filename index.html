@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.6">
+  <meta name="version" content="2.4.7">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -2912,14 +2912,7 @@
       if (typeof renderAssBadge === 'function') renderAssBadge();
       if (typeof renderFontError === 'function') renderFontError();
       if (typeof renderConvertResults === 'function') renderConvertResults();
-      const uploadError = document.querySelector('.upload-error');
-      if (uploadError && _assBadgeState && _assBadgeState.type === 'error') {
-        uploadError.textContent = t(_assBadgeState.errKey, _assBadgeState.errParams);
-      }
-      const fbSize = document.querySelector('.file-badge .fb-size');
-      if (fbSize && _assBadgeState && _assBadgeState.type === 'loading') {
-        fbSize.textContent = t('ass.loading');
-      }
+      
       if (document.getElementById('preview-modal').classList.contains('open')) {
         const previewTitle = document.getElementById('preview-title');
         if (previewTitle) previewTitle.textContent = t('preview.title');
@@ -2932,7 +2925,7 @@
         const flnProgressWrap = document.getElementById('fln-progress-wrap');
         const flnText = document.getElementById('fln-text');
         if (flnText) flnText.textContent = t('font.loading.label');
-        
+
         if (flnProgressWrap && !flnProgressWrap.classList.contains('hidden')) {
           const flnProgressText = document.getElementById('fln-progress-text');
           const currentText = flnProgressText ? flnProgressText.textContent : '';
@@ -3048,7 +3041,7 @@
         errBox.textContent = _assFileErrors.map(e => {
           const msg = e.message || t(e.key, e.params || {});
           if (e.name) {
-            const shortName = truncateName(e.name, 30);
+            const shortName = truncateName(e.name, 50);
             return `⚠ ${shortName}: ${msg}`;
           }
           return `⚠ ${msg}`;
@@ -3064,14 +3057,7 @@
       const badge = document.getElementById('ass-badge');
       const dzAss = document.getElementById('dz-ass');
       if (!badge || !_assBadgeState) return;
-      if (_assBadgeState.type === 'error') {
-        badge.classList.remove('hidden');
-        badge.innerHTML = '<div class="file-badge" style="border-color:var(--err)">' +
-          '<span class="fb-name">' + _assBadgeState.fileName + '</span>' +
-          '<span class="fb-change" onclick="resetUpload()">' + t('change') + '</span>' +
-          '</div><div class="upload-error">' + t(_assBadgeState.errKey, _assBadgeState.errParams) + '</div>';
-        if (dzAss) dzAss.style.display = 'none';
-      } else if (_assBadgeState.type === 'loading') {
+      if (_assBadgeState.type === 'loading') {
         badge.classList.remove('hidden');
         badge.innerHTML = '<div class="file-badge" style="border-color:var(--rule)">' +
           '<span class="fb-name">' + _assBadgeState.fileName + '</span>' +
@@ -3106,7 +3092,7 @@
       }
       errDiv.textContent = _fontErrState.map(e => {
         if (e.name) {
-          const shortName = truncateName(e.name, 30);
+          const shortName = truncateName(e.name, 50);
           return `⚠ ${shortName}: ${t(e.key, e.params || {})}`;
         }
         return `⚠ ${t(e.key, e.params || {})}`;
@@ -3812,8 +3798,6 @@
       const reqArr = Array.from(requiredFonts);
       const FILE_SIZE_LIMIT_FONT = 2 * 1024 * 1024 * 1024;
       const fontEntries = [];
-      let fontLoadErrKey = null;
-      let fontLoadErrParams = null;
       const errors = [];
       for (const f of Array.from(files)) {
         if (f.size > FILE_SIZE_LIMIT_FONT) {
