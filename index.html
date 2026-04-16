@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.9">
+  <meta name="version" content="2.4.10">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -1641,6 +1641,7 @@
         'result.detail.strip': '移除了 {count} 个内嵌字体 · {origKB} KB → {newKB} KB',
         'result.done': '转换完成',
         'stat.drawBlocks': '绘图块（唯一/总计）',
+        'stat.totalDrawings': '总计绘图块',
         'stat.embeddedFonts': '已内嵌字体',
         'stat.extFonts': '第三方字体',
         'stat.sysFonts': '系统字体',
@@ -1771,6 +1772,7 @@
         'result.detail.strip': '移除了 {count} 個內嵌字型 · {origKB} KB → {newKB} KB',
         'result.done': '轉換完成',
         'stat.drawBlocks': '繪圖塊（唯一/總計）',
+        'stat.totalDrawings': '總計繪圖塊',
         'stat.embeddedFonts': '已內嵌字型',
         'stat.extFonts': '第三方字型',
         'stat.sysFonts': '系統字型',
@@ -1901,6 +1903,7 @@
         'result.detail.strip': '{count} embedded font(s) removed · {origKB} KB → {newKB} KB',
         'result.done': 'Subsetting Complete',
         'stat.drawBlocks': 'Draw Blocks (uniq/total)',
+        'stat.totalDrawings': 'Total Draw Blocks',
         'stat.embeddedFonts': 'Embedded Fonts',
         'stat.extFonts': '3rd-Party Fonts',
         'stat.sysFonts': 'System Fonts',
@@ -2031,6 +2034,7 @@
         'result.detail.strip': '{count} 個の埋め込みフォントを削除 · {origKB} KB → {newKB} KB',
         'result.done': '変換完了',
         'stat.drawBlocks': '描画ブロック（唯一/合計）',
+        'stat.totalDrawings': '合計描画ブロック',
         'stat.embeddedFonts': '埋め込み済みフォント',
         'stat.extFonts': 'サードパーティフォント',
         'stat.sysFonts': 'システムフォント',
@@ -2161,6 +2165,7 @@
         'result.detail.strip': '내장 폰트 {count}개 제거됨 · {origKB} KB → {newKB} KB',
         'result.done': '변환 완료',
         'stat.drawBlocks': '드로우 블록 (고유/총계)',
+        'stat.totalDrawings': '총계 드로우 블록',
         'stat.embeddedFonts': '내장 폰트',
         'stat.extFonts': '서드파티 폰트',
         'stat.sysFonts': '시스템 폰트',
@@ -2291,6 +2296,7 @@
         'result.detail.strip': 'Se eliminaron {count} fuentes incrustadas · {origKB} KB → {newKB} KB',
         'result.done': 'Conversión completada',
         'stat.drawBlocks': 'Bloques de dibujo (únicos/total)',
+        'stat.totalDrawings': 'Total Bloques de dibujo',
         'stat.embeddedFonts': 'Fuentes incrustadas',
         'stat.extFonts': 'Fuentes de terceros',
         'stat.sysFonts': 'Fuentes del sistema',
@@ -2421,6 +2427,7 @@
         'result.detail.strip': 'Удалено {count} встр. шрифтов · {origKB} КБ → {newKB} КБ',
         'result.done': 'Обработка завершена',
         'stat.drawBlocks': 'Блоки рисования (уникальные/всего)',
+        'stat.totalDrawings': 'Всего блоков рисования',
         'stat.embeddedFonts': 'Встроенные шрифты',
         'stat.extFonts': 'Шрифты третьих сторон',
         'stat.sysFonts': 'Системные шрифты',
@@ -2551,6 +2558,7 @@
         'result.detail.strip': '{count} fonte(s) incorporada(s) removida(s) · {origKB} KB → {newKB} KB',
         'result.done': 'Processamento concluído',
         'stat.drawBlocks': 'Blocos de desenho (únicos/total)',
+        'stat.totalDrawings': 'Total Blocos de desenho',
         'stat.embeddedFonts': 'Fontes incorporadas',
         'stat.extFonts': 'Fontes de terceiros',
         'stat.sysFonts': 'Fontes do sistema',
@@ -2681,6 +2689,7 @@
         'result.detail.strip': 'تم إزالة {count} خط مضمن · {origKB} كيلوبايت → {newKB} كيلوبايت',
         'result.done': 'اكتملت المعالجة',
         'stat.drawBlocks': 'كتل الرسم (فريدة/الإجمالي)',
+        'stat.totalDrawings': 'إجمالي كتل الرسم',
         'stat.embeddedFonts': 'الخطوط المضمنة',
         'stat.extFonts': 'خطوط الطرف الثالث',
         'stat.sysFonts': 'خطوط النظام',
@@ -2811,6 +2820,7 @@
         'result.detail.strip': '{count} gömülü font kaldırıldı · {origKB} KB → {newKB} KB',
         'result.done': 'İşlem tamamlandı',
         'stat.drawBlocks': 'Çizim blokları (benzersiz/toplam)',
+        'stat.totalDrawings': 'Toplam Çizim blokları',
         'stat.embeddedFonts': 'Gömülü fontlar',
         'stat.extFonts': 'Üçüncü taraf fontlar',
         'stat.sysFonts': 'Sistem fontları',
@@ -3562,7 +3572,7 @@
       createExpandableRow(t('analysis.draw.label'),
         hasNewDrawings ? 'badge-ok' : (hasExistingDrawOnly ? 'badge-info' : 'badge-info'),
         hasNewDrawings ? (hasResubset ? t('analysis.draw.status.update_short') : t('analysis.draw.status.new_short')) : (hasExistingDrawOnly ? t('analysis.draw.status.existing_short', { count: totalExistingSubsetShapes }) : t('analysis.draw.none')),
-        hasDrawings ? [`<strong>${t('stat.uniqueShapes')}:</strong> ${totalUnique}`, `<strong>${t('stat.drawBlocks')}:</strong> ${totalDrawings}`, ...drawingsDetails] : [t('analysis.draw.none')]
+        hasDrawings ? [`<strong>${t('stat.uniqueShapes')}:</strong> ${totalUnique}`, `<strong>${t('stat.totalDrawings')}:</strong> ${totalDrawings}`, ...drawingsDetails] : [t('analysis.draw.none')]
       );
 
       createExpandableRow(t('analysis.font.label'),
