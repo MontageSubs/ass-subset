@@ -821,7 +821,7 @@ function rewriteASS(rawContent, opts, id) {
 
           let processed = l;
           if (opts.drawCharRemap && opts.drawCharRemap.size > 0) {
-            processed = renameSubsetCharsInLine(processed, opts.drawCharRemap, drawFontFamily, initialIsSubset);
+            processed = renameSubsetCharsInLine(processed, opts.drawCharRemap, drawFontFamily, initialIsSubset, subsetStyles);
           }
           processed = replaceDrawingsInLine(processed, drawingDataToChar, drawFontFamily);
           return processed;
@@ -863,7 +863,7 @@ function rewriteASS(rawContent, opts, id) {
   return processedBlocks.join(nl);
 }
 
-function renameSubsetCharsInLine(line, charRemap, fontFamily, initialIsSubset) {
+function renameSubsetCharsInLine(line, charRemap, fontFamily, initialIsSubset, subsetStyles) {
   const m = line.match(/^([^:]*?:\s*)(.*)$/s);
   if (!m) return line;
   const prefix = m[1];
@@ -880,7 +880,10 @@ function renameSubsetCharsInLine(line, charRemap, fontFamily, initialIsSubset) {
         isSubsetFont = fn.toLowerCase() === fontFamily.toLowerCase();
       }
       const rm = inner.match(/\\r([^\\}]*)/);
-      if (rm) isSubsetFont = false;
+      if (rm) {
+        const sn = rm[1].trim();
+        isSubsetFont = sn === '' ? !!initialIsSubset : (subsetStyles && subsetStyles.has(sn));
+      }
       result += seg;
     } else {
       if (isSubsetFont) {

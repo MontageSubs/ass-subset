@@ -13,7 +13,7 @@
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.1">
+  <meta name="version" content="2.4.2">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
   <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
@@ -3166,14 +3166,27 @@
     }
 
     async function decodeText(buffer) {
+      const uint8 = new Uint8Array(buffer);
+      if (uint8.length >= 2) {
+        if (uint8[0] === 0xFF && uint8[1] === 0xFE) return new TextDecoder('utf-16le').decode(buffer);
+        if (uint8[0] === 0xFE && uint8[1] === 0xFF) return new TextDecoder('utf-16be').decode(buffer);
+      }
       const utf8 = new TextDecoder('utf-8', { fatal: true });
       try {
         return utf8.decode(buffer);
       } catch (e) {
-        const gbk = new TextDecoder('gbk');
-        return gbk.decode(buffer);
+        const encodings = ['gbk', 'big5', 'shift-jis', 'euc-kr', 'windows-1251', 'windows-1252', 'iso-8859-1', 'iso-8859-9', 'iso-8859-15', 'windows-1256', 'iso-8859-6'];
+        for (const encoding of encodings) {
+          try {
+            return new TextDecoder(encoding).decode(buffer);
+          } catch (e) {
+            continue;
+          }
+        }
+        return new TextDecoder('iso-8859-1').decode(buffer);
       }
     }
+
     const ZIP_MAX_DEPTH = 10;
     function classifyZipError() {
       return 'err.zip_corrupt';
