@@ -1,35 +1,47 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
-
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASS 在线子集化工具</title>
-  <meta name="description"
-    content="基于浏览器端实现的 ASS/SSA 字幕在线字体子集化工具。支持绘图指令子集化与字体子集嵌入，纯浏览器本地处理，无需上传文件至服务器。由蒙太奇字幕组 MontageSubs 开发。">
-  <meta name="keywords"
-    content="ASS字幕字体嵌入,ASS字幕嵌入字体,ASS字幕字体子集化,ASS字体嵌入,ASS嵌入字体,ASS子集化,特效字幕字体嵌入,特效字幕嵌入字体,特效字幕子集化,字幕字体嵌入,字幕嵌入字体,字幕子集化,ASS字幕,SSA字幕,字体嵌入,嵌入字体,子集化,在线工具,字幕工具,字体工具,绘图指令,ass-subset,MontageSubs,蒙太奇字幕组,字幕优化,opentype,TTF子集化,Advanced SubStation Alpha,浏览器工具">
-  <meta name="author" content="MontageSubs (蒙太奇字幕组)">
+  <title>ASS Subsetter - Font Embedding & Optimization Tool | MontageSubs</title>
+  <meta name="description" content="Free ASS Online Subsetter for optimizing subtitle files. Embed fonts, subset drawing commands, and compress file size with intelligent data cleaning. Browser-based, local processing, no server upload. Perfect for Aegisub typesetting.">
+  <meta name="keywords" content="ASS subsetter,font subsetting,font embedding,ASS font optimizer,SSA subtitle tool,embedded fonts,font compression,Aegisub,subtitle typesetting,drawing commands,TTF subsetting,OTF subsetting,font subset,UUEncode,subtitle file optimization,subtitle effects,typesetting tool,ASS converter,online subtitle tool,browser-based subtitle editor,MontageSubs">
+  <meta name="author" content="MontageSubs">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
+  <link rel="alternate" hreflang="en" href="https://subs.js.org/ass-subset/">
+  <link rel="alternate" hreflang="zh-CN" href="https://subs.js.org/ass-subset/?lang=zh">
+  <link rel="alternate" hreflang="zh-TW" href="https://subs.js.org/ass-subset/?lang=zh-TW">
+  <link rel="alternate" hreflang="ja" href="https://subs.js.org/ass-subset/?lang=ja">
+  <link rel="alternate" hreflang="ko" href="https://subs.js.org/ass-subset/?lang=ko">
+  <link rel="alternate" hreflang="es" href="https://subs.js.org/ass-subset/?lang=es">
+  <link rel="alternate" hreflang="ru" href="https://subs.js.org/ass-subset/?lang=ru">
+  <link rel="alternate" hreflang="pt-BR" href="https://subs.js.org/ass-subset/?lang=pt-BR">
+  <link rel="alternate" hreflang="tr" href="https://subs.js.org/ass-subset/?lang=tr">
+  <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
+  <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.4.14">
+  <meta name="version" content="2.4.15">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="ASS 在线子集化工具 · MontageSubs">
-  <meta property="og:description" content="在浏览器中一键优化 ASS/SSA 字幕文件：绘图指令子集化与字体子集嵌入，纯浏览器本地处理。">
+  <meta property="og:title" content="ASS Subsetter· MontageSubs">
+  <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
   <meta property="og:url" content="https://subs.js.org/ass-subset/">
-  <meta property="og:site_name" content="MontageSubs (蒙太奇字幕组)">
-  <meta property="og:locale" content="zh_CN">
-  <meta name="twitter:card" content="summary">
-  <meta name="twitter:title" content="ASS 在线子集化工具 · MontageSubs">
-  <meta name="twitter:description" content="浏览器端 ASS/SSA 字幕优化：绘图指令子集化 + 字体子集嵌入，纯浏览器本地处理。">
+  <meta property="og:site_name" content="MontageSubs">
+  <meta property="og:locale" content="en_US">
+  <meta property="og:locale:alternate" content="zh_CN">
+  <meta property="og:locale:alternate" content="zh_TW">
+  <meta property="og:locale:alternate" content="ja_JP">
+  <meta property="og:locale:alternate" content="ko_KR">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="ASS Subsetter - Font Embedding & Optimization Tool">
+  <meta name="twitter:description" content="Minimize embedded font size in ASS/SSA subtitles with intelligent subsetting. Local browser processing, zero data sharing, free forever.">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f2">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13151c">
   <link rel="manifest" href="manifest.json" id="pwa-manifest">
   <link rel="apple-touch-icon" href="icons/icon-512.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
-  <meta name="apple-mobile-web-app-title" content="ASS子集化">
+  <meta name="apple-mobile-web-app-title" content="ASS Subsetter">
   <script src="vendor/opentype.min.js"></script>
   <script src="vendor/jszip.min.js"></script>
   <script src="worker.js"></script>
@@ -37,13 +49,15 @@
 {
   "@context": "https://schema.org",
   "@type": "WebApplication",
-  "name": "ASS 在线子集化工具",
-  "alternateName": "ASS Online Subsetter",
+  "name": "ASS Subsetter",
+  "alternateName": ["Font Subsetter", "ASS Font Optimizer", "Subtitle Font Embedding Tool"],
   "url": "https://subs.js.org/ass-subset/",
-  "description": "基于浏览器端原生实现的 ASS/SSA 字幕优化工具。支持绘图指令子集化与字体子集化嵌入，所有处理均在本地浏览器完成，无需上传服务器。",
+  "description": "Open-source browser-based utility for optimizing ASS and SSA subtitle files through intelligent font subsetting and drawing command optimization. Minimize embedded font file sizes while preserving complete font name table entries and drawing command integrity. Purpose-built for Aegisub typesetters. All processing occurs locally in the browser with zero data transmission to any server.",
   "applicationCategory": "MultimediaApplication",
   "operatingSystem": "All",
-  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "CNY" },
+  "browserRequirements": "Modern web browser with JavaScript ES6+ support",
+  "inLanguage": ["en", "zh-CN", "zh-TW", "ja", "ko", "es", "ru", "pt-BR", "tr", "ar"],
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
   "author": {
     "@type": "Organization",
     "name": "MontageSubs",
@@ -51,11 +65,21 @@
     "url": "https://github.com/MontageSubs"
   },
   "featureList": [
-    "ASS/SSA 字幕绘图指令子集化",
-    "字体子集化嵌入",
-    "纯本地处理，文件不离开浏览器",
-    "支持 TTF / OTF / TTC 等字体格式"
-  ]
+    "Intelligent font subsetting for ASS/SSA subtitle files",
+    "Drawing command optimization and cleanup",
+    "Support for TTF, OTF, and TTC font formats",
+    "Preserves complete font name table entries for player compatibility",
+    "Real-time file preview and validation",
+    "Batch processing support",
+    "UUEncoded embedded font compression",
+    "Pure browser-based processing with all data staying local",
+    "No installation required, works offline"
+  ],
+  "potentialAction": {
+    "@type": "Action",
+    "target": "https://subs.js.org/ass-subset/",
+    "name": "Optimize ASS Subtitles"
+  }
 }
 </script>
 
@@ -1307,7 +1331,7 @@
   <header class="site-header">
     <a href="https://subs.js.org/ass-subset/" class="brand-link">
       <span class="brand-org">蒙太奇字幕组 · MontageSubs</span>
-      <h1 class="brand-title" data-i18n="app.title">ASS 在线子集化工具</h1>
+      <h1 class="brand-title" data-i18n="app.title">ASS 子集化工具</h1>
     </a>
     <span class="sub" data-i18n="app.subtitle">字幕绘图指令子集化 · 字幕字体子集嵌入</span>
     <div class="header-right">
@@ -1508,7 +1532,7 @@
       <div class="footer-line" id="footer-license" data-i18n-html="footer.license_html">以 <a
           href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT
           License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a></div>
-      <div class="footer-line"><span id="ver">ASS 在线子集化工具 (ass-subset)</span></div>
+      <div class="footer-line"><span id="ver">ASS 子集化工具 (ass-subset)</span></div>
       <div class="footer-btns">
         <a href="https://github.com/MontageSubs/ass-subset/issues" target="_blank" rel="noopener" class="footer-btn"
           data-i18n="footer.feedback">反馈</a>
@@ -1546,7 +1570,7 @@
         'analysis.font.sys.none': '未发现引用的系统字体',
         'analysis.resubset': '检测到已子集化的绘图指令，将进行增量更新。',
         'app.subtitle': '字幕绘图指令子集化 · 字幕字体子集嵌入',
-        'app.title': 'ASS 在线子集化工具',
+        'app.title': 'ASS 子集化工具',
         'aria.dz_ass': '上传字幕文件，支持拖拽或点击选择',
         'aria.dz_font': '上传字体文件',
         'aria.lang_toggle': '切换语言',
@@ -1600,7 +1624,7 @@
         'footer.org': '蒙太奇字幕组 · MontageSubs',
         'footer.slogan': '用爱发电 ❤️ Powered by Love',
         'footer.source': '查看源代码',
-        'footer.tool': 'ASS 在线子集化工具 (ass-subset)',
+        'footer.tool': 'ASS 子集化工具 (ass-subset)',
         'leave.confirm': '转换正在进行中，确定要离开吗？',
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
         'log.convert.start': '[convert] 开始转换…',
@@ -1678,7 +1702,7 @@
         'analysis.font.sys.none': '未發現引用的系統字型',
         'analysis.resubset': '偵測到已子集化的繪圖指令，將進行增量更新。',
         'app.subtitle': '字幕繪圖指令子集化 · 字幕字型子集嵌入',
-        'app.title': 'ASS 線上子集化工具',
+        'app.title': 'ASS 子集化工具',
         'aria.dz_ass': '上傳字幕檔，支援拖曳或點擊選擇',
         'aria.dz_font': '上傳字型檔',
         'aria.lang_toggle': '切換語言',
@@ -1732,7 +1756,7 @@
         'footer.org': '蒙太奇字幕組 · MontageSubs',
         'footer.slogan': '用愛發電 ❤️ Powered by Love',
         'footer.source': '查看原始碼',
-        'footer.tool': 'ASS 線上子集化工具 (ass-subset)',
+        'footer.tool': 'ASS 子集化工具 (ass-subset)',
         'leave.confirm': '轉換正在進行中，確定要離開嗎？',
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
         'log.convert.start': '[convert] 開始轉換…',
@@ -1810,7 +1834,7 @@
         'analysis.font.sys.none': 'No system fonts referenced',
         'analysis.resubset': 'Existing draw subset detected — incremental update will run.',
         'app.subtitle': 'Draw Command Subsetting · Font Subset Embedding',
-        'app.title': 'ASS Online Subsetter',
+        'app.title': 'ASS Subsetter',
         'aria.dz_ass': 'Upload script — drag and drop or click to browse',
         'aria.dz_font': 'Upload font files',
         'aria.lang_toggle': 'Switch language',
@@ -1864,7 +1888,7 @@
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': 'Powered by Love ❤️ 用爱发电',
         'footer.source': 'Source Code',
-        'footer.tool': 'ASS Online Subsetter (ass-subset)',
+        'footer.tool': 'ASS Subsetter (ass-subset)',
         'leave.confirm': 'Subsetting is still running. Leave anyway?',
         'log.convert.done': '[done] Finished. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Starting…',
@@ -1942,7 +1966,7 @@
         'analysis.font.sys.none': '参照されているシステムフォントはありません',
         'analysis.resubset': '既存の描画サブセットを検出しました。増分更新を実行します。',
         'app.subtitle': '描画コマンドのサブセット化・フォントサブセット埋め込み',
-        'app.title': 'ASS オンラインサブセットツール',
+        'app.title': 'ASS サブセットツール',
         'aria.dz_ass': '字幕ファイルをアップロード（ドラッグ＆ドロップまたはクリック）',
         'aria.dz_font': 'フォントファイルをアップロード',
         'aria.lang_toggle': '言語を切り替える',
@@ -1996,7 +2020,7 @@
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': '愛を込めて ❤️ 用爱发电',
         'footer.source': 'ソースコードを見る',
-        'footer.tool': 'ASSオンラインサブセットツール (ass-subset)',
+        'footer.tool': 'ASS サブセットツール (ass-subset)',
         'leave.confirm': '変換中です。本当に離れますか？',
         'log.convert.done': '[done] 完了。{origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] 変換を開始…',
@@ -2074,7 +2098,7 @@
         'analysis.font.sys.none': '참조된 시스템 폰트가 없습니다',
         'analysis.resubset': '기존 드로우 서브셋이 감지되었습니다. 증분 업데이트를 수행합니다.',
         'app.subtitle': '드로우 명령어 서브셋화 · 폰트 서브셋 삽입',
-        'app.title': 'ASS 온라인 서브셋 도구',
+        'app.title': 'ASS 서브셋 도구',
         'aria.dz_ass': '자막 파일 업로드 — 드래그 앤 드롭 또는 클릭',
         'aria.dz_font': '폰트 파일 업로드',
         'aria.lang_toggle': '언어 변경',
@@ -2128,7 +2152,7 @@
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': '사랑으로 만들었습니다 ❤️ 用爱发电',
         'footer.source': '소스 코드 보기',
-        'footer.tool': 'ASS 온라인 서브셋 도구 (ass-subset)',
+        'footer.tool': 'ASS 서브셋 도구 (ass-subset)',
         'leave.confirm': '변환이 진행 중입니다. 정말 떠나시겠습니까?',
         'log.convert.done': '[done] 완료. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] 변환 시작…',
@@ -2338,7 +2362,7 @@
         'analysis.font.sys.none': 'Нет ссылок на системные шрифты',
         'analysis.resubset': 'Обнаружен существующий блок рисования — будет выполнено инкрементальное обновление.',
         'app.subtitle': 'Подмножество команд рисования · Встраивание шрифтов',
-        'app.title': 'ASS онлайн-субсеттер',
+        'app.title': 'ASS субсеттер',
         'aria.dz_ass': 'Загрузить файл субтитров — перетащите или нажмите для выбора',
         'aria.dz_font': 'Загрузить файлы шрифтов',
         'aria.lang_toggle': 'Сменить язык',
@@ -2392,7 +2416,7 @@
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': 'Сделано с любовью ❤️ 用爱发电',
         'footer.source': 'Исходный код',
-        'footer.tool': 'ASS онлайн-субсеттер (ass-subset)',
+        'footer.tool': 'ASS субсеттер (ass-subset)',
         'leave.confirm': 'Обработка ещё не завершена. Уйти?',
         'log.convert.done': '[done] Готово. {origKB} КБ → {newKB} КБ ({delta} КБ)',
         'log.convert.start': '[convert] Запуск обработки…',
@@ -2470,7 +2494,7 @@
         'analysis.font.sys.none': 'Nenhuma fonte do sistema referenciada',
         'analysis.resubset': 'Subconjunto de desenho existente detectado — atualização incremental será executada.',
         'app.subtitle': 'Subconjunto de comandos de desenho · Incorporação de fontes',
-        'app.title': 'ASS Subsetter Online',
+        'app.title': 'ASS Subsetter',
         'aria.dz_ass': 'Enviar arquivo de legenda — arraste ou clique para selecionar',
         'aria.dz_font': 'Enviar arquivos de fonte',
         'aria.lang_toggle': 'Alterar idioma',
@@ -2524,7 +2548,7 @@
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': 'Feito com amor ❤️ 用爱发电',
         'footer.source': 'Código-fonte',
-        'footer.tool': 'ASS Subsetter Online (ass-subset)',
+        'footer.tool': 'ASS Subsetter (ass-subset)',
         'leave.confirm': 'O processamento ainda está em andamento. Sair mesmo assim?',
         'log.convert.done': '[done] Concluído. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Iniciando…',
@@ -2602,7 +2626,7 @@
         'analysis.font.sys.none': 'لا توجد إشارات إلى خطوط النظام',
         'analysis.resubset': 'تم اكتشاف مجموعة رسم فرعية موجودة — سيتم تشغيل تحديث تدريجي.',
         'app.subtitle': 'تقليص أوامر الرسم · تضمين الخطوط',
-        'app.title': 'أداة ASS للتقليص عبر الإنترنت',
+        'app.title': 'أداة ASS للتقليص',
         'aria.dz_ass': 'رفع ملف الترجمة — اسحب وأفلت أو انقر للاختيار',
         'aria.dz_font': 'رفع ملفات الخطوط',
         'aria.lang_toggle': 'تغيير اللغة',
@@ -2656,7 +2680,7 @@
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': 'صُنع بمحبة ❤️ 用爱发电',
         'footer.source': 'الكود المصدري',
-        'footer.tool': 'أداة ASS للتقليص عبر الإنترنت (ass-subset)',
+        'footer.tool': 'أداة ASS للتقليص (ass-subset)',
         'leave.confirm': 'المعالجة لا تزال جارية. هل تريد المغادرة؟',
         'log.convert.done': '[done] اكتمل. {origKB} كيلوبايت → {newKB} كيلوبايت ({delta} كيلوبايت)',
         'log.convert.start': '[convert] بدء المعالجة…',
@@ -2734,7 +2758,7 @@
         'analysis.font.sys.none': 'Sistem fontlarına referans yok',
         'analysis.resubset': 'Mevcut çizim alt kümesi tespit edildi — artımlı güncelleme yapılacak.',
         'app.subtitle': 'Çizim komutu alt kümeleme · Font gömme',
-        'app.title': 'ASS Çevrimiçi Alt Kümeleme Aracı',
+        'app.title': 'ASS Alt Kümeleme Aracı',
         'aria.dz_ass': 'Altyazı dosyası yükle — sürükle veya tıkla',
         'aria.dz_font': 'Font dosyaları yükle',
         'aria.lang_toggle': 'Dil değiştir',
@@ -2788,7 +2812,7 @@
         'footer.org': 'MontageSubs · 蒙太奇字幕组',
         'footer.slogan': 'Sevgiyle yapıldı ❤️ 用爱发电',
         'footer.source': 'Kaynak kodu',
-        'footer.tool': 'ASS Çevrimiçi Alt Kümeleme Aracı (ass-subset)',
+        'footer.tool': 'ASS Alt Kümeleme Aracı (ass-subset)',
         'leave.confirm': 'İşlem hâlâ devam ediyor. Yine de ayrılmak istiyor musunuz?',
         'log.convert.done': '[done] Tamamlandı. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Başlatılıyor…',
