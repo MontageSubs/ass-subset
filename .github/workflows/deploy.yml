@@ -7,23 +7,71 @@ on:
       - 'app/**'
   workflow_dispatch:
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
     steps:
       - uses: actions/checkout@v6
-      
+        with:
+          fetch-depth: 0
+
+      - name: Get trigger commit info
+        id: trigger
+        run: |
+          AUTHOR="${{ github.event.head_commit.author.name }}"
+          EMAIL="${{ github.event.head_commit.author.email }}"
+          MESSAGE="${{ github.event.head_commit.message }}"
+
+          echo "name=$AUTHOR" >> $GITHUB_OUTPUT
+          echo "email=$EMAIL" >> $GITHUB_OUTPUT
+          echo "message<<EOF" >> $GITHUB_OUTPUT
+          echo "$MESSAGE" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Configure git
+        run: |
+          git config --local user.name "${{ steps.trigger.outputs.name }}"
+          git config --local user.email "${{ steps.trigger.outputs.email }}"
+
+      - name: Update sitemap
+        id: sitemap
+        run: |
+          DATE=$(date +%Y-%m-%d)
+          sed -i "s|<lastmod>.*</lastmod>|<lastmod>$DATE</lastmod>|" app/sitemap.xml
+          if ! git diff --quiet app/sitemap.xml; then
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Sync version
+        id: version
+        run: |
+          VERSION=$(grep -oP '(?<=<meta name="version" content=")[^"]*' app/index.html)
+          if ! grep -q "ass-subset-v$VERSION" app/sw.js; then
+            sed -i "s|const CACHE_NAME = 'ass-subset-v[^']*'|const CACHE_NAME = 'ass-subset-v$VERSION'|" app/sw.js
+            echo "changed=true" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Commit and push
+        if: steps.sitemap.outputs.changed == 'true' || steps.version.outputs.changed == 'true'
+        run: |
+          [ "${{ steps.sitemap.outputs.changed }}" = "true" ] && git add app/sitemap.xml
+          [ "${{ steps.version.outputs.changed }}" = "true" ] && git add app/sw.js
+
+          git commit -m "${{ steps.trigger.outputs.message }}" --no-verify || true
+          git push origin main || true
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
-      
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
           path: './app'
-      
+
       - name: Deploy to GitHub Pages
         uses: actions/deploy-pages@v4
