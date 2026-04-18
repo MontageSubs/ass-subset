@@ -4,8 +4,6 @@ const CACHE_NAME = 'ass-subset-v2.5.1';
 const PRECACHE = [
   '/ass-subset/',
   '/ass-subset/index.html',
-  '/ass-subset/manifest.json',
-  '/ass-subset/manifest-en.json',
   '/ass-subset/worker.js',
   '/ass-subset/vendor/jszip.min.js',
   '/ass-subset/vendor/opentype.min.js',
