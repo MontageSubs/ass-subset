@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.2">
+  <meta name="version" content="2.5.3">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter· MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -37,7 +37,7 @@
   <meta name="twitter:description" content="Minimize embedded font size in ASS/SSA subtitles with intelligent subsetting. Local browser processing, zero data sharing, free forever.">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f2">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13151c">
-  <link rel="manifest" href="manifest.json" id="pwa-manifest">
+  <link rel="manifest" href="manifests/manifest.json" id="pwa-manifest">
   <link rel="apple-touch-icon" href="icons/icon-512.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="default">
@@ -2897,7 +2897,6 @@
           if (norm && VALID[norm]) {
             currentLang = norm;
             try { localStorage.setItem('ass-subset-lang', norm); } catch(_) {}
-            window.history.replaceState({}, document.title, window.location.pathname + '?lang=' + norm);
             return;
           }
         }
@@ -2946,8 +2945,8 @@
       document.querySelector('meta[property="og:description"]')?.setAttribute('content', t('app.subtitle'));
       const manifest = document.getElementById('pwa-manifest');
       if (manifest) {
-        const mLangs = {'zh-CN':'manifest-zh-CN.json','zh-TW':'manifest-zh-TW.json','ja':'manifest-ja.json','ko':'manifest-ko.json','es':'manifest-es.json','pt-BR':'manifest-pt-BR.json','ru':'manifest-ru.json','ar':'manifest-ar.json','tr':'manifest-tr.json'};
-        manifest.setAttribute('href', mLangs[currentLang] || 'manifest.json');
+        const mLangs = {'zh-CN':'manifests/manifest-zh-CN.json','zh-TW':'manifests/manifest-zh-TW.json','ja':'manifests/manifest-ja.json','ko':'manifests/manifest-ko.json','es':'manifests/manifest-es.json','pt-BR':'manifests/manifest-pt-BR.json','ru':'manifests/manifest-ru.json','ar':'manifests/manifest-ar.json','tr':'manifests/manifest-tr.json'};
+        manifest.setAttribute('href', mLangs[currentLang] || 'manifests/manifest.json');
       }
 
       const v = document.querySelector('meta[name="version"]');
@@ -4780,7 +4779,7 @@
     }
 
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').catch(() => { });
+      navigator.serviceWorker.register('/ass-subset/sw.js', { scope: '/ass-subset/' }).catch(() => { });
     }
 
     if (typeof opentype === 'undefined') {
