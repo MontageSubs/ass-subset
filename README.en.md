@@ -72,8 +72,7 @@ ass-subset/
 │   ├── index.html                 # Tool main file
 │   ├── worker.js                  # Web Worker (main processing logic)
 │   ├── sw.js                      # Service Worker (caching strategy)
-│   ├── manifest.json              # PWA manifest (Chinese)
-│   ├── manifest-en.json           # PWA manifest (English)
+│   ├── manifests/                 # PWA manifests (10 languages)
 │   ├── sitemap.xml                # Sitemap for search engines
 │   ├── vendor/                    # Third-party dependencies
 │   │   ├── opentype.min.js        # Local copy of opentype.js

@@ -72,8 +72,7 @@ ass-subset/
 │   ├── index.html                 # 工具主文件
 │   ├── worker.js                  # Web Worker（主要处理逻辑）
 │   ├── sw.js                      # Service Worker（缓存策略）
-│   ├── manifest.json              # PWA 配置（中文）
-│   ├── manifest-en.json           # PWA 配置（英文）
+│   ├── manifests/                 # PWA 配置（10 种语言）
 │   ├── sitemap.xml                # 搜索引擎站点地图
 │   ├── vendor/                    # 第三方依赖
 │   │   ├── opentype.min.js        # opentype.js 本地副本
