@@ -215,6 +215,7 @@ function parseASSText(text, id, forceHasBOM) {
           nameIdx: flds.indexOf('name'),
           fontIdx: flds.indexOf('fontname'),
           boldIdx: flds.indexOf('bold'),
+          italicIdx: flds.indexOf('italic'),
         };
       }
       if (/^style\s*:/i.test(t) && styleFmt) {
@@ -222,7 +223,8 @@ function parseASSText(text, id, forceHasBOM) {
         const sName = parts[styleFmt.nameIdx]?.trim();
         const sFont = normFont(parts[styleFmt.fontIdx]?.trim() || 'Arial');
         const sBold = parseInt(parts[styleFmt.boldIdx]?.trim() || '0') !== 0;
-        if (sName) styles[sName] = { font: sFont, bold: sBold };
+        const sItalic = parseInt(parts[styleFmt.italicIdx ?? -1]?.trim() || '0') !== 0;
+        if (sName) styles[sName] = { font: sFont, bold: sBold, italic: sItalic };
       }
     }
     if (section === '[fonts]') {
@@ -271,17 +273,21 @@ function parseASSText(text, id, forceHasBOM) {
       externalFonts[name] = {
         normal: Array.from(weights.normal || []),
         bold: Array.from(weights.bold || []),
+        italic: Array.from(weights.italic || []),
+        boldItalic: Array.from(weights.boldItalic || []),
       };
     }
   }
   const systemFontsReferenced = {};
   for (const [name, weights] of Object.entries(fontChars)) {
     if (SYSTEM_FONTS.has(name.toLowerCase()) && !isAnyDrawFont(name)) {
-      const totalChars = (weights.normal?.size || 0) + (weights.bold?.size || 0);
+      const totalChars = (weights.normal?.size || 0) + (weights.bold?.size || 0) + (weights.italic?.size || 0) + (weights.boldItalic?.size || 0);
       if (totalChars > 0) {
         systemFontsReferenced[name] = {
           normal: Array.from(weights.normal || []),
           bold: Array.from(weights.bold || []),
+          italic: Array.from(weights.italic || []),
+          boldItalic: Array.from(weights.boldItalic || []),
         };
       }
     }
@@ -338,6 +344,7 @@ function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
   const segs = text.split(/(\{[^}]*\})/);
   let font = styleInfo.font;
   let bold = styleInfo.bold;
+  let italic = styleInfo.italic || false;
   let drawing = false, drawData = '', drawTag = '';
   let isDrawSubsetFont = isAnyDrawFont(font);
   for (const seg of segs) {
@@ -358,12 +365,14 @@ function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
         if (rm) {
           const sn = rm[1].trim();
           const s = (sn && styles && styles[sn]) ? styles[sn] : styleInfo;
-          font = s.font; bold = s.bold;
+          font = s.font; bold = s.bold; italic = s.italic || false;
         }
         const fm = inner.match(/\\fn([^\\}]*)/);
         if (fm) font = normFont(fm[1].trim()) || styleInfo.font;
         const bm = inner.match(/\\b(\d+)/);
         if (bm) bold = parseInt(bm[1]) !== 0;
+        const im = inner.match(/\\i(\d+)/);
+        if (im) italic = parseInt(im[1]) !== 0;
         isDrawSubsetFont = isAnyDrawFont(font);
       }
     } else if (seg) {
@@ -376,8 +385,8 @@ function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
           }
         }
       } else {
-        const weight = bold ? 'bold' : 'normal';
-        if (!fontChars[font]) fontChars[font] = { normal: new Set(), bold: new Set() };
+        const weight = bold && italic ? 'boldItalic' : bold ? 'bold' : italic ? 'italic' : 'normal';
+        if (!fontChars[font]) fontChars[font] = { normal: new Set(), bold: new Set(), italic: new Set(), boldItalic: new Set() };
         const clean = seg.replace(/\\[Nn]/g, '').replace(/\\h/g, ' ').replace(/\\([{}\\])/g, '$1');
         for (const ch of clean) {
           if (ch !== '\n' && ch !== '\r' && (ch.trim() !== '' || ch === ' ')) {
@@ -715,6 +724,18 @@ function getFontWeight(fontObj) {
   if (sub.includes('black') || sub.includes('heavy')) return 900;
   return 400;
 }
+function weightScore(weight) {
+  const dist = Math.abs(weight - 400);
+  if (dist === 0) return 0;
+  if (Math.abs(weight - 500) < dist) return Math.abs(weight - 500) + 1;
+  return dist + 2;
+}
+function getFontItalic(fontObj) {
+  const fsSelection = fontObj.tables?.os2?.fsSelection;
+  if (fsSelection !== undefined) return !!(fsSelection & 1);
+  const sub = (fontObj.names?.fontSubfamily?.en || fontObj.tables?.name?.fontSubfamily?.en || '').toLowerCase();
+  return sub.includes('italic') || sub.includes('oblique');
+}
 function matchFontBuffer(buffer, requiredFonts, id) {
   const view = new DataView(buffer);
   const isTTC = buffer.byteLength >= 4 && view.getUint32(0, false) === 0x74746366;
@@ -723,16 +744,25 @@ function matchFontBuffer(buffer, requiredFonts, id) {
     const allNames = extractFontNames(fontObj);
     const familyNames = extractFamilyNames(fontObj);
     const weight = getFontWeight(fontObj);
+    const isItalic = getFontItalic(fontObj);
     const allNamesLower = new Set([...allNames].map(n => n.toLowerCase()));
     const familyNamesLower = new Set([...familyNames].map(n => n.toLowerCase()));
     for (const req of requiredFonts) {
       const reqLower = req.toLowerCase();
       if (allNamesLower.has(reqLower)) {
         const isFamilyMatch = familyNamesLower.has(reqLower);
+        const versionField = fontObj.names?.version || fontObj.tables?.name?.version;
+        let version = '';
+        if (versionField) {
+          const v = versionField['en'] || Object.values(versionField).find(v => typeof v === 'string' && v.trim()) || '';
+          version = typeof v === 'string' ? v.trim() : '';
+        }
         results.push({
           matchedFor: req,
           weight,
+          isItalic,
           isFamilyMatch,
+          version,
           allNames: Array.from(allNames),
           familyNames: Array.from(familyNames),
           ttcIndex: index
@@ -1316,9 +1346,21 @@ function doConvert(data, id) {
     const totalDrawings = newDrawings.length;
     const hasReferencedChars = parsed.subsetReferencedChars.length > 0;
     if (totalDrawings > 0 || (parsed.hasExistingDrawSubset && hasReferencedChars)) {
-      emitLog(id, 'log.draw.building', 'info', {
-        unique: totalDrawings, total: parsed.drawings
-      });
+      if (parsed.hasExistingDrawSubset) {
+        const oldCount = parsed.subsetReferencedChars.length;
+        const newCount = totalDrawings;
+        const added = newCount;
+        const removed = Math.max(0, oldCount - newCount);
+        if (newCount === 0) {
+          emitLog(id, 'log.draw.building.delete', 'info', { removed, total: 0 });
+        } else if (removed > 0) {
+          emitLog(id, 'log.draw.building.delta', 'info', { added, removed, total: oldCount + added - removed });
+        } else {
+          emitLog(id, 'log.draw.building.incremental', 'info', { added, total: oldCount + added });
+        }
+      } else {
+        emitLog(id, 'log.draw.building', 'info', { unique: totalDrawings, total: parsed.drawings });
+      }
       const result = buildDrawingFont(
         newDrawings,
         parsed.existingSubsetFontBuffer,
@@ -1348,44 +1390,68 @@ function doConvert(data, id) {
     }
     for (const fontName of fontNames) {
       const charInfo = extFonts[fontName];
-      const allChars = new Set([...charInfo.normal, ...charInfo.bold]);
-      const chars = Array.from(allChars);
-      const fontFile = fonts.find(f => f.matchedFor.toLowerCase() === fontName.toLowerCase());
-      if (!fontFile) {
-        emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: '...' });
-        continue;
+      const variantDefs = [
+        { key: 'normal',     chars: charInfo.normal,     isBold: false, isItalic: false },
+        { key: 'bold',       chars: charInfo.bold,       isBold: true,  isItalic: false },
+        { key: 'italic',     chars: charInfo.italic || [],     isBold: false, isItalic: true  },
+        { key: 'boldItalic', chars: charInfo.boldItalic || [], isBold: true,  isItalic: true  },
+      ].filter(v => v.chars.length > 0);
+      if (variantDefs.length === 0) continue;
+      const pickFont = (isBold, isItalic) => {
+        const exactKey = (isBold && isItalic ? 'boldItalic' : isBold ? 'bold' : isItalic ? 'italic' : 'normal');
+        let f = fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase() && ff.variant === exactKey);
+        if (f) return f;
+        if (isBold && isItalic) {
+          f = fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase() && ff.variant === 'bold');
+          if (f) return f;
+          f = fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase() && ff.variant === 'italic');
+          if (f) return f;
+        }
+        return fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase());
+      };
+      const processed = new Map();
+      for (const vd of variantDefs) {
+        const fontFile = pickFont(vd.isBold, vd.isItalic);
+        if (!fontFile) {
+          emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: vd.key });
+          continue;
+        }
+        const cacheKey = fontFile.variant + '::' + fontFile.name;
+        if (processed.has(cacheKey)) {
+          const prev = processed.get(cacheKey);
+          for (const ch of vd.chars) prev.chars.add(ch);
+          continue;
+        }
+        processed.set(cacheKey, { fontFile, chars: new Set(vd.chars), name: fontName });
       }
-      emitLog(id, 'log.font.subsetting', 'info', {
-        name: fontName, weight: 'Regular', chars: chars.length
-      });
-      try {
-        const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, 'Regular', fontFile.ttcIndex, id, options.wantAscii);
-        embeddedFonts.push({ name: fontName, ttf: result.ttf, usedChars: result.usedChars });
-        const origKB = (result.origSize / 1024).toFixed(0);
-        const newKB = (result.ttf.length / 1024).toFixed(0);
-        const pct = ((1 - result.ttf.length / result.origSize) * 100).toFixed(0);
-        emitLog(id, 'log.font.subset_done', 'ok', {
-          name: fontName, weight: 'Merged', origKB, newKB, pct,
-          skipped: result.skipped
-        });
-      } catch (e) {
-        emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
+      for (const { fontFile, chars, name: fn } of processed.values()) {
+        const charArr = Array.from(chars);
+        const styleName = fontFile.isItalic ? (fontFile.weight >= 600 ? 'BoldItalic' : 'Italic') : (fontFile.weight >= 600 ? 'Bold' : 'Regular');
+        emitLog(id, 'log.font.subsetting', 'info', { name: fn, weight: fontFile.weight >= 600 ? 'bold' : 'normal', chars: charArr.length });
+        try {
+          const result = subsetFont(fontFile.buffer, charArr, fn, fontFile.isTTC, fontFile.weight >= 600 ? 'bold' : 'regular', fontFile.ttcIndex, id, options.wantAscii);
+          embeddedFonts.push({ name: fn, ttf: result.ttf, usedChars: result.usedChars });
+          const origKB = (result.origSize / 1024).toFixed(0);
+          const newKB = (result.ttf.length / 1024).toFixed(0);
+          const pct = ((1 - result.ttf.length / result.origSize) * 100).toFixed(0);
+          emitLog(id, 'log.font.subset_done', 'ok', { name: fn, weight: fontFile.weight >= 600 ? 'bold' : 'normal', origKB, newKB, pct, skipped: result.skipped });
+        } catch (e) {
+          emitLog(id, 'log.font.subset_fail', 'err', { name: fn, error: e.message });
+        }
       }
     }
   }
   if (options.wantSystemFont && parsed.systemFontsReferenced) {
     for (const fontName of Object.keys(parsed.systemFontsReferenced)) {
       const charInfo = parsed.systemFontsReferenced[fontName];
-      const allChars = new Set([...charInfo.normal, ...charInfo.bold]);
+      const allChars = new Set([...charInfo.normal, ...charInfo.bold, ...(charInfo.italic||[]), ...(charInfo.boldItalic||[])]);
       const chars = Array.from(allChars);
       const fontFile = fonts.find(f => f.matchedFor.toLowerCase() === fontName.toLowerCase());
       if (!fontFile) {
         emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: '...' });
         continue;
       }
-      emitLog(id, 'log.font.subsetting', 'info', {
-        name: fontName, weight: 'Regular', chars: chars.length
-      });
+      emitLog(id, 'log.font.subsetting', 'info', { name: fontName, weight: 'Regular', chars: chars.length });
       try {
         const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, 'Regular', fontFile.ttcIndex, id, options.wantAscii);
         embeddedFonts.push({ name: fontName, ttf: result.ttf, usedChars: result.usedChars });

@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.5">
+  <meta name="version" content="2.5.6">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -1557,12 +1557,16 @@
       'zh-CN': {
         'analysis.draw.label': '绘图指令（\\p1）',
         'analysis.draw.none': '未发现绘图指令',
-        'analysis.draw.status.existing': '已子集化 {count} 个形状，当前无新绘图',
-        'analysis.draw.status.existing_short': '已子集化 {count} 个形状',
-        'analysis.draw.status.new': '全新 {count} 处绘图',
+        'analysis.draw.status.existing': '已子集化 {count} 个形状，无变更',
+        'analysis.draw.status.existing_short': '无变更 ({count} 个形状)',
+        'analysis.draw.status.new': '{count} 处绘图（全新）',
         'analysis.draw.status.new_short': '全新',
-        'analysis.draw.status.update': '增量更新：{old} 个旧形状 → {new} 个当前形状',
-        'analysis.draw.status.update_short': '需增量更新',
+        'analysis.draw.status.update': '新增 {added} 个形状（原 {old} → 现 {new}）',
+        'analysis.draw.status.update_short': '有新增',
+        'analysis.draw.status.delete': '移除 {removed} 个形状（原 {old} → 现 {new}）',
+        'analysis.draw.status.delete_short': '有移除',
+        'analysis.draw.status.delta': '变更 {added} 增 / {removed} 减（原 {old} → 现 {new}）',
+        'analysis.draw.status.delta_short': '有变更',
         'analysis.font.embedded.found': '已内嵌 {count} 个字体',
         'analysis.font.embedded.label': '已内嵌字体',
         'analysis.font.embedded.none': '无已内嵌字体',
@@ -1570,7 +1574,6 @@
         'analysis.font.none': '未发现第三方字体',
         'analysis.font.sys.label': '系统字体',
         'analysis.font.sys.none': '未发现引用的系统字体',
-        'analysis.resubset': '检测到已子集化的绘图指令，将进行增量更新。',
         'app.subtitle': '字幕绘图指令子集化 · 字幕字体子集嵌入',
         'app.title': 'ASS 子集化工具',
         'aria.dz_ass': '上传字幕文件，支持拖拽或点击选择',
@@ -1631,6 +1634,9 @@
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
         'log.convert.start': '[convert] 开始转换…',
         'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体…',
+        'log.draw.building.incremental': '[draw] 增量更新：新增 {added} 个形状（共 {total} 个），正在构建字体…',
+        'log.draw.building.delete': '[draw] 增量更新：移除全部绘图形状，正在更新字体…',
+        'log.draw.building.delta': '[draw] 增量更新：{added} 增 / {removed} 减（共 {total} 个形状），正在构建字体…',
         'log.draw.detail.expand': '[draw] {count} 个字形详情（点击展开）',
         'log.draw.done': '[draw] 绘图字体生成完毕：{size} KB',
         'log.draw.item': '  - 字符: {char} | 计数: {count} | 时间轴: [{start} -> {end}]',
@@ -1691,12 +1697,16 @@
       'zh-TW': {
         'analysis.draw.label': '繪圖指令（\\p1）',
         'analysis.draw.none': '未發現繪圖指令',
-        'analysis.draw.status.existing': '已子集化 {count} 個形狀，目前無新繪圖',
-        'analysis.draw.status.existing_short': '已子集化 {count} 個形狀',
-        'analysis.draw.status.new': '全新 {count} 處繪圖',
+        'analysis.draw.status.existing': '已子集化 {count} 個形狀，無變更',
+        'analysis.draw.status.existing_short': '無變更 ({count} 個形狀)',
+        'analysis.draw.status.new': '{count} 處繪圖（全新）',
         'analysis.draw.status.new_short': '全新',
-        'analysis.draw.status.update': '增量更新：{old} 個舊形狀 → {new} 個當前形狀',
-        'analysis.draw.status.update_short': '需增量更新',
+        'analysis.draw.status.update': '新增 {added} 個形狀（原 {old} → 現 {new}）',
+        'analysis.draw.status.update_short': '有新增',
+        'analysis.draw.status.delete': '移除 {removed} 個形狀（原 {old} → 現 {new}）',
+        'analysis.draw.status.delete_short': '有移除',
+        'analysis.draw.status.delta': '變更 {added} 增 / {removed} 減（原 {old} → 現 {new}）',
+        'analysis.draw.status.delta_short': '有變更',
         'analysis.font.embedded.found': '已內嵌 {count} 個字型',
         'analysis.font.embedded.label': '已內嵌字型',
         'analysis.font.embedded.none': '無已內嵌字型',
@@ -1704,7 +1714,6 @@
         'analysis.font.none': '未發現第三方字型',
         'analysis.font.sys.label': '系統字型',
         'analysis.font.sys.none': '未發現引用的系統字型',
-        'analysis.resubset': '偵測到已子集化的繪圖指令，將進行增量更新。',
         'app.subtitle': '字幕繪圖指令子集化 · 字幕字型子集嵌入',
         'app.title': 'ASS 子集化工具',
         'aria.dz_ass': '上傳字幕檔，支援拖曳或點擊選擇',
@@ -1765,6 +1774,9 @@
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
         'log.convert.start': '[convert] 開始轉換…',
         'log.draw.building': '[draw] 發現 {unique} 個唯一繪圖形狀，共 {total} 處引用，正在建構字型…',
+        'log.draw.building.incremental': '[draw] 增量更新：新增 {added} 個形狀（共 {total} 個），正在建構字型…',
+        'log.draw.building.delete': '[draw] 增量更新：移除全部繪圖形狀，正在更新字型…',
+        'log.draw.building.delta': '[draw] 增量更新：{added} 增 / {removed} 減（共 {total} 個形狀），正在建構字型…',
         'log.draw.detail.expand': '[draw] {count} 個字形詳情（點擊展開）',
         'log.draw.done': '[draw] 繪圖字型生成完畢：{size} KB',
         'log.draw.item': '  - 字元: {char} | 計數: {count} | 時間軸: [{start} -> {end}]',
@@ -1825,12 +1837,16 @@
       en: {
         'analysis.draw.label': 'Draw Commands (\\p1)',
         'analysis.draw.none': 'No draw commands found',
-        'analysis.draw.status.existing': 'Already subsetted {count} shape(s), no new draws currently',
-        'analysis.draw.status.existing_short': '{count} shape(s) subsetted',
+        'analysis.draw.status.existing': '{count} shape(s) subsetted, no changes',
+        'analysis.draw.status.existing_short': 'No changes ({count} shapes)',
         'analysis.draw.status.new': '{count} draw block(s), all new',
         'analysis.draw.status.new_short': 'New',
-        'analysis.draw.status.update': 'Incremental update: {old} existing shape(s) → {new} current shape(s)',
-        'analysis.draw.status.update_short': 'Needs update',
+        'analysis.draw.status.update': '+{added} shape(s) added (was {old} → now {new})',
+        'analysis.draw.status.update_short': 'Added shapes',
+        'analysis.draw.status.delete': '−{removed} shape(s) removed (was {old} → now {new})',
+        'analysis.draw.status.delete_short': 'Removed shapes',
+        'analysis.draw.status.delta': '+{added} / −{removed} shapes changed (was {old} → now {new})',
+        'analysis.draw.status.delta_short': 'Shapes changed',
         'analysis.font.embedded.found': '{count} font(s) embedded',
         'analysis.font.embedded.label': 'Embedded Fonts',
         'analysis.font.embedded.none': 'No embedded fonts',
@@ -1838,7 +1854,6 @@
         'analysis.font.none': 'No third-party fonts found',
         'analysis.font.sys.label': 'System Fonts',
         'analysis.font.sys.none': 'No system fonts referenced',
-        'analysis.resubset': 'Existing draw subset detected — incremental update will run.',
         'app.subtitle': 'Draw Command Subsetting · Font Subset Embedding',
         'app.title': 'ASS Subsetter',
         'aria.dz_ass': 'Upload script — drag and drop or click to browse',
@@ -1899,6 +1914,9 @@
         'log.convert.done': '[done] Finished. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Starting…',
         'log.draw.building': '[draw] {unique} unique shapes, {total} references — building font…',
+        'log.draw.building.incremental': '[draw] Incremental update: +{added} new shape(s) (total {total}) — building font…',
+        'log.draw.building.delete': '[draw] Incremental update: all draw shapes removed — rebuilding font…',
+        'log.draw.building.delta': '[draw] Incremental update: +{added} / −{removed} (total {total} shapes) — building font…',
         'log.draw.detail.expand': '[draw] {count} glyph mappings (click to expand)',
         'log.draw.done': '[draw] Draw font built: {size} KB',
         'log.draw.item': '  - Char: {char} | Count: {count} | Timeline: [{start} → {end}]',
@@ -1959,12 +1977,16 @@
       ja: {
         'analysis.draw.label': '描画コマンド（\\p1）',
         'analysis.draw.none': '描画コマンドが見つかりません',
-        'analysis.draw.status.existing': '既にサブセット化された {count} 個の形状、現在新しい描画はありません',
-        'analysis.draw.status.existing_short': '{count} 個の形状をサブセット済み',
+        'analysis.draw.status.existing': '{count} 個の形状をサブセット済み、変更なし',
+        'analysis.draw.status.existing_short': '変更なし（{count} 個）',
         'analysis.draw.status.new': '{count} 件の描画ブロック（すべて新規）',
         'analysis.draw.status.new_short': '新規',
-        'analysis.draw.status.update': '増分更新：既存 {old} 形状 → 現在 {new} 形状',
-        'analysis.draw.status.update_short': '更新が必要',
+        'analysis.draw.status.update': '{added} 個の形状を追加（{old} → {new}）',
+        'analysis.draw.status.update_short': '追加あり',
+        'analysis.draw.status.delete': '{removed} 個の形状を削除（{old} → {new}）',
+        'analysis.draw.status.delete_short': '削除あり',
+        'analysis.draw.status.delta': '{added} 追加 / {removed} 削除（{old} → {new}）',
+        'analysis.draw.status.delta_short': '変更あり',
         'analysis.font.embedded.found': '{count} 個の埋め込みフォント',
         'analysis.font.embedded.label': '埋め込みフォント',
         'analysis.font.embedded.none': '埋め込みフォントなし',
@@ -1972,7 +1994,6 @@
         'analysis.font.none': 'サードパーティフォントが見つかりません',
         'analysis.font.sys.label': 'システムフォント',
         'analysis.font.sys.none': '参照されているシステムフォントはありません',
-        'analysis.resubset': '既存の描画サブセットを検出しました。増分更新を実行します。',
         'app.subtitle': '描画コマンドのサブセット化・フォントサブセット埋め込み',
         'app.title': 'ASS サブセットツール',
         'aria.dz_ass': '字幕ファイルをアップロード（ドラッグ＆ドロップまたはクリック）',
@@ -2033,6 +2054,9 @@
         'log.convert.done': '[done] 完了。{origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] 変換を開始…',
         'log.draw.building': '[draw] {unique} 個のユニーク形状、{total} 件の参照を検出 — フォントを構築中…',
+        'log.draw.building.incremental': '[draw] 増分更新：+{added} 個の新規形状（合計 {total} 個）— フォントを構築中…',
+        'log.draw.building.delete': '[draw] 増分更新：全描画形状を削除 — フォントを再構築中…',
+        'log.draw.building.delta': '[draw] 増分更新：+{added} / −{removed}（合計 {total} 個）— フォントを構築中…',
         'log.draw.detail.expand': '[draw] {count} 件のグリフマッピング（クリックで展開）',
         'log.draw.done': '[draw] 描画フォントを生成しました：{size} KB',
         'log.draw.item': '  - 文字: {char} | 数: {count} | タイムライン: [{start} → {end}]',
@@ -2093,12 +2117,16 @@
       ko: {
         'analysis.draw.label': '드로우 명령어 (\\p1)',
         'analysis.draw.none': '드로우 명령어가 없습니다',
-        'analysis.draw.status.existing': '이미 서브셋화된 {count}개 도형, 신규 드로우 없음',
-        'analysis.draw.status.existing_short': '{count}개 도형 서브셋 완료',
+        'analysis.draw.status.existing': '{count}개 도형 서브셋 완료, 변경 없음',
+        'analysis.draw.status.existing_short': '변경 없음 ({count}개)',
         'analysis.draw.status.new': '{count}개의 드로우 블록 (모두 신규)',
         'analysis.draw.status.new_short': '신규',
-        'analysis.draw.status.update': '증분 업데이트: 기존 {old}개 도형 → 현재 {new}개 도형',
-        'analysis.draw.status.update_short': '업데이트 필요',
+        'analysis.draw.status.update': '{added}개 형태 추가됨 ({old} → {new})',
+        'analysis.draw.status.update_short': '추가됨',
+        'analysis.draw.status.delete': '{removed}개 형태 제거됨 ({old} → {new})',
+        'analysis.draw.status.delete_short': '제거됨',
+        'analysis.draw.status.delta': '+{added} / −{removed} 변경됨 ({old} → {new})',
+        'analysis.draw.status.delta_short': '변경됨',
         'analysis.font.embedded.found': '{count}개의 내장 폰트',
         'analysis.font.embedded.label': '내장 폰트',
         'analysis.font.embedded.none': '내장 폰트 없음',
@@ -2106,7 +2134,6 @@
         'analysis.font.none': '서드파티 폰트가 없습니다',
         'analysis.font.sys.label': '시스템 폰트',
         'analysis.font.sys.none': '참조된 시스템 폰트가 없습니다',
-        'analysis.resubset': '기존 드로우 서브셋이 감지되었습니다. 증분 업데이트를 수행합니다.',
         'app.subtitle': '드로우 명령어 서브셋화 · 폰트 서브셋 삽입',
         'app.title': 'ASS 서브셋 도구',
         'aria.dz_ass': '자막 파일 업로드 — 드래그 앤 드롭 또는 클릭',
@@ -2167,6 +2194,9 @@
         'log.convert.done': '[done] 완료. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] 변환 시작…',
         'log.draw.building': '[draw] {unique}개의 고유 도형, {total}개의 참조 발견 — 폰트 구축 중…',
+        'log.draw.building.incremental': '[draw] 증분 업데이트: +{added}개 신규 도형 (총 {total}개) — 폰트 구축 중…',
+        'log.draw.building.delete': '[draw] 증분 업데이트: 모든 드로우 도형 제거 — 폰트 재구축 중…',
+        'log.draw.building.delta': '[draw] 증분 업데이트: +{added} / −{removed} (총 {total}개) — 폰트 구축 중…',
         'log.draw.detail.expand': '[draw] {count}개의 글리프 매핑 (클릭하여 펼치기)',
         'log.draw.done': '[draw] 드로우 폰트 생성 완료: {size} KB',
         'log.draw.item': '  - 문자: {char} | 횟수: {count} | 타임라인: [{start} → {end}]',
@@ -2227,12 +2257,16 @@
       es: {
         'analysis.draw.label': 'Comandos de dibujo (\\p1)',
         'analysis.draw.none': 'No se encontraron comandos de dibujo',
-        'analysis.draw.status.existing': 'Ya subconjuntadas {count} formas, sin dibujos nuevos actualmente',
-        'analysis.draw.status.existing_short': '{count} formas subconjuntadas',
+        'analysis.draw.status.existing': '{count} formas subconjuntadas, sin cambios',
+        'analysis.draw.status.existing_short': 'Sin cambios ({count} formas)',
         'analysis.draw.status.new': '{count} bloques de dibujo (todos nuevos)',
         'analysis.draw.status.new_short': 'Nuevos',
-        'analysis.draw.status.update': 'Actualización incremental: {old} formas existentes → {new} formas actuales',
-        'analysis.draw.status.update_short': 'Requiere actualización',
+        'analysis.draw.status.update': '+{added} forma(s) añadida(s) ({old} → {new})',
+        'analysis.draw.status.update_short': 'Formas añadidas',
+        'analysis.draw.status.delete': '−{removed} forma(s) eliminada(s) ({old} → {new})',
+        'analysis.draw.status.delete_short': 'Formas eliminadas',
+        'analysis.draw.status.delta': '+{added} / −{removed} cambios ({old} → {new})',
+        'analysis.draw.status.delta_short': 'Formas cambiadas',
         'analysis.font.embedded.found': '{count} fuente(s) incrustada(s)',
         'analysis.font.embedded.label': 'Fuentes incrustadas',
         'analysis.font.embedded.none': 'Sin fuentes incrustadas',
@@ -2240,7 +2274,6 @@
         'analysis.font.none': 'No se encontraron fuentes de terceros',
         'analysis.font.sys.label': 'Fuentes del sistema',
         'analysis.font.sys.none': 'No hay referencias a fuentes del sistema',
-        'analysis.resubset': 'Se detectó un subconjunto de dibujo existente; se realizará una actualización incremental.',
         'app.subtitle': 'Subconjunto de comandos de dibujo · Incrustación de fuentes',
         'app.title': 'Herramienta ASS de subconjunto',
         'aria.dz_ass': 'Subir archivo de subtítulos — arrastra o haz clic para seleccionar',
@@ -2301,6 +2334,9 @@
         'log.convert.done': '[done] Completado. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Iniciando…',
         'log.draw.building': '[draw] {unique} formas únicas, {total} referencias — construyendo fuente…',
+        'log.draw.building.incremental': '[draw] Actualización incremental: +{added} forma(s) nueva(s) (total {total}) — construyendo fuente…',
+        'log.draw.building.delete': '[draw] Actualización incremental: todas las formas eliminadas — reconstruyendo fuente…',
+        'log.draw.building.delta': '[draw] Actualización incremental: +{added} / −{removed} (total {total} formas) — construyendo fuente…',
         'log.draw.detail.expand': '[draw] {count} mapeos de glifos (clic para expandir)',
         'log.draw.done': '[draw] Fuente de dibujo generada: {size} KB',
         'log.draw.item': '  - Carácter: {char} | Conteo: {count} | Línea de tiempo: [{start} → {end}]',
@@ -2361,12 +2397,16 @@
       ru: {
         'analysis.draw.label': 'Команды рисования (\\p1)',
         'analysis.draw.none': 'Команды рисования не найдены',
-        'analysis.draw.status.existing': 'Уже субсетизированы {count} форм, новых рисунков нет',
-        'analysis.draw.status.existing_short': '{count} форм субсетизированы',
+        'analysis.draw.status.existing': '{count} форм субсетизированы, изменений нет',
+        'analysis.draw.status.existing_short': 'Изменений нет ({count} форм)',
         'analysis.draw.status.new': '{count} блок(ов) рисования (все новые)',
         'analysis.draw.status.new_short': 'Новые',
-        'analysis.draw.status.update': 'Инкрементальное обновление: {old} существующих форм → {new} текущих форм',
-        'analysis.draw.status.update_short': 'Требует обновления',
+        'analysis.draw.status.update': '+{added} форм добавлено ({old} → {new})',
+        'analysis.draw.status.update_short': 'Добавлены',
+        'analysis.draw.status.delete': '−{removed} форм удалено ({old} → {new})',
+        'analysis.draw.status.delete_short': 'Удалены',
+        'analysis.draw.status.delta': '+{added} / −{removed} форм изменено ({old} → {new})',
+        'analysis.draw.status.delta_short': 'Изменены',
         'analysis.font.embedded.found': '{count} шрифт(ов) встроено',
         'analysis.font.embedded.label': 'Встроенные шрифты',
         'analysis.font.embedded.none': 'Нет встроенных шрифтов',
@@ -2374,7 +2414,6 @@
         'analysis.font.none': 'Шрифты третьих сторон не найдены',
         'analysis.font.sys.label': 'Системные шрифты',
         'analysis.font.sys.none': 'Нет ссылок на системные шрифты',
-        'analysis.resubset': 'Обнаружен существующий блок рисования — будет выполнено инкрементальное обновление.',
         'app.subtitle': 'Подмножество команд рисования · Встраивание шрифтов',
         'app.title': 'ASS субсеттер',
         'aria.dz_ass': 'Загрузить файл субтитров — перетащите или нажмите для выбора',
@@ -2435,6 +2474,9 @@
         'log.convert.done': '[done] Готово. {origKB} КБ → {newKB} КБ ({delta} КБ)',
         'log.convert.start': '[convert] Запуск обработки…',
         'log.draw.building': '[draw] {unique} уникальных форм, {total} ссылок — строим шрифт…',
+        'log.draw.building.incremental': '[draw] Инкрементальное обновление: +{added} новых форм (всего {total}) — строим шрифт…',
+        'log.draw.building.delete': '[draw] Инкрементальное обновление: все формы удалены — перестраиваем шрифт…',
+        'log.draw.building.delta': '[draw] Инкрементальное обновление: +{added} / −{removed} (всего {total} форм) — строим шрифт…',
         'log.draw.detail.expand': '[draw] {count} глиф-маппингов (нажмите для раскрытия)',
         'log.draw.done': '[draw] Шрифт рисования создан: {size} КБ',
         'log.draw.item': '  - Символ: {char} | Кол-во: {count} | Тайм-код: [{start} → {end}]',
@@ -2495,12 +2537,16 @@
       'pt-BR': {
         'analysis.draw.label': 'Comandos de desenho (\\p1)',
         'analysis.draw.none': 'Nenhum comando de desenho encontrado',
-        'analysis.draw.status.existing': 'Já subconjuntadas {count} formas, sem novos desenhos atualmente',
-        'analysis.draw.status.existing_short': '{count} formas subconjuntadas',
+        'analysis.draw.status.existing': '{count} formas subconjuntadas, sem alterações',
+        'analysis.draw.status.existing_short': 'Sem alterações ({count} formas)',
         'analysis.draw.status.new': '{count} blocos de desenho, todos novos',
         'analysis.draw.status.new_short': 'Novos',
-        'analysis.draw.status.update': 'Atualização incremental: {old} formas existentes → {new} formas atuais',
-        'analysis.draw.status.update_short': 'Precisa de atualização',
+        'analysis.draw.status.update': '+{added} forma(s) adicionada(s) ({old} → {new})',
+        'analysis.draw.status.update_short': 'Formas adicionadas',
+        'analysis.draw.status.delete': '−{removed} forma(s) removida(s) ({old} → {new})',
+        'analysis.draw.status.delete_short': 'Formas removidas',
+        'analysis.draw.status.delta': '+{added} / −{removed} alterações ({old} → {new})',
+        'analysis.draw.status.delta_short': 'Formas alteradas',
         'analysis.font.embedded.found': '{count} fonte(s) incorporada(s)',
         'analysis.font.embedded.label': 'Fontes incorporadas',
         'analysis.font.embedded.none': 'Nenhuma fonte incorporada',
@@ -2508,7 +2554,6 @@
         'analysis.font.none': 'Nenhuma fonte de terceiros encontrada',
         'analysis.font.sys.label': 'Fontes do sistema',
         'analysis.font.sys.none': 'Nenhuma fonte do sistema referenciada',
-        'analysis.resubset': 'Subconjunto de desenho existente detectado — atualização incremental será executada.',
         'app.subtitle': 'Subconjunto de comandos de desenho · Incorporação de fontes',
         'app.title': 'ASS Subsetter',
         'aria.dz_ass': 'Enviar arquivo de legenda — arraste ou clique para selecionar',
@@ -2569,6 +2614,9 @@
         'log.convert.done': '[done] Concluído. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Iniciando…',
         'log.draw.building': '[draw] {unique} formas únicas, {total} referências — construindo fonte…',
+        'log.draw.building.incremental': '[draw] Atualização incremental: +{added} nova(s) forma(s) (total {total}) — construindo fonte…',
+        'log.draw.building.delete': '[draw] Atualização incremental: todas as formas removidas — reconstruindo fonte…',
+        'log.draw.building.delta': '[draw] Atualização incremental: +{added} / −{removed} (total {total} formas) — construindo fonte…',
         'log.draw.detail.expand': '[draw] {count} mapeamentos de glifos (clique para expandir)',
         'log.draw.done': '[draw] Fonte de desenho criada: {size} KB',
         'log.draw.item': '  - Caractere: {char} | Contagem: {count} | Timeline: [{start} → {end}]',
@@ -2629,12 +2677,16 @@
       ar: {
         'analysis.draw.label': 'أوامر الرسم (\\p1)',
         'analysis.draw.none': 'لم يتم العثور على أوامر رسم',
-        'analysis.draw.status.existing': 'تم بالفعل تقليص {count} شكل، لا توجد رسوم جديدة حالياً',
-        'analysis.draw.status.existing_short': 'تم تقليص {count} شكل',
+        'analysis.draw.status.existing': '{count} أشكال فريدة تم تقليصها، لا تغييرات',
+        'analysis.draw.status.existing_short': 'لا تغييرات ({count} أشكال)',
         'analysis.draw.status.new': '{count} كتلة رسم (كلها جديدة)',
         'analysis.draw.status.new_short': 'جديدة',
-        'analysis.draw.status.update': 'تحديث تدريجي: {old} أشكال موجودة → {new} أشكال حالية',
-        'analysis.draw.status.update_short': 'يحتاج تحديث',
+        'analysis.draw.status.update': '+{added} شكل مضاف ({old} → {new})',
+        'analysis.draw.status.update_short': 'أشكال مضافة',
+        'analysis.draw.status.delete': '−{removed} شكل محذوف ({old} → {new})',
+        'analysis.draw.status.delete_short': 'أشكال محذوفة',
+        'analysis.draw.status.delta': '+{added} / −{removed} أشكال تغيرت ({old} → {new})',
+        'analysis.draw.status.delta_short': 'أشكال متغيرة',
         'analysis.font.embedded.found': 'تم تضمين {count} خط',
         'analysis.font.embedded.label': 'الخطوط المضمنة',
         'analysis.font.embedded.none': 'لا توجد خطوط مضمنة',
@@ -2642,7 +2694,6 @@
         'analysis.font.none': 'لم يتم العثور على خطوط الطرف الثالث',
         'analysis.font.sys.label': 'خطوط النظام',
         'analysis.font.sys.none': 'لا توجد إشارات إلى خطوط النظام',
-        'analysis.resubset': 'تم اكتشاف مجموعة رسم فرعية موجودة — سيتم تشغيل تحديث تدريجي.',
         'app.subtitle': 'تقليص أوامر الرسم · تضمين الخطوط',
         'app.title': 'أداة ASS للتقليص',
         'aria.dz_ass': 'رفع ملف الترجمة — اسحب وأفلت أو انقر للاختيار',
@@ -2703,6 +2754,9 @@
         'log.convert.done': '[done] اكتمل. {origKB} كيلوبايت → {newKB} كيلوبايت ({delta} كيلوبايت)',
         'log.convert.start': '[convert] بدء المعالجة…',
         'log.draw.building': '[draw] {unique} شكل فريد، {total} إحالة — جارٍ بناء الخط…',
+        'log.draw.building.incremental': '[draw] تحديث تدريجي: +{added} أشكال جديدة (المجموع {total}) — جارٍ بناء الخط…',
+        'log.draw.building.delete': '[draw] تحديث تدريجي: تم حذف جميع الأشكال — جارٍ إعادة بناء الخط…',
+        'log.draw.building.delta': '[draw] تحديث تدريجي: +{added} / −{removed} (المجموع {total} أشكال) — جارٍ بناء الخط…',
         'log.draw.detail.expand': '[draw] {count} تعيين غليف (انقر للتوسيع)',
         'log.draw.done': '[draw] تم بناء خط الرسم: {size} كيلوبايت',
         'log.draw.item': '  - الحرف: {char} | العدد: {count} | التوقيت: [{start} → {end}]',
@@ -2763,12 +2817,16 @@
       tr: {
         'analysis.draw.label': 'Çizim komutları (\\p1)',
         'analysis.draw.none': 'Çizim komutu bulunamadı',
-        'analysis.draw.status.existing': 'Zaten {count} şekil alt kümeleştirildi, şu anda yeni çizim yok',
-        'analysis.draw.status.existing_short': '{count} şekil alt kümeleştirildi',
+        'analysis.draw.status.existing': '{count} şekil alt kümeleştirildi, değişiklik yok',
+        'analysis.draw.status.existing_short': 'Değişiklik yok ({count} şekil)',
         'analysis.draw.status.new': '{count} çizim bloğu (hepsi yeni)',
         'analysis.draw.status.new_short': 'Yeni',
-        'analysis.draw.status.update': 'Artımlı güncelleme: {old} mevcut şekil → {new} mevcut şekil',
-        'analysis.draw.status.update_short': 'Güncelleme gerekiyor',
+        'analysis.draw.status.update': '+{added} şekil eklendi ({old} → {new})',
+        'analysis.draw.status.update_short': 'Şekil eklendi',
+        'analysis.draw.status.delete': '−{removed} şekil kaldırıldı ({old} → {new})',
+        'analysis.draw.status.delete_short': 'Şekil kaldırıldı',
+        'analysis.draw.status.delta': '+{added} / −{removed} şekil değişti ({old} → {new})',
+        'analysis.draw.status.delta_short': 'Şekil değişti',
         'analysis.font.embedded.found': '{count} font gömüldü',
         'analysis.font.embedded.label': 'Gömülü fontlar',
         'analysis.font.embedded.none': 'Gömülü font yok',
@@ -2776,7 +2834,6 @@
         'analysis.font.none': 'Üçüncü taraf font bulunamadı',
         'analysis.font.sys.label': 'Sistem fontları',
         'analysis.font.sys.none': 'Sistem fontlarına referans yok',
-        'analysis.resubset': 'Mevcut çizim alt kümesi tespit edildi — artımlı güncelleme yapılacak.',
         'app.subtitle': 'Çizim komutu alt kümeleme · Font gömme',
         'app.title': 'ASS Alt Kümeleme Aracı',
         'aria.dz_ass': 'Altyazı dosyası yükle — sürükle veya tıkla',
@@ -2837,6 +2894,9 @@
         'log.convert.done': '[done] Tamamlandı. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Başlatılıyor…',
         'log.draw.building': '[draw] {unique} benzersiz şekil, {total} referans — font oluşturuluyor…',
+        'log.draw.building.incremental': '[draw] Artımlı güncelleme: +{added} yeni şekil (toplam {total}) — font oluşturuluyor…',
+        'log.draw.building.delete': '[draw] Artımlı güncelleme: tüm şekiller kaldırıldı — font yeniden oluşturuluyor…',
+        'log.draw.building.delta': '[draw] Artımlı güncelleme: +{added} / −{removed} (toplam {total} şekil) — font oluşturuluyor…',
         'log.draw.detail.expand': '[draw] {count} glif eşlemesi (genişletmek için tıkla)',
         'log.draw.done': '[draw] Çizim fontu oluşturuldu: {size} KB',
         'log.draw.item': '  - Karakter: {char} | Sayı: {count} | Zaman çizelgesi: [{start} → {end}]',
@@ -3108,6 +3168,7 @@
       converting: false,
       converted: false,
       downloaded: false,
+      pendingReplaceKeys: new Set(),
     };
 
     let _assBadgeState = null;
@@ -3498,6 +3559,7 @@
       S.uploadedFonts.clear();
       S.outputBlobs = [];
       S.fontBuffers = [];
+      S.pendingReplaceKeys.clear();
 
       dzAss.style.display = 'none';
       _assBadgeState = {
@@ -3589,6 +3651,7 @@
       S.converting = false;
       S.converted = false;
       S.downloaded = false;
+      S.pendingReplaceKeys.clear();
       _assBadgeState = null;
       _assFileErrors = null;
       _fontErrState = null;
@@ -3656,14 +3719,29 @@
         if (p.drawings > 0) {
           hasNewDrawings = true;
           if (p.hasExistingDrawSubset) {
-            drawingsDetails.push(t('analysis.draw.status.update', { old: p.subsetReferencedChars.length, new: p.uniqueDrawings.length }));
+            const oldCount = p.subsetReferencedChars.length;
+            const newCount = p.uniqueDrawings.length;
+            const added = Math.max(0, newCount - oldCount);
+            const removed = Math.max(0, oldCount - newCount);
+            if (added > 0 && removed > 0) {
+              drawingsDetails.push(t('analysis.draw.status.delta', { added, removed, old: oldCount, new: newCount }));
+            } else {
+              drawingsDetails.push(t('analysis.draw.status.update', { added, old: oldCount, new: newCount }));
+            }
           } else {
             drawingsDetails.push(t('analysis.draw.status.new', { count: p.drawings }));
           }
         } else if (p.hasExistingDrawSubset) {
-          hasExistingDrawOnly = true;
-          totalExistingSubsetShapes += p.subsetReferencedChars.length;
-          drawingsDetails.push(t('analysis.draw.status.existing', { count: p.subsetReferencedChars.length }));
+          if (p.subsetNeedsUpdate) {
+            hasNewDrawings = true;
+            const oldCount = p.subsetReferencedChars.length;
+            const removed = oldCount;
+            drawingsDetails.push(t('analysis.draw.status.delete', { removed, old: oldCount, new: 0 }));
+          } else {
+            hasExistingDrawOnly = true;
+            totalExistingSubsetShapes += p.subsetReferencedChars.length;
+            drawingsDetails.push(t('analysis.draw.status.existing', { count: p.subsetReferencedChars.length }));
+          }
         }
         if (extKeys.length > 0) hasFonts = true;
         if (sysKeys.length > 0) hasSysFonts = true;
@@ -3707,9 +3785,23 @@
         area.appendChild(row);
       };
 
+      let drawBadgeText;
+      if (!hasDrawings) {
+        drawBadgeText = t('analysis.draw.none');
+      } else if (hasExistingDrawOnly) {
+        drawBadgeText = t('analysis.draw.status.existing_short', { count: totalExistingSubsetShapes });
+      } else if (!hasResubset) {
+        drawBadgeText = t('analysis.draw.status.new_short');
+      } else {
+        const anyDelta = S.assFiles.some(e => e.parsed.drawings > 0 && e.parsed.hasExistingDrawSubset && e.parsed.uniqueDrawings.length < e.parsed.subsetReferencedChars.length);
+        const anyDelete = S.assFiles.some(e => e.parsed.drawings === 0 && e.parsed.hasExistingDrawSubset && e.parsed.subsetNeedsUpdate);
+        if (anyDelta || anyDelete) drawBadgeText = t('analysis.draw.status.delta_short');
+        else drawBadgeText = t('analysis.draw.status.update_short');
+      }
+
       createExpandableRow(t('analysis.draw.label'),
-        hasNewDrawings ? 'badge-ok' : (hasExistingDrawOnly ? 'badge-info' : 'badge-info'),
-        hasNewDrawings ? (hasResubset ? t('analysis.draw.status.update_short') : t('analysis.draw.status.new_short')) : (hasExistingDrawOnly ? t('analysis.draw.status.existing_short', { count: totalExistingSubsetShapes }) : t('analysis.draw.none')),
+        hasNewDrawings ? 'badge-ok' : 'badge-info',
+        drawBadgeText,
         hasDrawings ? [`<strong>${t('stat.uniqueShapes')}:</strong> ${totalUnique}`, `<strong>${t('stat.totalDrawings')}:</strong> ${totalDrawings}`, ...drawingsDetails] : [t('analysis.draw.none')]
       );
 
@@ -3730,13 +3822,6 @@
         totalEmbedded.size > 0 ? t('analysis.font.embedded.found', { count: totalEmbedded.size }) : t('analysis.font.embedded.none'),
         totalEmbedded.size > 0 ? embeddedDetails : [t('analysis.font.embedded.none')]
       );
-
-      if (hasResubset) {
-        const notice = document.createElement('div');
-        notice.className = 'notice';
-        notice.textContent = t('analysis.resubset');
-        area.appendChild(notice);
-      }
 
       const cbDraw = document.getElementById('opt-draw');
       const cbFont = document.getElementById('opt-font');
@@ -3900,20 +3985,68 @@
         if (info.normal > 0) weights.push(t('font.weight.normal'));
         if (info.bold > 0) weights.push(t('font.weight.bold'));
 
-        let statusHtml = '';
-        if (uploaded) {
-          statusHtml = '<span class="fi-status fi-uploaded">' + t('font.uploaded', { name: uploaded.file.name }) + '</span>';
-        } else {
-          statusHtml = '<span class="fi-status fi-missing">' + t('font.missing') + '</span>';
-        }
-
         const div = document.createElement('div');
         div.className = 'font-item' + (info.isSystem ? ' fi-system' : '');
-        div.innerHTML = '<span class="fi-name">' + name + '</span>' +
-          '<span class="fi-chars">' + t('font.chars', { n: totalChars }) + ' [' + weights.join('+') + ']</span>' +
-          statusHtml;
+
+        const nameEl = document.createElement('span');
+        nameEl.className = 'fi-name';
+        nameEl.textContent = name;
+
+        const charsEl = document.createElement('span');
+        charsEl.className = 'fi-chars';
+        charsEl.textContent = t('font.chars', { n: totalChars }) + ' [' + weights.join('+') + ']';
+
+        div.appendChild(nameEl);
+
+        if (uploaded) {
+          const replaceBtn = document.createElement('span');
+          replaceBtn.className = 'fb-change';
+          replaceBtn.style.cssText = 'font-size:0.75rem;cursor:pointer;text-decoration:underline;color:var(--accent);flex-shrink:0;';
+          replaceBtn.textContent = t('change');
+          replaceBtn.onclick = () => {
+            const key = name.toLowerCase();
+            S.uploadedFonts.delete(key);
+            S.pendingReplaceKeys.add(key);
+            const inp = document.getElementById('inp-font');
+            if (inp) inp.value = '';
+            renderFontList();
+          };
+          div.appendChild(replaceBtn);
+        }
+
+        div.appendChild(charsEl);
+
+        if (uploaded) {
+          const statusEl = document.createElement('span');
+          statusEl.className = 'fi-status fi-uploaded';
+          statusEl.textContent = t('font.uploaded', { name: uploaded.file.name });
+          div.appendChild(statusEl);
+        } else {
+          const statusEl = document.createElement('span');
+          statusEl.className = 'fi-status fi-missing';
+          statusEl.textContent = t('font.missing');
+          div.appendChild(statusEl);
+        }
+
         list.appendChild(div);
       }
+    }
+
+    function weightScore(w) {
+      w = w || 400;
+      const d400 = Math.abs(w - 400);
+      const d500 = Math.abs(w - 500);
+      if (d400 === 0) return 0;
+      if (d500 < d400) return d500 + 1;
+      return d400 + 2;
+    }
+    function parseVersion(s) {
+      const m = (s || '').match(/(\d+)\.(\d+)/);
+      return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : [0, 0];
+    }
+    function cmpVersion(a, b) {
+      if (a[0] !== b[0]) return a[0] - b[0];
+      return a[1] - b[1];
     }
 
     async function handleFonts(files) {
@@ -4009,11 +4142,50 @@
             for (const match of result.results) {
               const key = match.matchedFor.toLowerCase();
               const existing = S.uploadedFonts.get(key);
-              if (!existing || (match.isFamilyMatch && !existing.isFamilyMatch)) {
+              const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(key);
+              if (isPendingReplace) {
+                S.pendingReplaceKeys.delete(key);
                 S.uploadedFonts.set(key, {
                   file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
-                  isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight, isFamilyMatch: match.isFamilyMatch
+                  isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
+                  isFamilyMatch: match.isFamilyMatch, weightScore: weightScore(match.weight),
+                  version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
                 });
+                continue;
+              }
+              const newWeightScore = weightScore(match.weight);
+              if (!existing) {
+                S.uploadedFonts.set(key, {
+                  file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
+                  isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
+                  isFamilyMatch: match.isFamilyMatch, weightScore: newWeightScore,
+                  version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
+                });
+              } else {
+                const existingWeightScore = existing.weightScore ?? weightScore(existing.weight || 400);
+                const sameWeightClass = Math.abs((match.weight || 400) - (existing.weight || 400)) < 50;
+                if (sameWeightClass) {
+                  const newVer = parseVersion(match.version || '');
+                  const exVer = parseVersion(existing.version || '');
+                  const verCmp = cmpVersion(newVer, exVer);
+                  if (verCmp > 0 ||
+                      (verCmp === 0 && (entry.file.lastModified || 0) > (existing.lastModified || 0)) ||
+                      (verCmp === 0 && (entry.file.lastModified || 0) === (existing.lastModified || 0) && (entry.file.size || entry.buffer.byteLength) > (existing.size || 0))) {
+                    S.uploadedFonts.set(key, {
+                      file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
+                      isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
+                      isFamilyMatch: match.isFamilyMatch, weightScore: newWeightScore,
+                      version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
+                    });
+                  }
+                } else if (newWeightScore < existingWeightScore) {
+                  S.uploadedFonts.set(key, {
+                    file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
+                    isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
+                    isFamilyMatch: match.isFamilyMatch, weightScore: newWeightScore,
+                    version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
+                  });
+                }
               }
             }
             itemLines.push(t('font.upload.item.ok', { name: entry.file.name, matched: matchNames }));
