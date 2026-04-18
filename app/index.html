@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5">
+  <meta name="version" content="2.5.1">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter· MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -2897,6 +2897,7 @@
           if (norm && VALID[norm]) {
             currentLang = norm;
             try { localStorage.setItem('ass-subset-lang', norm); } catch(_) {}
+            window.history.replaceState({}, document.title, window.location.pathname + '?lang=' + norm);
             return;
           }
         }
@@ -2955,6 +2956,7 @@
     }
 
     function setLang(lang) {
+      window.history.replaceState({}, document.title, window.location.pathname + '?lang=' + lang);
       currentLang = lang;
       try { localStorage.setItem('ass-subset-lang', lang); } catch (_) { }
       applyI18n();
