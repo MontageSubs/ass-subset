@@ -1,0 +1,31 @@
+{
+  "name": "Ferramenta ASS Subsetter",
+  "short_name": "ASS Subset",
+  "description": "Ferramenta online de subconjunto de fontes para legendas ASS/SSA, processado localmente no navegador.",
+  "start_url": "/ass-subset/",
+  "scope": "/ass-subset/",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#c0392b",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "/ass-subset/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

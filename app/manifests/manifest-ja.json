@@ -1,0 +1,31 @@
+{
+  "name": "ASS サブセットツール",
+  "short_name": "ASSサブセット",
+  "description": "ASS/SSA 字幕用のオンラインフォントサブセットツール。ブラウザ上でローカル処理します。",
+  "start_url": "/ass-subset/",
+  "scope": "/ass-subset/",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#c0392b",
+  "lang": "ja",
+  "icons": [
+    {
+      "src": "/ass-subset/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

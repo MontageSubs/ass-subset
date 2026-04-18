@@ -1,0 +1,31 @@
+{
+  "name": "ASS 서브셋 도구",
+  "short_name": "ASS서브셋",
+  "description": "ASS/SSA 자막용 온라인 폰트 서브셋 도구. 브라우저에서 로컬로 처리합니다.",
+  "start_url": "/ass-subset/",
+  "scope": "/ass-subset/",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#c0392b",
+  "lang": "ko",
+  "icons": [
+    {
+      "src": "/ass-subset/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

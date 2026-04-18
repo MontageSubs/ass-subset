@@ -1,0 +1,31 @@
+{
+  "name": "ASS 子集化工具",
+  "short_name": "ASS子集化",
+  "description": "基於瀏覽器端實作的 ASS/SSA 字幕優化工具，支援繪圖指令子集化與字型子集嵌入，純前端本地處理。",
+  "start_url": "/ass-subset/",
+  "scope": "/ass-subset/",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#c0392b",
+  "lang": "zh-TW",
+  "icons": [
+    {
+      "src": "/ass-subset/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

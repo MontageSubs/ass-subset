@@ -1,0 +1,31 @@
+{
+  "name": "ASS Alt Küme Aracı",
+  "short_name": "ASS Subset",
+  "description": "ASS/SSA altyazılar için çevrimiçi yazı tipi alt küme aracı, tarayıcınızda yerel olarak işlenir.",
+  "start_url": "/ass-subset/",
+  "scope": "/ass-subset/",
+  "display": "standalone",
+  "background_color": "#f6f5f2",
+  "theme_color": "#c0392b",
+  "lang": "tr",
+  "icons": [
+    {
+      "src": "/ass-subset/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/ass-subset/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
