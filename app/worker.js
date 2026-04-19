@@ -1394,32 +1394,46 @@ function doConvert(data, id) {
       ...(charInfo.italic || []),
       ...(charInfo.boldItalic || [])
     ]);
-    if (allChars.size === 0) return;
-
-    const italicCount = (charInfo.italic || []).length + (charInfo.boldItalic || []).length;
-    const boldCount = charInfo.bold.length + (charInfo.boldItalic || []).length;
-
+    const charArr = Array.from(allChars);
+    if (charArr.length === 0) return;
     const candidates = fonts.filter(f => f.matchedFor.toLowerCase() === fontNameStr.toLowerCase());
     if (candidates.length === 0) {
       emitLog(id, 'log.font.missing', 'warn', { name: fontNameStr, weight: 'normal' });
       return;
     }
-
+    const hasBold = charInfo.bold.length > 0 || (charInfo.boldItalic && charInfo.boldItalic.length > 0);
+    const hasItalic = (charInfo.italic && charInfo.italic.length > 0) || (charInfo.boldItalic && charInfo.boldItalic.length > 0);
+    const targetWeight = hasBold ? 700 : 400;
     const fontFile = candidates.slice().sort((a, b) => {
-      const sA = Math.abs((a.weight || 400) - 400) + (a.isItalic ? 5 : 0);
-      const sB = Math.abs((b.weight || 400) - 400) + (b.isItalic ? 5 : 0);
-      return sA - sB;
+      let scoreA = 0;
+      let scoreB = 0;
+      const aW = a.weight || 400;
+      const bW = b.weight || 400;
+      const aName = (a.fileName + ' ' + (a.postscriptName || '')).toLowerCase();
+      const bName = (b.fileName + ' ' + (b.postscriptName || '')).toLowerCase();
+      const fName = fontNameStr.toLowerCase();
+      const kws = ['heavy', 'black', 'semibold', 'demi', 'medium', 'light', 'thin', 'w9', 'w7', 'w5', 'w3'];
+      kws.forEach(kw => {
+        if (fName.includes(kw)) {
+          if (aName.includes(kw)) scoreA -= 20000;
+          if (bName.includes(kw)) scoreB -= 20000;
+        }
+      });
+      if (hasItalic !== !!a.isItalic) scoreA += 10000;
+      if (hasItalic !== !!b.isItalic) scoreB += 10000;
+      if (hasBold) {
+        if (aW >= 600 || aName.includes('bold')) scoreA -= 5000;
+        if (bW >= 600 || bName.includes('bold')) scoreB -= 5000;
+      }
+      scoreA += Math.abs(aW - targetWeight);
+      scoreB += Math.abs(bW - targetWeight);
+      if (scoreA === scoreB) {
+        return hasBold ? (bW - aW) : (aW - bW);
+      }
+      return scoreA - scoreB;
     })[0];
-
-    const charArr = Array.from(allChars);
-    const wLabel = 'normal';
-
-    if (italicCount > 0 || boldCount > 0) {
-      emitLog(id, 'log.font.style_warn', 'warn', { name: fontNameStr, bold: boldCount, italic: italicCount });
-    }
-
+    const wLabel = fontFile.weight >= 600 ? 'bold' : 'normal';
     emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: wLabel, chars: charArr.length });
-
     try {
       const result = subsetFont(fontFile.buffer, charArr, fontNameStr, fontFile.isTTC, wLabel, fontFile.ttcIndex, id, options.wantAscii);
       embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars });
