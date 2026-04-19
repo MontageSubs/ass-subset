@@ -966,13 +966,18 @@ function modifyNameTable(buffer, newNames) {
 
   const resolveValue = (entries, platformID, encodingID) => {
     const str = entries['en'] || Object.values(entries).find(v => typeof v === 'string') || '';
-    if (platformID === 3) {
+    if (platformID === 3 || platformID === 0) {
       const buf = new Uint8Array(str.length * 2);
       const dv = new DataView(buf.buffer);
       for (let i = 0; i < str.length; i++) dv.setUint16(i * 2, str.charCodeAt(i), false);
       return buf;
     }
-    return new TextEncoder().encode(str);
+    const bytes = [];
+    for (let i = 0; i < str.length; i++) {
+      const cp = str.charCodeAt(i);
+      bytes.push(cp <= 0xFF ? cp : 0x3F);
+    }
+    return new Uint8Array(bytes);
   };
 
   for (let i = 0; i < count; i++) {

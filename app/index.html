@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.11">
+  <meta name="version" content="2.5.12">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -4475,7 +4475,7 @@
             for (const name of Object.keys(entry.parsed.systemFontsReferenced)) normReq.add(normFont(name).toLowerCase());
           }
         }
-        let loadedCount = 0;
+        let matchedCount = 0;
         for (const font of localFonts) {
           const fam = font.family?.toLowerCase();
           const full = font.fullName?.toLowerCase();
@@ -4509,12 +4509,12 @@
             S.allFontCandidates.push(record);
             if (!S.uploadedFonts.has(vk)) {
               S.uploadedFonts.set(vk, record);
-              loadedCount++;
             }
+            matchedCount++;
           }
         }
-        if (loadedCount > 0) {
-          log(t('log.sysfont.done', { n: loadedCount }), 'ok');
+        if (matchedCount > 0) {
+          log(t('log.sysfont.done', { n: matchedCount }), 'ok');
         } else {
           log(t('log.sysfont.none'), 'warn');
         }
