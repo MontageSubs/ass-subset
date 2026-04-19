@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.6">
+  <meta name="version" content="2.5.7">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -759,6 +759,38 @@
     .fi-uploaded {
       background: rgba(30, 122, 70, 0.1);
       color: var(--ok);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .fi-dismiss {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      font-size: 0.6rem;
+      line-height: 1;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--ink2);
+      border-radius: 2px;
+      padding: 0;
+      flex-shrink: 0;
+      transition: color 0.15s, background 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .fi-dismiss:hover {
+      color: var(--err);
+      background: rgba(181, 42, 28, 0.12);
+    }
+
+    .fi-dismiss:active {
+      color: var(--err);
+      background: rgba(181, 42, 28, 0.22);
     }
 
     .fi-system {
@@ -1559,6 +1591,11 @@
         'analysis.draw.none': '未发现绘图指令',
         'analysis.draw.status.existing': '已子集化 {count} 个形状，无变更',
         'analysis.draw.status.existing_short': '无变更 ({count} 个形状)',
+        'analysis.draw.status.sync': '已嵌入 {embedded} 个字形，当前引用 {referenced} 个，将重建',
+        'analysis.draw.status.sync_short': '需重建',
+        'analysis.draw.status.orphan': '新增 {new} 处绘图，但嵌入字体含 {orphan} 个孤立字形（已无引用）',
+        'analysis.draw.status.orphan_only': '嵌入字体含 {orphan} 个孤立字形（已无引用，共 {total} 个字形）',
+        'analysis.draw.status.orphan_short': '含孤立字形',
         'analysis.draw.status.new': '{count} 处绘图（全新）',
         'analysis.draw.status.new_short': '全新',
         'analysis.draw.status.update': '新增 {added} 个形状（原 {old} → 现 {new}）',
@@ -1622,6 +1659,9 @@
         'font.loading.aria': '字体文件读取中，请勿关闭页面',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': '粗体',
+        'font.weight.italic': '斜体',
+        'font.weight.boldItalic': '粗斜体',
+        'font.replace.aria': '移除字体文件 {name}',
         'font.weight.normal': '常规',
         'footer.feedback': '反馈',
         'footer.home': '主页',
@@ -1699,6 +1739,11 @@
         'analysis.draw.none': '未發現繪圖指令',
         'analysis.draw.status.existing': '已子集化 {count} 個形狀，無變更',
         'analysis.draw.status.existing_short': '無變更 ({count} 個形狀)',
+        'analysis.draw.status.sync': '已嵌入 {embedded} 個字形，當前引用 {referenced} 個，將重建',
+        'analysis.draw.status.sync_short': '需重建',
+        'analysis.draw.status.orphan': '新增 {new} 處繪圖，但嵌入字型含 {orphan} 個孤立字形（已無引用）',
+        'analysis.draw.status.orphan_only': '嵌入字型含 {orphan} 個孤立字形（已無引用，共 {total} 個字形）',
+        'analysis.draw.status.orphan_short': '含孤立字形',
         'analysis.draw.status.new': '{count} 處繪圖（全新）',
         'analysis.draw.status.new_short': '全新',
         'analysis.draw.status.update': '新增 {added} 個形狀（原 {old} → 現 {new}）',
@@ -1762,6 +1807,9 @@
         'font.loading.aria': '字型檔讀取中，請勿關閉頁面',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': '粗體',
+        'font.weight.italic': '斜體',
+        'font.weight.boldItalic': '粗斜體',
+        'font.replace.aria': '移除字型檔 {name}',
         'font.weight.normal': '常規',
         'footer.feedback': '回報問題',
         'footer.home': '首頁',
@@ -1839,6 +1887,11 @@
         'analysis.draw.none': 'No draw commands found',
         'analysis.draw.status.existing': '{count} shape(s) subsetted, no changes',
         'analysis.draw.status.existing_short': 'No changes ({count} shapes)',
+        'analysis.draw.status.sync': 'Embedded {embedded} glyph(s), {referenced} referenced — will rebuild',
+        'analysis.draw.status.sync_short': 'Will rebuild',
+        'analysis.draw.status.orphan': '+{new} new draw(s), but embedded font has {orphan} orphaned glyph(s) with no reference',
+        'analysis.draw.status.orphan_only': 'Embedded font has {orphan} orphaned glyph(s) (unreferenced, {total} total)',
+        'analysis.draw.status.orphan_short': 'Orphaned glyphs',
         'analysis.draw.status.new': '{count} draw block(s), all new',
         'analysis.draw.status.new_short': 'New',
         'analysis.draw.status.update': '+{added} shape(s) added (was {old} → now {new})',
@@ -1902,6 +1955,9 @@
         'font.loading.aria': 'Font files are being read, do not close this page',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Bold',
+        'font.weight.italic': 'Italic',
+        'font.weight.boldItalic': 'Bold Italic',
+        'font.replace.aria': 'Remove font file {name}',
         'font.weight.normal': 'Regular',
         'footer.feedback': 'Report Issue',
         'footer.home': 'Home',
@@ -1979,6 +2035,11 @@
         'analysis.draw.none': '描画コマンドが見つかりません',
         'analysis.draw.status.existing': '{count} 個の形状をサブセット済み、変更なし',
         'analysis.draw.status.existing_short': '変更なし（{count} 個）',
+        'analysis.draw.status.sync': '{embedded} 個の字形が埋め込まれ、{referenced} 個が参照中 — 再構築します',
+        'analysis.draw.status.sync_short': '再構築が必要',
+        'analysis.draw.status.orphan': '{new} 個の新規描画、ただし埋め込みフォントに {orphan} 個の孤立字形あり（参照なし）',
+        'analysis.draw.status.orphan_only': '埋め込みフォントに {orphan} 個の孤立字形（参照なし、合計 {total} 個）',
+        'analysis.draw.status.orphan_short': '孤立字形あり',
         'analysis.draw.status.new': '{count} 件の描画ブロック（すべて新規）',
         'analysis.draw.status.new_short': '新規',
         'analysis.draw.status.update': '{added} 個の形状を追加（{old} → {new}）',
@@ -2042,6 +2103,9 @@
         'font.loading.aria': 'フォントファイル読み込み中。ページを閉じないでください',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'ボールド',
+        'font.weight.italic': 'イタリック',
+        'font.weight.boldItalic': '太字イタリック',
+        'font.replace.aria': 'フォントファイル {name} を削除',
         'font.weight.normal': 'レギュラー',
         'footer.feedback': '問題を報告',
         'footer.home': 'ホーム',
@@ -2119,6 +2183,11 @@
         'analysis.draw.none': '드로우 명령어가 없습니다',
         'analysis.draw.status.existing': '{count}개 도형 서브셋 완료, 변경 없음',
         'analysis.draw.status.existing_short': '변경 없음 ({count}개)',
+        'analysis.draw.status.sync': '{embedded}개 글리프 내장, {referenced}개 참조 중 — 재구성 예정',
+        'analysis.draw.status.sync_short': '재구성 필요',
+        'analysis.draw.status.orphan': '+{new}개 새 드로우, 내장 폰트에 {orphan}개 고아 글리프(참조 없음)',
+        'analysis.draw.status.orphan_only': '내장 폰트에 {orphan}개 고아 글리프(참조 없음, 총 {total}개)',
+        'analysis.draw.status.orphan_short': '고아 글리프',
         'analysis.draw.status.new': '{count}개의 드로우 블록 (모두 신규)',
         'analysis.draw.status.new_short': '신규',
         'analysis.draw.status.update': '{added}개 형태 추가됨 ({old} → {new})',
@@ -2182,6 +2251,9 @@
         'font.loading.aria': '폰트 파일 읽는 중입니다. 페이지를 닫지 마세요',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': '굵게',
+        'font.weight.italic': '이탤릭',
+        'font.weight.boldItalic': '굵은 이탤릭',
+        'font.replace.aria': '폰트 파일 {name} 제거',
         'font.weight.normal': '보통',
         'footer.feedback': '이슈 보고',
         'footer.home': '홈',
@@ -2259,6 +2331,11 @@
         'analysis.draw.none': 'No se encontraron comandos de dibujo',
         'analysis.draw.status.existing': '{count} formas subconjuntadas, sin cambios',
         'analysis.draw.status.existing_short': 'Sin cambios ({count} formas)',
+        'analysis.draw.status.sync': '{embedded} glifo(s) incrustado(s), {referenced} referenciado(s) — se reconstruirá',
+        'analysis.draw.status.sync_short': 'Se reconstruirá',
+        'analysis.draw.status.orphan': '+{new} dibujo(s) nuevo(s), pero la fuente incrustada tiene {orphan} glifo(s) huérfano(s)',
+        'analysis.draw.status.orphan_only': 'La fuente incrustada tiene {orphan} glifo(s) huérfano(s) (sin referencia, {total} total)',
+        'analysis.draw.status.orphan_short': 'Glifos huérfanos',
         'analysis.draw.status.new': '{count} bloques de dibujo (todos nuevos)',
         'analysis.draw.status.new_short': 'Nuevos',
         'analysis.draw.status.update': '+{added} forma(s) añadida(s) ({old} → {new})',
@@ -2322,6 +2399,9 @@
         'font.loading.aria': 'Leyendo archivos de fuentes, no cierres la página',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Negrita',
+        'font.weight.italic': 'Cursiva',
+        'font.weight.boldItalic': 'Negrita Cursiva',
+        'font.replace.aria': 'Eliminar archivo de fuente {name}',
         'font.weight.normal': 'Regular',
         'footer.feedback': 'Reportar problema',
         'footer.home': 'Inicio',
@@ -2399,6 +2479,11 @@
         'analysis.draw.none': 'Команды рисования не найдены',
         'analysis.draw.status.existing': '{count} форм субсетизированы, изменений нет',
         'analysis.draw.status.existing_short': 'Изменений нет ({count} форм)',
+        'analysis.draw.status.sync': 'Встроено {embedded} глиф(ов), используется {referenced} — будет пересобрано',
+        'analysis.draw.status.sync_short': 'Пересборка',
+        'analysis.draw.status.orphan': '+{new} новых рисунков, но во встроенном шрифте {orphan} висячих глифов (без ссылок)',
+        'analysis.draw.status.orphan_only': 'Во встроенном шрифте {orphan} висячих глифов (без ссылок, всего {total})',
+        'analysis.draw.status.orphan_short': 'Висячие глифы',
         'analysis.draw.status.new': '{count} блок(ов) рисования (все новые)',
         'analysis.draw.status.new_short': 'Новые',
         'analysis.draw.status.update': '+{added} форм добавлено ({old} → {new})',
@@ -2462,6 +2547,9 @@
         'font.loading.aria': 'Идёт чтение файлов шрифтов, не закрывайте страницу',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Жирный',
+        'font.weight.italic': 'Курсив',
+        'font.weight.boldItalic': 'Полужирный курсив',
+        'font.replace.aria': 'Удалить файл шрифта {name}',
         'font.weight.normal': 'Обычный',
         'footer.feedback': 'Сообщить о проблеме',
         'footer.home': 'Главная',
@@ -2539,6 +2627,11 @@
         'analysis.draw.none': 'Nenhum comando de desenho encontrado',
         'analysis.draw.status.existing': '{count} formas subconjuntadas, sem alterações',
         'analysis.draw.status.existing_short': 'Sem alterações ({count} formas)',
+        'analysis.draw.status.sync': '{embedded} glifo(s) incorporado(s), {referenced} referenciado(s) — será reconstruído',
+        'analysis.draw.status.sync_short': 'Será reconstruído',
+        'analysis.draw.status.orphan': '+{new} novo(s) desenho(s), mas a fonte incorporada tem {orphan} glifo(s) órfão(s)',
+        'analysis.draw.status.orphan_only': 'A fonte incorporada tem {orphan} glifo(s) órfão(s) (sem referência, {total} total)',
+        'analysis.draw.status.orphan_short': 'Glifos órfãos',
         'analysis.draw.status.new': '{count} blocos de desenho, todos novos',
         'analysis.draw.status.new_short': 'Novos',
         'analysis.draw.status.update': '+{added} forma(s) adicionada(s) ({old} → {new})',
@@ -2602,6 +2695,9 @@
         'font.loading.aria': 'Lendo arquivos de fonte, não feche a página',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Negrito',
+        'font.weight.italic': 'Itálico',
+        'font.weight.boldItalic': 'Negrito Itálico',
+        'font.replace.aria': 'Remover arquivo de fonte {name}',
         'font.weight.normal': 'Regular',
         'footer.feedback': 'Reportar problema',
         'footer.home': 'Início',
@@ -2679,6 +2775,11 @@
         'analysis.draw.none': 'لم يتم العثور على أوامر رسم',
         'analysis.draw.status.existing': '{count} أشكال فريدة تم تقليصها، لا تغييرات',
         'analysis.draw.status.existing_short': 'لا تغييرات ({count} أشكال)',
+        'analysis.draw.status.sync': '{embedded} صورة حرفية مضمنة، {referenced} مُشار إليها — ستُعاد البناء',
+        'analysis.draw.status.sync_short': 'ستُعاد البناء',
+        'analysis.draw.status.orphan': '+{new} رسم جديد، لكن الخط المضمّن يحتوي {orphan} صورة حرفية يتيمة (بلا مرجع)',
+        'analysis.draw.status.orphan_only': 'الخط المضمّن يحتوي {orphan} صورة حرفية يتيمة (بلا مرجع، المجموع {total})',
+        'analysis.draw.status.orphan_short': 'صور يتيمة',
         'analysis.draw.status.new': '{count} كتلة رسم (كلها جديدة)',
         'analysis.draw.status.new_short': 'جديدة',
         'analysis.draw.status.update': '+{added} شكل مضاف ({old} → {new})',
@@ -2742,6 +2843,9 @@
         'font.loading.aria': 'جارٍ قراءة ملفات الخطوط، لا تغلق الصفحة',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'عريض',
+        'font.weight.italic': 'مائل',
+        'font.weight.boldItalic': 'غامق مائل',
+        'font.replace.aria': 'إزالة ملف الخط {name}',
         'font.weight.normal': 'عادي',
         'footer.feedback': 'الإبلاغ عن مشكلة',
         'footer.home': 'الرئيسية',
@@ -2819,6 +2923,11 @@
         'analysis.draw.none': 'Çizim komutu bulunamadı',
         'analysis.draw.status.existing': '{count} şekil alt kümeleştirildi, değişiklik yok',
         'analysis.draw.status.existing_short': 'Değişiklik yok ({count} şekil)',
+        'analysis.draw.status.sync': '{embedded} glif gömülü, {referenced} referans — yeniden oluşturulacak',
+        'analysis.draw.status.sync_short': 'Yeniden oluşturulacak',
+        'analysis.draw.status.orphan': '+{new} yeni çizim, ancak gömülü fontta {orphan} yetim glif var (referans yok)',
+        'analysis.draw.status.orphan_only': 'Gömülü fontta {orphan} yetim glif var (referans yok, toplam {total})',
+        'analysis.draw.status.orphan_short': 'Yetim glif',
         'analysis.draw.status.new': '{count} çizim bloğu (hepsi yeni)',
         'analysis.draw.status.new_short': 'Yeni',
         'analysis.draw.status.update': '+{added} şekil eklendi ({old} → {new})',
@@ -2882,6 +2991,9 @@
         'font.loading.aria': 'Font dosyaları okunuyor, sayfayı kapatmayın',
         'font.uploaded': '✓ {name}',
         'font.weight.bold': 'Kalın',
+        'font.weight.italic': 'İtalik',
+        'font.weight.boldItalic': 'Kalın İtalik',
+        'font.replace.aria': 'Font dosyasını kaldır {name}',
         'font.weight.normal': 'Normal',
         'footer.feedback': 'Sorun bildir',
         'footer.home': 'Ana sayfa',
@@ -3675,7 +3787,7 @@
       let totalDrawings = 0, totalUnique = 0, totalExtFonts = new Set(), totalChars = 0;
       let totalSysFonts = new Set(), totalSysChars = 0;
       let totalEmbedded = new Set();
-      let hasNewDrawings = false, hasExistingDrawOnly = false, hasFonts = false, hasResubset = false, hasSysFonts = false;
+      let hasNewDrawings = false, hasExistingDrawOnly = false, hasFonts = false, hasResubset = false, hasSysFonts = false, hasOrphanDrawings = false;
       let totalExistingSubsetShapes = 0;
 
       const drawingsDetails = [];
@@ -3694,7 +3806,7 @@
           if (!extFontsDetails.includes(k)) extFontsDetails.push(k);
         });
         for (const info of Object.values(p.externalFonts)) {
-          totalChars += info.normal.length + info.bold.length;
+          totalChars += info.normal.length + info.bold.length + (info.italic||[]).length + (info.boldItalic||[]).length;
         }
 
         const sysKeys = Object.keys(p.systemFontsReferenced || {});
@@ -3703,7 +3815,7 @@
           if (!sysFontsDetails.includes(k)) sysFontsDetails.push(k);
         });
         for (const info of Object.values(p.systemFontsReferenced || {})) {
-          totalSysChars += info.normal.length + info.bold.length;
+          totalSysChars += info.normal.length + info.bold.length + (info.italic||[]).length + (info.boldItalic||[]).length;
         }
 
         if (p.embeddedFonts) {
@@ -3719,14 +3831,20 @@
         if (p.drawings > 0) {
           hasNewDrawings = true;
           if (p.hasExistingDrawSubset) {
-            const oldCount = p.subsetReferencedChars.length;
-            const newCount = p.uniqueDrawings.length;
-            const added = Math.max(0, newCount - oldCount);
-            const removed = Math.max(0, oldCount - newCount);
-            if (added > 0 && removed > 0) {
-              drawingsDetails.push(t('analysis.draw.status.delta', { added, removed, old: oldCount, new: newCount }));
+            const orphans = p.orphanGlyphCount || 0;
+            if (orphans > 0) {
+              hasOrphanDrawings = true;
+              drawingsDetails.push(t('analysis.draw.status.orphan', { new: p.uniqueDrawings.length, orphan: orphans }));
             } else {
-              drawingsDetails.push(t('analysis.draw.status.update', { added, old: oldCount, new: newCount }));
+              const oldCount = p.subsetReferencedChars.length;
+              const newCount = p.uniqueDrawings.length;
+              const added = Math.max(0, newCount - oldCount);
+              const removed = Math.max(0, oldCount - newCount);
+              if (added > 0 && removed > 0) {
+                drawingsDetails.push(t('analysis.draw.status.delta', { added, removed, old: oldCount, new: newCount }));
+              } else {
+                drawingsDetails.push(t('analysis.draw.status.update', { added, old: oldCount, new: newCount }));
+              }
             }
           } else {
             drawingsDetails.push(t('analysis.draw.status.new', { count: p.drawings }));
@@ -3734,9 +3852,15 @@
         } else if (p.hasExistingDrawSubset) {
           if (p.subsetNeedsUpdate) {
             hasNewDrawings = true;
-            const oldCount = p.subsetReferencedChars.length;
-            const removed = oldCount;
-            drawingsDetails.push(t('analysis.draw.status.delete', { removed, old: oldCount, new: 0 }));
+            const orphans = p.orphanGlyphCount || 0;
+            if (orphans > 0) {
+              hasOrphanDrawings = true;
+              drawingsDetails.push(t('analysis.draw.status.orphan_only', { orphan: orphans, total: p.existingGlyphCount }));
+            } else {
+              const embCount = p.existingGlyphCount || p.subsetReferencedChars.length;
+              const refCount = p.subsetReferencedChars.length;
+              drawingsDetails.push(t('analysis.draw.status.sync', { embedded: embCount, referenced: refCount }));
+            }
           } else {
             hasExistingDrawOnly = true;
             totalExistingSubsetShapes += p.subsetReferencedChars.length;
@@ -3786,21 +3910,29 @@
       };
 
       let drawBadgeText;
+      let drawBadgeCls;
       if (!hasDrawings) {
         drawBadgeText = t('analysis.draw.none');
+        drawBadgeCls = 'badge-info';
+      } else if (hasOrphanDrawings) {
+        drawBadgeText = t('analysis.draw.status.orphan_short');
+        drawBadgeCls = 'badge-warn';
       } else if (hasExistingDrawOnly) {
         drawBadgeText = t('analysis.draw.status.existing_short', { count: totalExistingSubsetShapes });
+        drawBadgeCls = 'badge-info';
       } else if (!hasResubset) {
         drawBadgeText = t('analysis.draw.status.new_short');
+        drawBadgeCls = 'badge-ok';
       } else {
         const anyDelta = S.assFiles.some(e => e.parsed.drawings > 0 && e.parsed.hasExistingDrawSubset && e.parsed.uniqueDrawings.length < e.parsed.subsetReferencedChars.length);
-        const anyDelete = S.assFiles.some(e => e.parsed.drawings === 0 && e.parsed.hasExistingDrawSubset && e.parsed.subsetNeedsUpdate);
-        if (anyDelta || anyDelete) drawBadgeText = t('analysis.draw.status.delta_short');
+        const anySync = S.assFiles.some(e => e.parsed.drawings === 0 && e.parsed.hasExistingDrawSubset && e.parsed.subsetNeedsUpdate && !(e.parsed.orphanGlyphCount > 0));
+        drawBadgeCls = 'badge-ok';
+        if (anyDelta || anySync) drawBadgeText = t('analysis.draw.status.sync_short');
         else drawBadgeText = t('analysis.draw.status.update_short');
       }
 
       createExpandableRow(t('analysis.draw.label'),
-        hasNewDrawings ? 'badge-ok' : 'badge-info',
+        drawBadgeCls,
         drawBadgeText,
         hasDrawings ? [`<strong>${t('stat.uniqueShapes')}:</strong> ${totalUnique}`, `<strong>${t('stat.totalDrawings')}:</strong> ${totalDrawings}`, ...drawingsDetails] : [t('analysis.draw.none')]
       );
@@ -3961,29 +4093,33 @@
       const wantFont = document.getElementById('opt-font').checked;
       const wantSys = document.getElementById('opt-sysfont').checked;
       for (const entry of S.assFiles) {
-        if (wantFont) {
-          for (const [name, info] of Object.entries(entry.parsed.externalFonts)) {
-            if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, isSystem: false };
-            allFonts[name].normal += info.normal.length;
-            allFonts[name].bold += info.bold.length;
-          }
-        }
-        if (wantSys && entry.parsed.systemFontsReferenced) {
-          for (const [name, info] of Object.entries(entry.parsed.systemFontsReferenced)) {
-            if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, isSystem: true };
-            allFonts[name].normal += info.normal.length;
-            allFonts[name].bold += info.bold.length;
-          }
+        const sources = [];
+        if (wantFont) sources.push(...Object.entries(entry.parsed.externalFonts).map(([n,i]) => [n,i,false]));
+        if (wantSys && entry.parsed.systemFontsReferenced)
+          sources.push(...Object.entries(entry.parsed.systemFontsReferenced).map(([n,i]) => [n,i,true]));
+        for (const [name, info, isSys] of sources) {
+          if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, italic: 0, boldItalic: 0, isSystem: isSys };
+          allFonts[name].normal += info.normal.length;
+          allFonts[name].bold += info.bold.length;
+          allFonts[name].italic += (info.italic || []).length;
+          allFonts[name].boldItalic += (info.boldItalic || []).length;
         }
       }
       const list = document.getElementById('font-list');
       list.innerHTML = '';
       for (const [name, info] of Object.entries(allFonts)) {
-        const uploaded = S.uploadedFonts.get(name.toLowerCase());
-        const totalChars = info.normal + info.bold;
-        const weights = [];
-        if (info.normal > 0) weights.push(t('font.weight.normal'));
-        if (info.bold > 0) weights.push(t('font.weight.bold'));
+        const key = name.toLowerCase();
+        const totalChars = info.normal + info.bold + info.italic + info.boldItalic;
+        const variants = [];
+        if (info.normal > 0) variants.push(t('font.weight.normal'));
+        if (info.bold > 0) variants.push(t('font.weight.bold'));
+        if (info.italic > 0) variants.push(t('font.weight.italic'));
+        if (info.boldItalic > 0) variants.push(t('font.weight.boldItalic'));
+
+        const variantKeys = ['normal','bold','italic','boldItalic'];
+        const uploadedVariants = variantKeys.map(v => S.uploadedFonts.get(key + '::' + v)).filter(Boolean);
+        const anyUploaded = uploadedVariants.length > 0;
+        const primaryUpload = uploadedVariants[0];
 
         const div = document.createElement('div');
         div.className = 'font-item' + (info.isSystem ? ' fi-system' : '');
@@ -3991,35 +4127,39 @@
         const nameEl = document.createElement('span');
         nameEl.className = 'fi-name';
         nameEl.textContent = name;
+        div.appendChild(nameEl);
 
         const charsEl = document.createElement('span');
         charsEl.className = 'fi-chars';
-        charsEl.textContent = t('font.chars', { n: totalChars }) + ' [' + weights.join('+') + ']';
+        charsEl.textContent = t('font.chars', { n: totalChars }) + ' [' + variants.join('+') + ']';
+        div.appendChild(charsEl);
 
-        div.appendChild(nameEl);
+        if (anyUploaded) {
+          const statusEl = document.createElement('span');
+          statusEl.className = 'fi-status fi-uploaded';
 
-        if (uploaded) {
-          const replaceBtn = document.createElement('span');
-          replaceBtn.className = 'fb-change';
-          replaceBtn.style.cssText = 'font-size:0.75rem;cursor:pointer;text-decoration:underline;color:var(--accent);flex-shrink:0;';
-          replaceBtn.textContent = t('change');
-          replaceBtn.onclick = () => {
-            const key = name.toLowerCase();
-            S.uploadedFonts.delete(key);
-            S.pendingReplaceKeys.add(key);
+          const fileLabel = document.createElement('span');
+          fileLabel.textContent = t('font.uploaded', { name: primaryUpload.file.name });
+          statusEl.appendChild(fileLabel);
+
+          const dismissBtn = document.createElement('button');
+          dismissBtn.className = 'fi-dismiss';
+          dismissBtn.setAttribute('aria-label', t('font.replace.aria', { name: primaryUpload.file.name }));
+          dismissBtn.textContent = '✕';
+          dismissBtn.onclick = (e) => {
+            e.stopPropagation();
+            variantKeys.forEach(v => {
+              const vk = key + '::' + v;
+              if (S.uploadedFonts.has(vk)) {
+                S.uploadedFonts.delete(vk);
+                S.pendingReplaceKeys.add(vk);
+              }
+            });
             const inp = document.getElementById('inp-font');
             if (inp) inp.value = '';
             renderFontList();
           };
-          div.appendChild(replaceBtn);
-        }
-
-        div.appendChild(charsEl);
-
-        if (uploaded) {
-          const statusEl = document.createElement('span');
-          statusEl.className = 'fi-status fi-uploaded';
-          statusEl.textContent = t('font.uploaded', { name: uploaded.file.name });
+          statusEl.appendChild(dismissBtn);
           div.appendChild(statusEl);
         } else {
           const statusEl = document.createElement('span');
@@ -4140,51 +4280,36 @@
           if (result.results && result.results.length > 0) {
             const matchNames = result.results.map(r => r.matchedFor).join(', ');
             for (const match of result.results) {
-              const key = match.matchedFor.toLowerCase();
-              const existing = S.uploadedFonts.get(key);
-              const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(key);
+              const nameKey = match.matchedFor.toLowerCase();
+              const isBold = (match.weight || 400) >= 600;
+              const isItalicFont = match.isItalic || false;
+              const variant = isBold && isItalicFont ? 'boldItalic' : isBold ? 'bold' : isItalicFont ? 'italic' : 'normal';
+              const vk = nameKey + '::' + variant;
+              const fontRecord = {
+                file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
+                isTTC: result.isTTC, ttcIndex: match.ttcIndex,
+                weight: match.weight, isItalic: isItalicFont, variant,
+                isFamilyMatch: match.isFamilyMatch,
+                version: match.version || '', lastModified: entry.file.lastModified || 0,
+                size: entry.file.size || entry.buffer.byteLength
+              };
+              const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
               if (isPendingReplace) {
-                S.pendingReplaceKeys.delete(key);
-                S.uploadedFonts.set(key, {
-                  file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
-                  isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
-                  isFamilyMatch: match.isFamilyMatch, weightScore: weightScore(match.weight),
-                  version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
-                });
+                S.pendingReplaceKeys.delete(vk);
+                S.uploadedFonts.set(vk, fontRecord);
                 continue;
               }
-              const newWeightScore = weightScore(match.weight);
+              const existing = S.uploadedFonts.get(vk);
               if (!existing) {
-                S.uploadedFonts.set(key, {
-                  file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
-                  isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
-                  isFamilyMatch: match.isFamilyMatch, weightScore: newWeightScore,
-                  version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
-                });
+                S.uploadedFonts.set(vk, fontRecord);
               } else {
-                const existingWeightScore = existing.weightScore ?? weightScore(existing.weight || 400);
-                const sameWeightClass = Math.abs((match.weight || 400) - (existing.weight || 400)) < 50;
-                if (sameWeightClass) {
-                  const newVer = parseVersion(match.version || '');
-                  const exVer = parseVersion(existing.version || '');
-                  const verCmp = cmpVersion(newVer, exVer);
-                  if (verCmp > 0 ||
-                      (verCmp === 0 && (entry.file.lastModified || 0) > (existing.lastModified || 0)) ||
-                      (verCmp === 0 && (entry.file.lastModified || 0) === (existing.lastModified || 0) && (entry.file.size || entry.buffer.byteLength) > (existing.size || 0))) {
-                    S.uploadedFonts.set(key, {
-                      file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
-                      isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
-                      isFamilyMatch: match.isFamilyMatch, weightScore: newWeightScore,
-                      version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
-                    });
-                  }
-                } else if (newWeightScore < existingWeightScore) {
-                  S.uploadedFonts.set(key, {
-                    file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
-                    isTTC: result.isTTC, ttcIndex: match.ttcIndex, weight: match.weight,
-                    isFamilyMatch: match.isFamilyMatch, weightScore: newWeightScore,
-                    version: match.version || '', lastModified: entry.file.lastModified || 0, size: entry.file.size || entry.buffer.byteLength
-                  });
+                const newVer = parseVersion(match.version || '');
+                const exVer = parseVersion(existing.version || '');
+                const verCmp = cmpVersion(newVer, exVer);
+                if (verCmp > 0 ||
+                    (verCmp === 0 && (entry.file.lastModified || 0) > (existing.lastModified || 0)) ||
+                    (verCmp === 0 && (entry.file.lastModified || 0) === (existing.lastModified || 0) && (entry.file.size || entry.buffer.byteLength) > (existing.size || 0))) {
+                  S.uploadedFonts.set(vk, fontRecord);
                 }
               }
             }
@@ -4223,7 +4348,7 @@
 
       const requiredKeys = new Set(Array.from(requiredFonts).map(n => n.toLowerCase()));
       for (const key of S.uploadedFonts.keys()) {
-        if (!requiredKeys.has(key)) S.uploadedFonts.delete(key);
+        if (!requiredKeys.has(key.split('::')[0])) S.uploadedFonts.delete(key);
       }
 
       renderFontList();
@@ -4313,6 +4438,8 @@
           ttcIndex: info.ttcIndex,
           matchedFor: info.matchedFor,
           weight: info.weight,
+          isItalic: info.isItalic || false,
+          variant: info.variant || 'normal',
         });
       }
 

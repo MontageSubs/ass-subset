@@ -223,7 +223,7 @@ function parseASSText(text, id, forceHasBOM) {
         const sName = parts[styleFmt.nameIdx]?.trim();
         const sFont = normFont(parts[styleFmt.fontIdx]?.trim() || 'Arial');
         const sBold = parseInt(parts[styleFmt.boldIdx]?.trim() || '0') !== 0;
-        const sItalic = parseInt(parts[styleFmt.italicIdx ?? -1]?.trim() || '0') !== 0;
+        const sItalic = styleFmt.italicIdx >= 0 ? parseInt(parts[styleFmt.italicIdx]?.trim() || '0') !== 0 : false;
         if (sName) styles[sName] = { font: sFont, bold: sBold, italic: sItalic };
       }
     }
@@ -302,6 +302,8 @@ function parseASSText(text, id, forceHasBOM) {
     }
   }
   let subsetNeedsUpdate = false;
+  let existingGlyphCount = 0;
+  let orphanGlyphCount = 0;
   if (hasExistingDrawSubset) {
     if (existingSubsetFontBuffer) {
       try {
@@ -311,9 +313,12 @@ function parseASSText(text, id, forceHasBOM) {
           const g = existingFont.glyphs.get(i);
           if (g && g.unicode && g.unicode > 0) existingChars.add(String.fromCodePoint(g.unicode));
         }
+        existingGlyphCount = existingChars.size;
         const refChars = Array.from(subsetReferencedChars.keys());
+        const orphanCount = Array.from(existingChars).filter(ch => !subsetReferencedChars.has(ch)).length;
         subsetNeedsUpdate = existingChars.size !== refChars.length ||
           !refChars.every(ch => existingChars.has(ch));
+        orphanGlyphCount = orphanCount;
       } catch (_) {
         subsetNeedsUpdate = true;
       }
@@ -331,6 +336,8 @@ function parseASSText(text, id, forceHasBOM) {
     lineCount: totalLines,
     hasExistingDrawSubset,
     subsetNeedsUpdate,
+    existingGlyphCount,
+    orphanGlyphCount,
     existingSubsetFontBuffer,
     subsetReferencedChars: Array.from(subsetReferencedChars.entries()).map(([char, firstSeenMs]) => ({ char, firstSeenMs })),
     embeddedFonts,
@@ -712,6 +719,12 @@ function extractFamilyNames(fontObj) {
   });
   return names;
 }
+function getFontItalic(fontObj) {
+  const fs = fontObj.tables?.os2?.fsSelection;
+  if (fs !== undefined) return !!(fs & 1);
+  const sub = (fontObj.names?.fontSubfamily?.en || fontObj.tables?.name?.fontSubfamily?.en || '').toLowerCase();
+  return sub.includes('italic') || sub.includes('oblique');
+}
 function getFontWeight(fontObj) {
   const wc = fontObj.tables?.os2?.usWeightClass;
   if (wc) return wc;
@@ -729,12 +742,6 @@ function weightScore(weight) {
   if (dist === 0) return 0;
   if (Math.abs(weight - 500) < dist) return Math.abs(weight - 500) + 1;
   return dist + 2;
-}
-function getFontItalic(fontObj) {
-  const fsSelection = fontObj.tables?.os2?.fsSelection;
-  if (fsSelection !== undefined) return !!(fsSelection & 1);
-  const sub = (fontObj.names?.fontSubfamily?.en || fontObj.tables?.name?.fontSubfamily?.en || '').toLowerCase();
-  return sub.includes('italic') || sub.includes('oblique');
 }
 function matchFontBuffer(buffer, requiredFonts, id) {
   const view = new DataView(buffer);
@@ -1214,8 +1221,6 @@ function rewriteASS(rawContent, opts, id) {
       embeddedFonts.forEach(ef => encodeAndAppend(ef.name, ef.ttf));
     }
     finalSec = newFontLines.join(nl);
-  } else if (originalFontsBlock && !opts.wantStrip) {
-    finalSec = originalFontsBlock;
   }
 
   if (finalSec) {
@@ -1382,90 +1387,59 @@ function doConvert(data, id) {
   } else if (parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
+  const subsetFontGroup = (charInfo, fontNameStr) => {
+    const allChars = new Set([
+      ...charInfo.normal,
+      ...charInfo.bold,
+      ...(charInfo.italic || []),
+      ...(charInfo.boldItalic || [])
+    ]);
+    if (allChars.size === 0) return;
+
+    const italicCount = (charInfo.italic || []).length + (charInfo.boldItalic || []).length;
+    const boldCount = charInfo.bold.length + (charInfo.boldItalic || []).length;
+
+    const candidates = fonts.filter(f => f.matchedFor.toLowerCase() === fontNameStr.toLowerCase());
+    if (candidates.length === 0) {
+      emitLog(id, 'log.font.missing', 'warn', { name: fontNameStr, weight: 'normal' });
+      return;
+    }
+
+    const fontFile = candidates.slice().sort((a, b) => {
+      const sA = Math.abs((a.weight || 400) - 400) + (a.isItalic ? 5 : 0);
+      const sB = Math.abs((b.weight || 400) - 400) + (b.isItalic ? 5 : 0);
+      return sA - sB;
+    })[0];
+
+    const charArr = Array.from(allChars);
+    const wLabel = 'normal';
+
+    if (italicCount > 0 || boldCount > 0) {
+      emitLog(id, 'log.font.style_warn', 'warn', { name: fontNameStr, bold: boldCount, italic: italicCount });
+    }
+
+    emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: wLabel, chars: charArr.length });
+
+    try {
+      const result = subsetFont(fontFile.buffer, charArr, fontNameStr, fontFile.isTTC, wLabel, fontFile.ttcIndex, id, options.wantAscii);
+      embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars });
+      const origKB = (result.origSize / 1024).toFixed(0);
+      const newKB = (result.ttf.length / 1024).toFixed(0);
+      const pct = ((1 - result.ttf.length / result.origSize) * 100).toFixed(0);
+      emitLog(id, 'log.font.subset_done', 'ok', { name: fontNameStr, weight: wLabel, origKB, newKB, pct, skipped: result.skipped });
+    } catch (e) {
+      emitLog(id, 'log.font.subset_fail', 'err', { name: fontNameStr, error: e.message });
+    }
+  };
   if (options.wantFont) {
     const extFonts = parsed.externalFonts;
     const fontNames = Object.keys(extFonts);
-    if (fontNames.length === 0) {
-      emitLog(id, 'log.font.none_external', 'info', {});
-    }
-    for (const fontName of fontNames) {
-      const charInfo = extFonts[fontName];
-      const variantDefs = [
-        { key: 'normal',     chars: charInfo.normal,     isBold: false, isItalic: false },
-        { key: 'bold',       chars: charInfo.bold,       isBold: true,  isItalic: false },
-        { key: 'italic',     chars: charInfo.italic || [],     isBold: false, isItalic: true  },
-        { key: 'boldItalic', chars: charInfo.boldItalic || [], isBold: true,  isItalic: true  },
-      ].filter(v => v.chars.length > 0);
-      if (variantDefs.length === 0) continue;
-      const pickFont = (isBold, isItalic) => {
-        const exactKey = (isBold && isItalic ? 'boldItalic' : isBold ? 'bold' : isItalic ? 'italic' : 'normal');
-        let f = fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase() && ff.variant === exactKey);
-        if (f) return f;
-        if (isBold && isItalic) {
-          f = fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase() && ff.variant === 'bold');
-          if (f) return f;
-          f = fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase() && ff.variant === 'italic');
-          if (f) return f;
-        }
-        return fonts.find(ff => ff.matchedFor.toLowerCase() === fontName.toLowerCase());
-      };
-      const processed = new Map();
-      for (const vd of variantDefs) {
-        const fontFile = pickFont(vd.isBold, vd.isItalic);
-        if (!fontFile) {
-          emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: vd.key });
-          continue;
-        }
-        const cacheKey = fontFile.variant + '::' + fontFile.name;
-        if (processed.has(cacheKey)) {
-          const prev = processed.get(cacheKey);
-          for (const ch of vd.chars) prev.chars.add(ch);
-          continue;
-        }
-        processed.set(cacheKey, { fontFile, chars: new Set(vd.chars), name: fontName });
-      }
-      for (const { fontFile, chars, name: fn } of processed.values()) {
-        const charArr = Array.from(chars);
-        const styleName = fontFile.isItalic ? (fontFile.weight >= 600 ? 'BoldItalic' : 'Italic') : (fontFile.weight >= 600 ? 'Bold' : 'Regular');
-        emitLog(id, 'log.font.subsetting', 'info', { name: fn, weight: fontFile.weight >= 600 ? 'bold' : 'normal', chars: charArr.length });
-        try {
-          const result = subsetFont(fontFile.buffer, charArr, fn, fontFile.isTTC, fontFile.weight >= 600 ? 'bold' : 'regular', fontFile.ttcIndex, id, options.wantAscii);
-          embeddedFonts.push({ name: fn, ttf: result.ttf, usedChars: result.usedChars });
-          const origKB = (result.origSize / 1024).toFixed(0);
-          const newKB = (result.ttf.length / 1024).toFixed(0);
-          const pct = ((1 - result.ttf.length / result.origSize) * 100).toFixed(0);
-          emitLog(id, 'log.font.subset_done', 'ok', { name: fn, weight: fontFile.weight >= 600 ? 'bold' : 'normal', origKB, newKB, pct, skipped: result.skipped });
-        } catch (e) {
-          emitLog(id, 'log.font.subset_fail', 'err', { name: fn, error: e.message });
-        }
-      }
-    }
+    if (fontNames.length === 0) emitLog(id, 'log.font.none_external', 'info', {});
+    for (const fontName of fontNames) subsetFontGroup(extFonts[fontName], fontName);
   }
   if (options.wantSystemFont && parsed.systemFontsReferenced) {
-    for (const fontName of Object.keys(parsed.systemFontsReferenced)) {
-      const charInfo = parsed.systemFontsReferenced[fontName];
-      const allChars = new Set([...charInfo.normal, ...charInfo.bold, ...(charInfo.italic||[]), ...(charInfo.boldItalic||[])]);
-      const chars = Array.from(allChars);
-      const fontFile = fonts.find(f => f.matchedFor.toLowerCase() === fontName.toLowerCase());
-      if (!fontFile) {
-        emitLog(id, 'log.font.missing', 'warn', { name: fontName, weight: '...' });
-        continue;
-      }
-      emitLog(id, 'log.font.subsetting', 'info', { name: fontName, weight: 'Regular', chars: chars.length });
-      try {
-        const result = subsetFont(fontFile.buffer, chars, fontName, fontFile.isTTC, 'Regular', fontFile.ttcIndex, id, options.wantAscii);
-        embeddedFonts.push({ name: fontName, ttf: result.ttf, usedChars: result.usedChars });
-        emitLog(id, 'log.font.subset_done', 'ok', {
-          name: fontName, weight: 'Merged',
-          origKB: (result.origSize / 1024).toFixed(0),
-          newKB: (result.ttf.length / 1024).toFixed(0),
-          pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0),
-          skipped: result.skipped
-        });
-      } catch (e) {
-        emitLog(id, 'log.font.subset_fail', 'err', { name: fontName, error: e.message });
-      }
-    }
+    for (const fontName of Object.keys(parsed.systemFontsReferenced))
+      subsetFontGroup(parsed.systemFontsReferenced[fontName], fontName);
   }
   const finalEmbeddedFonts = [];
   const processedNames = new Set();
@@ -1492,7 +1466,7 @@ function doConvert(data, id) {
     }
   }
 
-  if (!drawTTF && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
+  if (!options.wantDraw && !drawTTF && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
   const pureOriginalText = text.startsWith('\uFEFF') ? text.slice(1) : text;
