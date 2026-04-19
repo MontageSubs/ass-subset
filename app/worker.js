@@ -883,7 +883,6 @@ function repairFontBuffer(u8) {
     }
     if (headOffset !== -1) headOffset -= dataShift;
     u8 = out;
-    view.__proto__ = null;
   }
   const outView = new DataView(out.buffer, out.byteOffset, out.byteLength);
   const finalNumTables = outView.getUint16(4, false);
@@ -924,48 +923,149 @@ function repairFontBuffer(u8) {
   }
   return out;
 }
+const NAME_ID_MAP = {
+  copyright: 0, fontFamily: 1, fontSubfamily: 2, uniqueSubfamilyID: 3,
+  fullName: 4, version: 5, postScriptName: 6, trademark: 7,
+  manufacturer: 8, designer: 9, description: 10, manufacturerURL: 11,
+  designerURL: 12, license: 13, licenseURL: 14,
+  preferredFamily: 16, preferredSubfamily: 17,
+};
 function modifyNameTable(buffer, newNames) {
-  const view = new DataView(buffer);
-  const tableOffset = 0;
-  let tableDir = null;
-  
-  for (let i = 0; i < view.getUint16(4) * 16; i += 16) {
-    const tag = String.fromCharCode(
-      view.getUint8(4 + i),
-      view.getUint8(5 + i),
-      view.getUint8(6 + i),
-      view.getUint8(7 + i)
-    );
-    if (tag === 'name') {
-      tableDir = {
-        offset: view.getUint32(8 + i),
-        length: view.getUint32(12 + i)
-      };
-      break;
+  const ensureTTF = (buf) => {
+    const v = new DataView(buf instanceof ArrayBuffer ? buf : buf.buffer ?? buf);
+    const sig = buf.byteLength >= 4 ? v.getUint32(0, false) : 0;
+    if (sig === 0x774F4646 || sig === 0x774F4632) {
+      const font = opentype.parse(buf);
+      return new Uint8Array(font.toArrayBuffer()).buffer;
     }
+    return buf instanceof ArrayBuffer ? buf : buf.buffer ?? buf;
+  };
+  buffer = ensureTTF(buffer);
+
+  const view = new DataView(buffer);
+  const numTables = view.getUint16(4, false);
+  let nameDirOffset = -1;
+  for (let i = 0; i < numTables; i++) {
+    const base = 12 + i * 16;
+    const tag = String.fromCharCode(
+      view.getUint8(base), view.getUint8(base + 1),
+      view.getUint8(base + 2), view.getUint8(base + 3)
+    );
+    if (tag === 'name') { nameDirOffset = base; break; }
   }
-  
-  if (!tableDir) return buffer;
-  
-  const nameTable = buffer.slice(tableDir.offset, tableDir.offset + tableDir.length);
-  const nameView = new DataView(nameTable);
-  const stringStart = nameView.getUint16(4) * 6 + 6;
-  
-  for (let i = 0; i < nameView.getUint16(2); i++) {
-    const offset = 6 + i * 12;
-    const nameID = nameView.getUint16(offset + 6);
-    const strOffset = nameView.getUint16(offset + 10);
-    
-    for (const [id, entries] of Object.entries(newNames)) {
-      if (parseInt(id) === nameID) {
-        const str = entries['en'] || Object.values(entries)[0];
-        const encoded = new TextEncoder().encode(str);
-        nameView.setUint16(offset + 8, encoded.length);
+  if (nameDirOffset === -1) return buffer;
+
+  const nameTableOffset = view.getUint32(nameDirOffset + 8, false);
+  const nameView = new DataView(buffer, nameTableOffset);
+  const count = nameView.getUint16(2, false);
+  const storageOffset = nameView.getUint16(4, false);
+
+  const newRecords = [];
+  const stringChunks = [];
+  let strPos = 0;
+
+  const resolveValue = (entries, platformID, encodingID) => {
+    const str = entries['en'] || Object.values(entries).find(v => typeof v === 'string') || '';
+    if (platformID === 3) {
+      const buf = new Uint8Array(str.length * 2);
+      const dv = new DataView(buf.buffer);
+      for (let i = 0; i < str.length; i++) dv.setUint16(i * 2, str.charCodeAt(i), false);
+      return buf;
+    }
+    return new TextEncoder().encode(str);
+  };
+
+  for (let i = 0; i < count; i++) {
+    const rec = nameTableOffset + 6 + i * 12;
+    const platformID = view.getUint16(rec, false);
+    const encodingID = view.getUint16(rec + 2, false);
+    const languageID = view.getUint16(rec + 4, false);
+    const nameID = view.getUint16(rec + 6, false);
+    const origLen = view.getUint16(rec + 8, false);
+    const origStrOff = view.getUint16(rec + 10, false);
+
+    let bytes = null;
+    for (const [field, entries] of Object.entries(newNames)) {
+      if (NAME_ID_MAP[field] === nameID) {
+        bytes = resolveValue(entries, platformID, encodingID);
+        break;
       }
     }
+    if (!bytes) {
+      const origAbsOff = nameTableOffset + storageOffset + origStrOff;
+      bytes = new Uint8Array(buffer, origAbsOff, origLen);
+    }
+    const aligned = new Uint8Array(bytes);
+    newRecords.push({ platformID, encodingID, languageID, nameID, length: aligned.length, strOff: strPos });
+    stringChunks.push(aligned);
+    strPos += aligned.length;
   }
-  
-  return buffer;
+
+  for (const [field, entries] of Object.entries(newNames)) {
+    const nameID = NAME_ID_MAP[field];
+    if (nameID === undefined) continue;
+    const alreadyHas3 = newRecords.some(r => r.nameID === nameID && r.platformID === 3);
+    const alreadyHas1 = newRecords.some(r => r.nameID === nameID && r.platformID === 1);
+    for (const platformID of [3, 1]) {
+      if (platformID === 3 && alreadyHas3) continue;
+      if (platformID === 1 && alreadyHas1) continue;
+      const bytes = resolveValue(entries, platformID, 0);
+      newRecords.push({ platformID, encodingID: platformID === 3 ? 1 : 0, languageID: 0, nameID, length: bytes.length, strOff: strPos });
+      stringChunks.push(bytes);
+      strPos += bytes.length;
+    }
+  }
+
+  newRecords.sort((a, b) => a.platformID - b.platformID || a.encodingID - b.encodingID || a.languageID - b.languageID || a.nameID - b.nameID);
+
+  const newStorageOffset = 6 + newRecords.length * 12;
+  const newNameTableSize = newStorageOffset + strPos;
+  const newNameU8 = new Uint8Array(newNameTableSize);
+  const newNameView = new DataView(newNameU8.buffer);
+  newNameView.setUint16(0, 0, false);
+  newNameView.setUint16(2, newRecords.length, false);
+  newNameView.setUint16(4, newStorageOffset, false);
+  for (let i = 0; i < newRecords.length; i++) {
+    const r = newRecords[i];
+    const base = 6 + i * 12;
+    newNameView.setUint16(base, r.platformID, false);
+    newNameView.setUint16(base + 2, r.encodingID, false);
+    newNameView.setUint16(base + 4, r.languageID, false);
+    newNameView.setUint16(base + 6, r.nameID, false);
+    newNameView.setUint16(base + 8, r.length, false);
+    newNameView.setUint16(base + 10, r.strOff, false);
+  }
+  let writePos = newStorageOffset;
+  for (const chunk of stringChunks) {
+    newNameU8.set(chunk, writePos);
+    writePos += chunk.length;
+  }
+
+  const origNameTableLen = view.getUint32(nameDirOffset + 12, false);
+  const paddedOrig = (origNameTableLen + 3) & ~3;
+  const paddedNew = (newNameTableSize + 3) & ~3;
+  const delta = paddedNew - paddedOrig;
+  const newTotalLen = buffer.byteLength + delta;
+  const out = new Uint8Array(newTotalLen);
+  out.set(new Uint8Array(buffer));
+
+  const origOffset = nameTableOffset;
+  if (delta !== 0) {
+    const afterOrig = origOffset + paddedOrig;
+    const rest = new Uint8Array(buffer, afterOrig);
+    out.set(rest, afterOrig + delta);
+    const outView = new DataView(out.buffer);
+    const finalNumTables = outView.getUint16(4, false);
+    for (let i = 0; i < finalNumTables; i++) {
+      const base = 12 + i * 16;
+      const off = outView.getUint32(base + 8, false);
+      if (off > origOffset) outView.setUint32(base + 8, off + delta, false);
+    }
+  }
+  out.set(newNameU8, origOffset);
+  const outView = new DataView(out.buffer);
+  outView.setUint32(nameDirOffset + 12, newNameTableSize, false);
+  return out.buffer;
 }
 async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcIndex, id, wantAscii, wantFullFont) {
   let orig;
@@ -1184,6 +1284,7 @@ async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, 
   } else {
     rawTTF = repairFontBuffer(new Uint8Array(newFont.toArrayBuffer()));
   }
+
   return {
     ttf: rawTTF,
     skipped,
@@ -1446,7 +1547,54 @@ async function doConvert(data, id) {
   } else if (parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
+  const ITALIC_KEYWORDS = ['italic', 'oblique', 'slanted'];
+  const BOLD_NEUTRAL_KEYWORDS = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'medium', 'regular', 'normal', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
+  const nameContains = (name, keywords) => { const n = name.toLowerCase(); return keywords.some(kw => n.includes(kw)); };
+
+  const pickBestCandidate = (candidates, hasBoldChars, fontNameStr) => {
+    const fNameLower = fontNameStr.toLowerCase();
+    const nameSpecifiesItalic = nameContains(fNameLower, ITALIC_KEYWORDS);
+    const nameSpecifiesWeight = nameContains(fNameLower, BOLD_NEUTRAL_KEYWORDS);
+
+    const scored = candidates.map(c => {
+      const cNameLower = (c.name || '').toLowerCase();
+      const cW = c.weight || 400;
+      let score = 0;
+
+      if (nameSpecifiesItalic) {
+        if (!c.isItalic) score += 20000;
+      } else {
+        if (c.isItalic) score += 20000;
+      }
+
+      if (nameSpecifiesWeight) {
+        BOLD_NEUTRAL_KEYWORDS.forEach(kw => {
+          if (fNameLower.includes(kw) && !cNameLower.includes(kw)) score += 15000;
+        });
+        ITALIC_KEYWORDS.forEach(kw => {
+          if (fNameLower.includes(kw) && !cNameLower.includes(kw)) score += 15000;
+        });
+      } else {
+        const idealWeight = hasBoldChars ? 700 : 400;
+        score += Math.abs(cW - idealWeight) * 10;
+        if (hasBoldChars && cW >= 600) score -= 500;
+        if (!hasBoldChars && cW === 400) score -= 200;
+        if (!hasBoldChars && cW === 500) score -= 100;
+      }
+
+      return { c, score };
+    });
+
+    scored.sort((a, b) => a.score - b.score);
+    return scored[0].c;
+  };
+
   const subsetFontGroup = async (charInfo, fontNameStr) => {
+    const candidates = fonts.filter(f => f.matchedFor.toLowerCase() === fontNameStr.toLowerCase());
+    if (candidates.length === 0) {
+      emitLog(id, 'log.font.missing', 'warn', { name: fontNameStr, weight: 'normal' });
+      return;
+    }
     const allChars = new Set([
       ...charInfo.normal,
       ...charInfo.bold,
@@ -1455,51 +1603,14 @@ async function doConvert(data, id) {
     ]);
     const charArr = Array.from(allChars);
     if (charArr.length === 0) return;
-    const candidates = fonts.filter(f => f.matchedFor.toLowerCase() === fontNameStr.toLowerCase());
-    if (candidates.length === 0) {
-      emitLog(id, 'log.font.missing', 'warn', { name: fontNameStr, weight: 'normal' });
-      return;
-    }
-    const hasBold = charInfo.bold.length > 0 || (charInfo.boldItalic && charInfo.boldItalic.length > 0);
-    const hasItalic = (charInfo.italic && charInfo.italic.length > 0) || (charInfo.boldItalic && charInfo.boldItalic.length > 0);
-    const targetWeight = hasBold ? 700 : 400;
-    const fontFile = candidates.slice().sort((a, b) => {
-      let scoreA = 0;
-      let scoreB = 0;
-      const aW = a.weight || 400;
-      const bW = b.weight || 400;
-      const aName = (a.fileName + ' ' + (a.postscriptName || '')).toLowerCase();
-      const bName = (b.fileName + ' ' + (b.postscriptName || '')).toLowerCase();
-      const fName = fontNameStr.toLowerCase();
-      const kws = ['heavy', 'black', 'semibold', 'demi', 'medium', 'light', 'thin', 'w9', 'w7', 'w5', 'w3'];
-      kws.forEach(kw => {
-        if (fName.includes(kw)) {
-          if (aName.includes(kw)) scoreA -= 20000;
-          if (bName.includes(kw)) scoreB -= 20000;
-        }
-      });
-      if (hasItalic !== !!a.isItalic) scoreA += 10000;
-      if (hasItalic !== !!b.isItalic) scoreB += 10000;
-      if (hasBold) {
-        if (aW >= 600 || aName.includes('bold')) scoreA -= 5000;
-        if (bW >= 600 || bName.includes('bold')) scoreB -= 5000;
-      }
-      scoreA += Math.abs(aW - targetWeight);
-      scoreB += Math.abs(bW - targetWeight);
-      if (scoreA === scoreB) {
-        return hasBold ? (bW - aW) : (aW - bW);
-      }
-      return scoreA - scoreB;
-    })[0];
-    const wLabel = fontFile.weight >= 600 ? 'bold' : 'normal';
+    const hasBoldChars = charInfo.bold.length > 0 || (charInfo.boldItalic && charInfo.boldItalic.length > 0);
+    const fontFile = pickBestCandidate(candidates, hasBoldChars, fontNameStr);
+    const wLabel = (fontFile.weight || 400) >= 600 ? 'bold' : 'normal';
     emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: wLabel, chars: charArr.length });
     try {
       const result = await subsetFont(fontFile.buffer, charArr, fontNameStr, fontFile.isTTC, wLabel, fontFile.ttcIndex, id, options.wantAscii, options.wantFullFont);
-      embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars });
-      const origKB = (result.origSize / 1024).toFixed(0);
-      const newKB = (result.ttf.length / 1024).toFixed(0);
-      const pct = ((1 - result.ttf.length / result.origSize) * 100).toFixed(0);
-      emitLog(id, 'log.font.subset_done', 'ok', { name: fontNameStr, weight: wLabel, origKB, newKB, pct, skipped: result.skipped });
+      embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars, weight: fontFile.weight });
+      emitLog(id, 'log.font.subset_done', 'ok', { name: fontNameStr, weight: wLabel, origKB: (result.origSize / 1024).toFixed(0), newKB: (result.ttf.length / 1024).toFixed(0), pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0), skipped: result.skipped });
     } catch (e) {
       emitLog(id, 'log.font.subset_fail', 'err', { name: fontNameStr, error: e.message });
     }

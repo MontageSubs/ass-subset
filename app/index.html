@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.9">
+  <meta name="version" content="2.5.10">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -3312,6 +3312,7 @@
     const S = {
       assFiles: [],
       uploadedFonts: new Map(),
+      allFontCandidates: [],
       outputBlobs: [],
       fontBuffers: [],
       fileFontBuffers: [],
@@ -3707,6 +3708,7 @@
 
       S.assFiles = [];
       S.uploadedFonts.clear();
+      S.allFontCandidates = [];
       S.outputBlobs = [];
       S.fontBuffers = [];
       S.pendingReplaceKeys.clear();
@@ -3795,6 +3797,7 @@
 
       S.assFiles = [];
       S.uploadedFonts.clear();
+      S.allFontCandidates = [];
       S.outputBlobs = [];
       S.fontBuffers = [];
       S.fileFontBuffers = [];
@@ -4163,10 +4166,9 @@
         if (info.italic > 0) variants.push(t('font.weight.italic'));
         if (info.boldItalic > 0) variants.push(t('font.weight.boldItalic'));
 
-        const variantKeys = ['normal','bold','italic','boldItalic'];
-        const uploadedVariants = variantKeys.map(v => S.uploadedFonts.get(key + '::' + v)).filter(Boolean);
-        const anyUploaded = uploadedVariants.length > 0;
-        const primaryUpload = uploadedVariants[0];
+        const vk = key + '::default';
+        const uploadedRecord = S.uploadedFonts.get(vk);
+        const anyUploaded = !!uploadedRecord;
 
         const div = document.createElement('div');
         div.className = 'font-item' + (info.isSystem ? ' fi-system' : '');
@@ -4186,22 +4188,17 @@
           statusEl.className = 'fi-status fi-uploaded';
 
           const fileLabel = document.createElement('span');
-          fileLabel.textContent = t('font.uploaded', { name: primaryUpload.file.name });
+          fileLabel.textContent = t('font.uploaded', { name: uploadedRecord.file.name });
           statusEl.appendChild(fileLabel);
 
           const dismissBtn = document.createElement('button');
           dismissBtn.className = 'fi-dismiss';
-          dismissBtn.setAttribute('aria-label', t('font.replace.aria', { name: primaryUpload.file.name }));
+          dismissBtn.setAttribute('aria-label', t('font.replace.aria', { name: uploadedRecord.file.name }));
           dismissBtn.textContent = '✕';
           dismissBtn.onclick = (e) => {
             e.stopPropagation();
-            variantKeys.forEach(v => {
-              const vk = key + '::' + v;
-              if (S.uploadedFonts.has(vk)) {
-                S.uploadedFonts.delete(vk);
-                S.pendingReplaceKeys.add(vk);
-              }
-            });
+            S.uploadedFonts.delete(vk);
+            S.pendingReplaceKeys.add(vk);
             const inp = document.getElementById('inp-font');
             if (inp) inp.value = '';
             renderFontList();
@@ -4314,6 +4311,7 @@
       flnProgressWrap.classList.remove('hidden');
       flnProgressText.textContent = t('font.loading.matching', { current: 0, total: totalEntries });
 
+      S.allFontCandidates = [];
       log(t('font.upload.summary', { total: totalEntries }));
       let notMatched = 0;
       let matched = 0;
@@ -4328,18 +4326,16 @@
             const matchNames = result.results.map(r => r.matchedFor).join(', ');
             for (const match of result.results) {
               const nameKey = match.matchedFor.toLowerCase();
-              const isBold = (match.weight || 400) >= 600;
-              const isItalicFont = match.isItalic || false;
-              const variant = isBold && isItalicFont ? 'boldItalic' : isBold ? 'bold' : isItalicFont ? 'italic' : 'normal';
-              const vk = nameKey + '::' + variant;
+              const vk = nameKey + '::default';
               const fontRecord = {
                 file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
                 isTTC: result.isTTC, ttcIndex: match.ttcIndex,
-                weight: match.weight, isItalic: isItalicFont, variant,
+                weight: match.weight, isItalic: match.isItalic || false,
                 isFamilyMatch: match.isFamilyMatch,
                 version: match.version || '', lastModified: entry.file.lastModified || 0,
                 size: entry.file.size || entry.buffer.byteLength
               };
+              S.allFontCandidates.push(fontRecord);
               const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
               if (isPendingReplace) {
                 S.pendingReplaceKeys.delete(vk);
@@ -4397,12 +4393,16 @@
       for (const key of S.uploadedFonts.keys()) {
         if (!requiredKeys.has(key.split('::')[0])) S.uploadedFonts.delete(key);
       }
+      S.allFontCandidates = S.allFontCandidates.filter(c => requiredKeys.has(c.matchedFor.toLowerCase()));
 
       renderFontList();
     }
 
     async function loadLocalFonts() {
-      if (!('queryLocalFonts' in window)) return;
+      if (!('queryLocalFonts' in window)) {
+        log('Local Font Access API not supported in this browser.', 'warn');
+        return;
+      }
       try {
         const SYSTEM_FONT_ALIASES = {
           "microsoft yahei": ["微软雅黑", "microsoft yahei ui"],
@@ -4413,9 +4413,8 @@
           "宋体": ["simsun"]
         };
         const localFonts = await window.queryLocalFonts();
-        const requiredFonts = new Set();
-        const wantSys = document.getElementById('opt-sysfont').checked;
         const normReq = new Set();
+        const wantSys = document.getElementById('opt-sysfont').checked;
         for (const entry of S.assFiles) {
           for (const name of Object.keys(entry.parsed.externalFonts)) normReq.add(normFont(name).toLowerCase());
           if (wantSys && entry.parsed.systemFontsReferenced) {
@@ -4431,23 +4430,30 @@
           [fam, full, ...aliasesFam, ...aliasesFull].forEach(n => {
             if (n && normReq.has(n)) matched.push(n);
           });
-
-          if (matched.length > 0) {
-            let buffer = null;
-            for (const matchName of matched) {
-              if (!S.uploadedFonts.has(matchName)) {
-                if (!buffer) {
-                  const blob = await font.blob();
-                  buffer = await blob.arrayBuffer();
-                }
-                const view = new DataView(buffer);
-                const isTTC = buffer.byteLength > 12 && view.getUint32(0, false) === 0x74746366;
-                S.uploadedFonts.set(matchName, {
-                  file: { name: font.fullName + ' (system)' },
-                  buffer, matchedFor: matchName,
-                  isTTC, ttcIndex: 0, weight: 400, isFamilyMatch: true, isSystem: true
-                });
-              }
+          if (matched.length === 0) continue;
+          let buffer = null;
+          const subfamilyLow = (font.style || '').toLowerCase();
+          const isBold = subfamilyLow.includes('bold') || subfamilyLow.includes('heavy') || subfamilyLow.includes('black');
+          const isItalic = subfamilyLow.includes('italic') || subfamilyLow.includes('oblique');
+          const weight = isBold ? 700 : 400;
+          for (const matchName of matched) {
+            const vk = matchName + '::default';
+            if (!buffer) {
+              const blob = await font.blob();
+              buffer = await blob.arrayBuffer();
+            }
+            const dataView = new DataView(buffer);
+            const isTTC = buffer.byteLength > 12 && dataView.getUint32(0, false) === 0x74746366;
+            const record = {
+              file: { name: font.fullName + ' (system)' },
+              buffer, matchedFor: matchName,
+              isTTC, ttcIndex: isTTC ? 0 : -1,
+              weight, isItalic,
+              isFamilyMatch: true, isSystem: true
+            };
+            S.allFontCandidates.push(record);
+            if (!S.uploadedFonts.has(vk)) {
+              S.uploadedFonts.set(vk, record);
             }
           }
         }
@@ -4476,19 +4482,15 @@
       const wantSystemFont = document.getElementById('opt-sysfont').checked;
       const wantStrip = document.getElementById('opt-strip').checked;
 
-      const fonts = [];
-      for (const [, info] of S.uploadedFonts) {
-        fonts.push({
-          name: info.file.name,
-          buffer: info.buffer,
-          isTTC: info.isTTC,
-          ttcIndex: info.ttcIndex,
-          matchedFor: info.matchedFor,
-          weight: info.weight,
-          isItalic: info.isItalic || false,
-          variant: info.variant || 'normal',
-        });
-      }
+      const fonts = S.allFontCandidates.map(info => ({
+        name: info.file.name,
+        buffer: info.buffer,
+        isTTC: info.isTTC,
+        ttcIndex: info.ttcIndex,
+        matchedFor: info.matchedFor,
+        weight: info.weight,
+        isItalic: info.isItalic || false,
+      }));
 
       batchFileIdx = 0;
       batchTotal = S.assFiles.length;
