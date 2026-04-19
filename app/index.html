@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.8">
+  <meta name="version" content="2.5.9">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -1457,6 +1457,13 @@
             <span id="opt-ascii-desc" data-i18n="opt.ascii.desc">Retain all available ASCII characters from the original font in the subset, improving compatibility across media players.</span>
           </div>
         </label>
+        <label class="opt-row hidden" id="opt-row-fullfont">
+          <input type="checkbox" id="opt-fullfont" aria-describedby="opt-fullfont-desc">
+          <div class="opt-label">
+            <strong data-i18n="opt.fullfont.title">Embed Full Fonts</strong>
+            <span id="opt-fullfont-desc" data-i18n="opt.fullfont.desc">Bypass subsetting and embed the entire font file. This will significantly increase the output file size.</span>
+          </div>
+        </label>
         <label class="opt-row disabled" id="opt-row-strip">
           <input type="checkbox" id="opt-strip" disabled aria-describedby="opt-strip-desc">
           <div class="opt-label">
@@ -1465,6 +1472,7 @@
           </div>
         </label>
         <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.</div>
+        <div id="fullfont-notice" class="notice notice-warn hidden" data-i18n="notice.fullfont">⚠ Size Warning: Embedding full fonts will drastically inflate the subtitle file size, potentially causing player performance issues.</div>
         <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.</div>
         <div id="font-section" class="hidden">
           <hr class="divider">
@@ -1701,6 +1709,9 @@
         'opt.sysfont.title': '嵌入系统字体',
         'opt.ascii.title': '补全 ASCII 字符',
         'opt.ascii.desc': '在子集字体中保留原字体所有可用 ASCII 字符，提高播放器兼容性',
+        'opt.fullfont.title': '完整嵌入字体',
+        'opt.fullfont.desc': '跳过子集化过程，直接嵌入完整的字体文件。警告：这将极大地增加输出文件的体积。',
+        'notice.fullfont': '⚠ 完整字体警告：完整嵌入字体会导致字幕文件体积剧增，可能引起播放器卡顿或加载缓慢。',
         'opt.strip.desc': '移除字幕中已有的内嵌字体，但保留子集化绘图指令所用的字型',
         'opt.strip.title': '移除内嵌字体',
         'opt.append_optimize': '追加 _optimized 后缀',
@@ -1849,6 +1860,9 @@
         'opt.sysfont.title': '嵌入系統字型',
         'opt.ascii.title': '補全 ASCII 字元',
         'opt.ascii.desc': '在子集字型中保留原字型所有可用 ASCII 字元，提高播放器相容性',
+        'opt.fullfont.title': '完整嵌入字型',
+        'opt.fullfont.desc': '跳過子集化過程，直接嵌入完整的字型檔。警告：這將極大地增加輸出檔案的體積。',
+        'notice.fullfont': '⚠ 完整字型警告：完整嵌入字型會導致字幕檔案體積劇增，可能引起播放器卡頓或載入緩慢。',
         'opt.strip.desc': '移除字幕中已有的內嵌字型，但保留子集化繪圖指令所用的字型',
         'opt.strip.title': '移除內嵌字型',
         'opt.append_optimize': '追加 _optimized 後綴',
@@ -1997,6 +2011,9 @@
         'opt.sysfont.title': 'Embed System Fonts',
         'opt.ascii.title': 'Include ASCII Characters',
         'opt.ascii.desc': 'Retain all available ASCII characters from the original font in the subset, improving compatibility across media players.',
+        'opt.fullfont.title': 'Embed Full Fonts',
+        'opt.fullfont.desc': 'Bypass subsetting and embed the entire font file. Warning: This will significantly increase the output file size.',
+        'notice.fullfont': '⚠ Full Font Warning: Embedding full fonts will significantly bloat the subtitle file size, potentially causing performance issues in media players.',
         'opt.strip.desc': 'Remove existing embedded fonts from the script while keeping the subsetted draw fonts.',
         'opt.strip.title': 'Strip Embedded Fonts',
         'opt.append_optimize': 'Add _optimized suffix',
@@ -2145,6 +2162,9 @@
         'opt.sysfont.title': 'システムフォントの埋め込み',
         'opt.ascii.title': 'ASCII 文字を補完',
         'opt.ascii.desc': '元フォントに含まれる全 ASCII 文字をサブセットに保持し、メディアプレイヤーとの互換性を向上させます。',
+        'opt.fullfont.title': 'フルフォントを埋め込む',
+        'opt.fullfont.desc': 'サブセット化をスキップし、フォントファイル全体を埋め込みます。警告：出力ファイルのサイズが大幅に増加します。',
+        'notice.fullfont': '⚠ フルフォント警告：フルフォントを埋め込むと字幕ファイルのサイズが劇的に増加し、プレイヤーのパフォーマンスに影響を与える可能性があります。',
         'opt.strip.desc': 'スクリプト内の既存の埋め込みフォントを削除します（描画サブセット字型は保持）。',
         'opt.strip.title': '埋め込みフォントを削除',
         'opt.append_optimize': '_optimized 接尾辞を追加',
@@ -2293,6 +2313,9 @@
         'opt.sysfont.title': '시스템 폰트 삽입',
         'opt.ascii.title': 'ASCII 문자 보완',
         'opt.ascii.desc': '원본 폰트에 있는 모든 ASCII 문자를 서브셋에 보존하여 미디어 플레이어 호환성을 높입니다.',
+        'opt.fullfont.title': '전체 폰트 삽입',
+        'opt.fullfont.desc': '서브셋화를 건너뛰고 전체 폰트 파일을 삽입합니다. 경고: 출력 파일 크기가 크게 증가합니다.',
+        'notice.fullfont': '⚠ 전체 폰트 경고: 전체 폰트를 삽입하면 자막 파일 크기가 급격히 커져 미디어 플레이어 성능 문제가 발생할 수 있습니다.',
         'opt.strip.desc': '자막에 내장된 기존 폰트를 제거합니다(드로우 서브셋 폰트는 유지).',
         'opt.strip.title': '내장 폰트 제거',
         'opt.append_optimize': '_optimized 접미사 추가',
@@ -2441,6 +2464,9 @@
         'opt.sysfont.title': 'Incrustar fuentes del sistema',
         'opt.ascii.title': 'Incluir caracteres ASCII',
         'opt.ascii.desc': 'Conserva todos los caracteres ASCII disponibles de la fuente original en el subconjunto, mejorando la compatibilidad con reproductores.',
+        'opt.fullfont.title': 'Incrustar fuentes completas',
+        'opt.fullfont.desc': 'Omitir el subconjunto e incrustar el archivo de fuente completo. Advertencia: Esto aumentará significativamente el tamaño del archivo.',
+        'notice.fullfont': '⚠ Advertencia de fuente completa: Incrustar fuentes completas inflará drásticamente el tamaño del archivo, lo que podría causar problemas de rendimiento en el reproductor.',
         'opt.strip.desc': 'Elimina las fuentes incrustadas existentes en el guion (conserva las fuentes de dibujo).',
         'opt.strip.title': 'Eliminar fuentes incrustadas',
         'opt.append_optimize': 'Añadir sufijo _optimized',
@@ -2589,6 +2615,9 @@
         'opt.sysfont.title': 'Встроить системные шрифты',
         'opt.ascii.title': 'Включить символы ASCII',
         'opt.ascii.desc': 'Сохраняет все доступные ASCII-символы из исходного шрифта в подмножестве, улучшая совместимость с медиаплеерами.',
+        'opt.fullfont.title': 'Встроить полные шрифты',
+        'opt.fullfont.desc': 'Пропустить создание подмножества и встроить весь файл шрифта. Предупреждение: Это значительно увеличит размер файла.',
+        'notice.fullfont': '⚠ Предупреждение о полных шрифтах: Встраивание полных шрифтов радикально увеличит размер файла субтитров, что может вызвать проблемы с производительностью.',
         'opt.strip.desc': 'Удаляет существующие встроенные шрифты (сохраняет шрифты команд рисования).',
         'opt.strip.title': 'Удалить встроенные шрифты',
         'opt.append_optimize': 'Добавить суффикс _optimized',
@@ -2737,6 +2766,9 @@
         'opt.sysfont.title': 'Incorporar fontes do sistema',
         'opt.ascii.title': 'Incluir caracteres ASCII',
         'opt.ascii.desc': 'Preserva todos os caracteres ASCII disponíveis da fonte original no subconjunto, melhorando a compatibilidade com players de mídia.',
+        'opt.fullfont.title': 'Incorporar Fontes Completas',
+        'opt.fullfont.desc': 'Ignorar o subconjunto e incorporar o arquivo de fonte inteiro. Aviso: Isso aumentará significativamente o tamanho do arquivo de saída.',
+        'notice.fullfont': '⚠ Aviso de Fonte Completa: Incorporar fontes completas aumentará drasticamente o tamanho do arquivo de legenda, podendo causar problemas de desempenho.',
         'opt.strip.desc': 'Remove fontes embutidas não padronizadas existentes para reduzir o tamanho do arquivo (mantém fontes de desenho).',
         'opt.strip.title': 'Remover Fontes Embutidas',
         'opt.append_optimize': 'Adicionar sufixo _optimized',
@@ -2885,6 +2917,9 @@
         'opt.sysfont.title': 'تضمين خطوط النظام',
         'opt.ascii.title': 'تضمين أحرف ASCII',
         'opt.ascii.desc': 'يحتفظ بجميع أحرف ASCII المتاحة من الخط الأصلي في المجموعة الفرعية، مما يحسّن التوافق مع مشغلات الوسائط.',
+        'opt.fullfont.title': 'تضمين خطوط كاملة',
+        'opt.fullfont.desc': 'تخطي التقليص وتضمين ملف الخط بالكامل. تحذير: سيؤدي هذا إلى زيادة حجم ملف الإخراج بشكل كبير.',
+        'notice.fullfont': '⚠ تحذير الخط الكامل: سيؤدي تضمين خطوط كاملة إلى تضخم حجم ملف الترجمة بشكل كبير، مما قد يسبب مشاكل في أداء مشغلات الوسائط.',
         'opt.strip.desc': 'يزيل الخطوط المضمنة الموجودة في النص (يحافظ على خطوط الرسم).',
         'opt.strip.title': 'إزالة الخطوط المضمنة',
         'opt.append_optimize': 'إضافة لاحقة _optimized',
@@ -3033,6 +3068,9 @@
         'opt.sysfont.title': 'Sistem fontlarını göm',
         'opt.ascii.title': 'ASCII karakterleri dahil et',
         'opt.ascii.desc': 'Orijinal fontun mevcut tüm ASCII karakterlerini alt kümede saklayarak medya oynatıcı uyumluluğunu artırır.',
+        'opt.fullfont.title': 'Tam Fontları Göm',
+        'opt.fullfont.desc': 'Alt kümelemeyi atlayın ve tüm font dosyasını gömün. Uyarı: Bu, çıktı dosyasının boyutunu önemli ölçüde artıracaktır.',
+        'notice.fullfont': '⚠ Tam Font Uyarısı: Tam fontları gömmek altyazı dosyasının boyutunu büyük ölçüde şişirir ve medya oynatıcılarında performans sorunlarına yol açabilir.',
         'opt.strip.desc': 'Altyazıdaki mevcut gömülü fontları kaldırır (çizim komutu fontlarını korur).',
         'opt.strip.title': 'Gömülü Fontları Kaldır',
         'opt.append_optimize': '_optimized son ekini ekle',
@@ -4015,10 +4053,19 @@
         rowStrip.classList.toggle('selected', cbStrip.checked);
       }
 
+      const cbFullFont = document.getElementById('opt-fullfont');
+      const rowFullFont = document.getElementById('opt-row-fullfont');
+      const noticeFullFont = document.getElementById('fullfont-notice');
+      
+      if (!preserveState) cbFullFont.checked = false;
+      const anyFont = cbFont.checked || cbSys.checked;
+      rowFullFont.classList.toggle('hidden', !anyFont);
+      noticeFullFont.classList.toggle('hidden', !cbFullFont.checked);
+      
       document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
-      document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
-      document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
-      document.getElementById('opt-row-ascii').classList.toggle('hidden', !cbFont.checked && !cbSys.checked);
+      document.getElementById('copyright-notice').classList.toggle('hidden', !anyFont);
+      document.getElementById('font-section').classList.toggle('hidden', !anyFont);
+      document.getElementById('opt-row-ascii').classList.toggle('hidden', !anyFont || cbFullFont.checked);
 
       if (hasFonts || hasSysFonts) renderFontList();
 
@@ -4479,7 +4526,7 @@
               forceHasBOM: entry.hasBOM,
               fonts,
               fileName: entry.file.name,
-              options: { wantDraw, wantFont, wantSystemFont, wantStrip, wantAscii: document.getElementById('opt-ascii').checked },
+              options: { wantDraw, wantFont, wantSystemFont, wantStrip, wantAscii: document.getElementById('opt-ascii').checked, wantFullFont: document.getElementById('opt-fullfont').checked },
             });
           }
 
@@ -4988,25 +5035,43 @@
         enforceMutualExclusion();
         updateStep4Visibility();
       });
+      const cbFullFont = document.getElementById('opt-fullfont');
+      const rowFullFont = document.getElementById('opt-row-fullfont');
+      const noticeFullFont = document.getElementById('fullfont-notice');
+
+      const updateFontOptionsVisibility = () => {
+        const anyFont = cbFont.checked || optSysFont.checked;
+        document.getElementById('font-section').classList.toggle('hidden', !anyFont);
+        document.getElementById('copyright-notice').classList.toggle('hidden', !anyFont);
+        rowFullFont.classList.toggle('hidden', !anyFont);
+        
+        if (!anyFont) {
+          cbFullFont.checked = false;
+          rowFullFont.classList.remove('selected');
+          noticeFullFont.classList.add('hidden');
+        }
+        
+        const showAscii = anyFont && !cbFullFont.checked;
+        document.getElementById('opt-row-ascii').classList.toggle('hidden', !showAscii);
+      };
+
       cbFont.addEventListener('change', () => {
         rowFont.classList.toggle('selected', cbFont.checked);
-        document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
-        document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
-        const showAscii = cbFont.checked || optSysFont.checked;
-        document.getElementById('opt-row-ascii').classList.toggle('hidden', !showAscii);
+        updateFontOptionsVisibility();
         renderFontList();
         enforceMutualExclusion();
         updateStep4Visibility();
       });
       optSysFont.addEventListener('change', () => {
         rowSysFont.classList.toggle('selected', optSysFont.checked);
-        document.getElementById('font-section').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
-        document.getElementById('copyright-notice').classList.toggle('hidden', !cbFont.checked && !optSysFont.checked);
-        const showAscii = cbFont.checked || optSysFont.checked;
-        document.getElementById('opt-row-ascii').classList.toggle('hidden', !showAscii);
+        updateFontOptionsVisibility();
         enforceMutualExclusion();
         renderFontList();
         updateStep4Visibility();
+      });
+      cbFullFont.addEventListener('change', () => {
+        noticeFullFont.classList.toggle('hidden', !cbFullFont.checked);
+        updateFontOptionsVisibility();
       });
       cbStrip.addEventListener('change', () => {
         rowStrip.classList.toggle('selected', cbStrip.checked);
