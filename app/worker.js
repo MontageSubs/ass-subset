@@ -993,7 +993,8 @@ function modifyNameTable(buffer, newNames) {
     }
     if (!bytes) {
       const origAbsOff = nameTableOffset + storageOffset + origStrOff;
-      bytes = new Uint8Array(buffer, origAbsOff, origLen);
+      const safeLen = Math.min(origLen, Math.max(0, buffer.byteLength - origAbsOff));
+      bytes = safeLen > 0 ? new Uint8Array(buffer, origAbsOff, safeLen) : new Uint8Array(0);
     }
     const aligned = new Uint8Array(bytes);
     newRecords.push({ platformID, encodingID, languageID, nameID, length: aligned.length, strOff: strPos });
@@ -1047,19 +1048,19 @@ function modifyNameTable(buffer, newNames) {
   const delta = paddedNew - paddedOrig;
   const newTotalLen = buffer.byteLength + delta;
   const out = new Uint8Array(newTotalLen);
-  out.set(new Uint8Array(buffer));
-
   const origOffset = nameTableOffset;
+  const afterOrig = origOffset + paddedOrig;
+
+  out.set(new Uint8Array(buffer, 0, origOffset));
+  out.set(new Uint8Array(buffer, afterOrig), afterOrig + delta);
+
   if (delta !== 0) {
-    const afterOrig = origOffset + paddedOrig;
-    const rest = new Uint8Array(buffer, afterOrig);
-    out.set(rest, afterOrig + delta);
     const outView = new DataView(out.buffer);
     const finalNumTables = outView.getUint16(4, false);
     for (let i = 0; i < finalNumTables; i++) {
       const base = 12 + i * 16;
       const off = outView.getUint32(base + 8, false);
-      if (off > origOffset) outView.setUint32(base + 8, off + delta, false);
+      if (off >= afterOrig) outView.setUint32(base + 8, off + delta, false);
     }
   }
   out.set(newNameU8, origOffset);
@@ -1547,46 +1548,45 @@ async function doConvert(data, id) {
   } else if (parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
-  const ITALIC_KEYWORDS = ['italic', 'oblique', 'slanted'];
-  const BOLD_NEUTRAL_KEYWORDS = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'medium', 'regular', 'normal', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
-  const nameContains = (name, keywords) => { const n = name.toLowerCase(); return keywords.some(kw => n.includes(kw)); };
+  const ITALIC_KW = ['italic', 'oblique', 'slanted'];
+  const NEUTRAL_KW = ['regular', 'normal', 'medium'];
+  const EXTREME_KW = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
+  const nameContainsAny = (n, kws) => kws.some(kw => n.includes(kw));
 
   const pickBestCandidate = (candidates, hasBoldChars, fontNameStr) => {
-    const fNameLower = fontNameStr.toLowerCase();
-    const nameSpecifiesItalic = nameContains(fNameLower, ITALIC_KEYWORDS);
-    const nameSpecifiesWeight = nameContains(fNameLower, BOLD_NEUTRAL_KEYWORDS);
+    const fLow = fontNameStr.toLowerCase();
+    const nameIsItalic = nameContainsAny(fLow, ITALIC_KW);
+    const nameIsExact = nameContainsAny(fLow, [...NEUTRAL_KW, ...EXTREME_KW, ...ITALIC_KW]);
 
-    const scored = candidates.map(c => {
-      const cNameLower = (c.name || '').toLowerCase();
-      const cW = c.weight || 400;
-      let score = 0;
+    const nonItalic = candidates.filter(c => nameIsItalic ? true : !c.isItalic);
+    const pool = nonItalic.length > 0 ? nonItalic : candidates;
 
-      if (nameSpecifiesItalic) {
-        if (!c.isItalic) score += 20000;
-      } else {
-        if (c.isItalic) score += 20000;
-      }
+    if (nameIsExact) {
+      const exactMatch = pool.filter(c => {
+        const cLow = (c.name || '').toLowerCase();
+        return [...NEUTRAL_KW, ...EXTREME_KW, ...ITALIC_KW].some(kw => fLow.includes(kw) && cLow.includes(kw));
+      });
+      if (exactMatch.length > 0) return exactMatch[0];
+      return pool[0];
+    }
 
-      if (nameSpecifiesWeight) {
-        BOLD_NEUTRAL_KEYWORDS.forEach(kw => {
-          if (fNameLower.includes(kw) && !cNameLower.includes(kw)) score += 15000;
-        });
-        ITALIC_KEYWORDS.forEach(kw => {
-          if (fNameLower.includes(kw) && !cNameLower.includes(kw)) score += 15000;
-        });
-      } else {
-        const idealWeight = hasBoldChars ? 700 : 400;
-        score += Math.abs(cW - idealWeight) * 10;
-        if (hasBoldChars && cW >= 600) score -= 500;
-        if (!hasBoldChars && cW === 400) score -= 200;
-        if (!hasBoldChars && cW === 500) score -= 100;
-      }
-
-      return { c, score };
+    const neutralPool = pool.filter(c => {
+      const cLow = (c.name || '').toLowerCase();
+      return nameContainsAny(cLow, NEUTRAL_KW) && !nameContainsAny(cLow, EXTREME_KW);
     });
 
-    scored.sort((a, b) => a.score - b.score);
-    return scored[0].c;
+    const workingPool = neutralPool.length > 0 ? neutralPool : pool;
+
+    if (workingPool.length === 1) return workingPool[0];
+
+    return workingPool.slice().sort((a, b) => {
+      const aW = a.weight || 400, bW = b.weight || 400;
+      if (hasBoldChars) {
+        return bW - aW;
+      }
+      const da = Math.abs(aW - 400), db = Math.abs(bW - 400);
+      return da !== db ? da - db : aW - bW;
+    })[0];
   };
 
   const subsetFontGroup = async (charInfo, fontNameStr) => {

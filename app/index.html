@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.10">
+  <meta name="version" content="2.5.11">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -1651,6 +1651,11 @@
         'ass.loading': '正在读取字幕文件，请稍候…',
         'font.chars': '{n} 字符',
         'font.local.btn': '从系统自动加载字体',
+        'log.sysfont.scanning': '[font] 正在扫描系统字体…',
+        'log.sysfont.done': '[font] ✓ 已从系统加载 {n} 个字体。',
+        'log.sysfont.none': '[font] ⚠ 未找到与当前字幕匹配的系统字体。',
+        'log.sysfont.error': '[font] 系统字体访问出错: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ 当前浏览器不支持系统字体访问 API。',
         'font.match_fail': '[font] ⚠ {n} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。',
         'font.upload.summary': '[font] 已读取 {total} 个字体文件，正在识别…',
         'font.upload.done': '[font] ✓ 字体识别完成，共 {matched} 个已匹配。',
@@ -1802,6 +1807,11 @@
         'ass.loading': '正在讀取字幕檔，請稍候…',
         'font.chars': '{n} 字元',
         'font.local.btn': '從系統自動載入字型',
+        'log.sysfont.scanning': '[font] 正在掃描系統字型…',
+        'log.sysfont.done': '[font] ✓ 已從系統載入 {n} 個字型。',
+        'log.sysfont.none': '[font] ⚠ 未找到與目前字幕匹配的系統字型。',
+        'log.sysfont.error': '[font] 系統字型存取錯誤: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ 目前瀏覽器不支援系統字型存取 API。',
         'font.match_fail': '[font] ⚠ {n} 個字型檔未能匹配到字幕中的引用字型名，請確認字型是否正確。',
         'font.upload.summary': '[font] 已讀取 {total} 個字型檔案，正在識別…',
         'font.upload.done': '[font] ✓ 字型識別完成，共 {matched} 個已匹配。',
@@ -1953,6 +1963,11 @@
         'ass.loading': 'Reading subtitle files, please wait…',
         'font.chars': '{n} chars',
         'font.local.btn': 'Load System Fonts',
+        'log.sysfont.scanning': '[font] Scanning system fonts…',
+        'log.sysfont.done': '[font] ✓ Loaded {n} matching font(s) from system.',
+        'log.sysfont.none': '[font] ⚠ No system fonts matched the referenced fonts.',
+        'log.sysfont.error': '[font] System font access error: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ This browser does not support the Local Font Access API.',
         'font.match_fail': '[font] ⚠ {n} font file(s) could not be matched to any referenced font name. Please verify font names.',
         'font.upload.summary': '[font] {total} font file(s) read — identifying…',
         'font.upload.done': '[font] ✓ Font identification complete — {matched} matched.',
@@ -2104,6 +2119,11 @@
         'ass.loading': '字幕ファイルを読み込んでいます。しばらくお待ちください…',
         'font.chars': '{n} 文字',
         'font.local.btn': 'システムフォントを自動読み込み',
+        'log.sysfont.scanning': '[font] システムフォントをスキャン中…',
+        'log.sysfont.done': '[font] ✓ システムから {n} 個のフォントを読み込みました。',
+        'log.sysfont.none': '[font] ⚠ 参照フォントに一致するシステムフォントが見つかりませんでした。',
+        'log.sysfont.error': '[font] システムフォントアクセスエラー: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ このブラウザはローカルフォントアクセス API をサポートしていません。',
         'font.match_fail': '[font] ⚠ {n} 個のフォントファイルが字幕内の参照フォント名と一致しませんでした。フォント名を確認してください。',
         'font.upload.summary': '[font] {total} 件のフォントファイルを読み込み — 識別中…',
         'font.upload.done': '[font] ✓ フォント識別完了 — {matched} 件が一致しました。',
@@ -2255,6 +2275,11 @@
         'ass.loading': '자막 파일을 읽는 중입니다. 잠시 기다려 주세요…',
         'font.chars': '{n}자',
         'font.local.btn': '시스템 폰트 자동 로드',
+        'log.sysfont.scanning': '[font] 시스템 폰트 스캔 중…',
+        'log.sysfont.done': '[font] ✓ 시스템에서 {n}개의 폰트를 로드했습니다.',
+        'log.sysfont.none': '[font] ⚠ 참조된 폰트와 일치하는 시스템 폰트를 찾을 수 없습니다.',
+        'log.sysfont.error': '[font] 시스템 폰트 접근 오류: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ 이 브라우저는 로컬 폰트 액세스 API를 지원하지 않습니다.',
         'font.match_fail': '[font] ⚠ {n}개의 폰트 파일이 참조된 폰트 이름과 일치하지 않습니다. 폰트 이름을 확인하세요.',
         'font.upload.summary': '[font] {total}개 폰트 파일 읽기 완료 — 식별 중…',
         'font.upload.done': '[font] ✓ 폰트 식별 완료 — {matched}개 일치.',
@@ -2406,6 +2431,11 @@
         'ass.loading': 'Leyendo archivos de subtítulos, por favor esperá…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Cargar fuentes del sistema',
+        'log.sysfont.scanning': '[font] Escaneando fuentes del sistema…',
+        'log.sysfont.done': '[font] ✓ Se cargaron {n} fuente(s) del sistema.',
+        'log.sysfont.none': '[font] ⚠ No se encontraron fuentes del sistema que coincidan.',
+        'log.sysfont.error': '[font] Error al acceder a fuentes del sistema: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ Este navegador no soporta la API de acceso a fuentes locales.',
         'font.match_fail': '[font] ⚠ {n} archivo(s) de fuente no pudieron coincidir con ninguna fuente referenciada. Verificá los nombres.',
         'font.upload.summary': '[font] {total} archivo(s) leído(s) — identificando fuentes…',
         'font.upload.done': '[font] ✓ Identificación completa — {matched} coincidencias.',
@@ -2557,6 +2587,11 @@
         'ass.loading': 'Чтение файлов субтитров, пожалуйста подождите…',
         'font.chars': '{n} симв.',
         'font.local.btn': 'Загрузить системные шрифты',
+        'log.sysfont.scanning': '[font] Сканирование системных шрифтов…',
+        'log.sysfont.done': '[font] ✓ Загружено {n} системных шрифтов.',
+        'log.sysfont.none': '[font] ⚠ Системные шрифты, соответствующие субтитрам, не найдены.',
+        'log.sysfont.error': '[font] Ошибка доступа к системным шрифтам: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ Этот браузер не поддерживает API локального доступа к шрифтам.',
         'font.match_fail': '[font] ⚠ {n} файл(ов) шрифтов не удалось сопоставить с именами в скрипте. Проверьте правильность имён.',
         'font.upload.summary': '[font] Прочитано {total} файл(ов) шрифтов — идентификация…',
         'font.upload.done': '[font] ✓ Идентификация завершена — совпало {matched}.',
@@ -2708,6 +2743,11 @@
         'ass.loading': 'Lendo arquivos de legenda, aguarde…',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Carregar fontes do sistema',
+        'log.sysfont.scanning': '[font] Verificando fontes do sistema…',
+        'log.sysfont.done': '[font] ✓ {n} fonte(s) carregada(s) do sistema.',
+        'log.sysfont.none': '[font] ⚠ Nenhuma fonte do sistema correspondeu às fontes referenciadas.',
+        'log.sysfont.error': '[font] Erro ao acessar fontes do sistema: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ Este navegador não suporta a API de acesso a fontes locais.',
         'font.match_fail': '[font] ⚠ {n} arquivo(s) de fonte não corresponderam a nenhuma fonte referenciada. Verifique os nomes.',
         'font.upload.summary': '[font] {total} arquivo(s) lido(s) — identificando fontes…',
         'font.upload.done': '[font] ✓ Identificação concluída — {matched} correspondência(s).',
@@ -2859,6 +2899,11 @@
         'ass.loading': 'جارٍ قراءة ملفات الترجمة، يرجى الانتظار…',
         'font.chars': '{n} حرف',
         'font.local.btn': 'تحميل خطوط النظام',
+        'log.sysfont.scanning': '[font] جارٍ فحص خطوط النظام…',
+        'log.sysfont.done': '[font] ✓ تم تحميل {n} خط(وط) من النظام.',
+        'log.sysfont.none': '[font] ⚠ لم يتم العثور على خطوط نظام مطابقة.',
+        'log.sysfont.error': '[font] خطأ في الوصول إلى خطوط النظام: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ هذا المتصفح لا يدعم واجهة برمجة الوصول إلى الخطوط المحلية.',
         'font.match_fail': '[font] ⚠ تعذّر مطابقة {n} ملف خط مع الخطوط المشار إليها في النص. تحقق من الأسماء.',
         'font.upload.summary': '[font] تمّت قراءة {total} ملف(ات) خطوط — جارٍ التعرف…',
         'font.upload.done': '[font] ✓ اكتمل التعرف — {matched} خط متطابق.',
@@ -3010,6 +3055,11 @@
         'ass.loading': 'Altyazı dosyaları okunuyor, lütfen bekleyin…',
         'font.chars': '{n} karakter',
         'font.local.btn': 'Sistem fontlarını yükle',
+        'log.sysfont.scanning': '[font] Sistem fontları taranıyor…',
+        'log.sysfont.done': '[font] ✓ Sistemden {n} font yüklendi.',
+        'log.sysfont.none': '[font] ⚠ Referans verilen fontlarla eşleşen sistem fontu bulunamadı.',
+        'log.sysfont.error': '[font] Sistem font erişim hatası: {error}',
+        'log.sysfont.unsupported': '[font] ⚠ Bu tarayıcı Yerel Font Erişim API\'sini desteklemiyor.',
         'font.match_fail': '[font] ⚠ {n} font dosyası altyazıdaki font adlarıyla eşleştirilemedi. Adları kontrol edin.',
         'font.upload.summary': '[font] {total} font dosyası okundu — tanımlanıyor…',
         'font.upload.done': '[font] ✓ Tanımlama tamamlandı — {matched} eşleşme.',
@@ -4197,7 +4247,9 @@
           dismissBtn.textContent = '✕';
           dismissBtn.onclick = (e) => {
             e.stopPropagation();
+            const dismissedName = key;
             S.uploadedFonts.delete(vk);
+            S.allFontCandidates = S.allFontCandidates.filter(c => c.matchedFor.toLowerCase() !== dismissedName);
             S.pendingReplaceKeys.add(vk);
             const inp = document.getElementById('inp-font');
             if (inp) inp.value = '';
@@ -4335,13 +4387,14 @@
                 version: match.version || '', lastModified: entry.file.lastModified || 0,
                 size: entry.file.size || entry.buffer.byteLength
               };
-              S.allFontCandidates.push(fontRecord);
               const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
               if (isPendingReplace) {
                 S.pendingReplaceKeys.delete(vk);
                 S.uploadedFonts.set(vk, fontRecord);
+                S.allFontCandidates.push(fontRecord);
                 continue;
               }
+              S.allFontCandidates.push(fontRecord);
               const existing = S.uploadedFonts.get(vk);
               if (!existing) {
                 S.uploadedFonts.set(vk, fontRecord);
@@ -4400,7 +4453,7 @@
 
     async function loadLocalFonts() {
       if (!('queryLocalFonts' in window)) {
-        log('Local Font Access API not supported in this browser.', 'warn');
+        log(t('log.sysfont.unsupported'), 'warn');
         return;
       }
       try {
@@ -4412,6 +4465,7 @@
           "simsun": ["宋体"],
           "宋体": ["simsun"]
         };
+        log(t('log.sysfont.scanning'), 'info');
         const localFonts = await window.queryLocalFonts();
         const normReq = new Set();
         const wantSys = document.getElementById('opt-sysfont').checked;
@@ -4421,6 +4475,7 @@
             for (const name of Object.keys(entry.parsed.systemFontsReferenced)) normReq.add(normFont(name).toLowerCase());
           }
         }
+        let loadedCount = 0;
         for (const font of localFonts) {
           const fam = font.family?.toLowerCase();
           const full = font.fullName?.toLowerCase();
@@ -4454,12 +4509,18 @@
             S.allFontCandidates.push(record);
             if (!S.uploadedFonts.has(vk)) {
               S.uploadedFonts.set(vk, record);
+              loadedCount++;
             }
           }
         }
+        if (loadedCount > 0) {
+          log(t('log.sysfont.done', { n: loadedCount }), 'ok');
+        } else {
+          log(t('log.sysfont.none'), 'warn');
+        }
         renderFontList();
       } catch (e) {
-        log('Local Font Access: ' + e.message, 'warn');
+        log(t('log.sysfont.error', { error: e.message }), 'warn');
       }
     }
 
