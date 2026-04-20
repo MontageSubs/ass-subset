@@ -93,8 +93,8 @@ ass-subset/
 │   │   └── jszip.min.js           # Local copy of JSZip
 │   └── icons/                     # App icons
 ├── LICENSE
-├── README.md                      # Chinese documentation
-└── README.en.md                   # English documentation (this file)
+├── README.md                      # English documentation (this file)
+└── README.zh-hans.md              # Chinese documentation
 ```
 
 ## Localization
