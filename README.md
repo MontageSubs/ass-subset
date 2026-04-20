@@ -47,8 +47,6 @@ Subsets and embeds system fonts to ensure consistent rendering across platforms 
 
 Removes existing embedded fonts while preserving optimized drawing fonts.
 
----
-
 ### Advanced Options
 
 **Include ASCII Characters** — Retain all ASCII characters from the original font in the subset, improving media player compatibility.
@@ -122,7 +120,7 @@ Join us in [Issues](https://github.com/MontageSubs/ass-subset/issues) and [Discu
 <details>
 <summary><strong>Core Team</strong></summary>
 
-- **Meow P** (@mtsubs) — Lead Developer, Frontend Design, Backend Development
+- **Meow P** ([@mtsubs](https://github.com/mtsubs/)) — Lead Developer, Frontend Design, Backend Development
 
 </details>
 
