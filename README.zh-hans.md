@@ -93,8 +93,8 @@ ass-subset/
 │   │   └── jszip.min.js           # JSZip 本地副本
 │   └── icons/                     # 应用图标
 ├── LICENSE
-├── README.md                      # 中文说明（本文件）
-└── README.en.md                   # 英文说明
+├── README.md                      # 英文说明
+└── README.zh-hans.md              # 中文说明（本文件）
 ```
 
 ## 本地化
