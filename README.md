@@ -31,7 +31,7 @@ The ASS/SSA format allows subtitle creators to use custom fonts to enhance visua
 
 **Accessibility Standards Compliant** — Full support for keyboard navigation and screen readers, meeting WCAG and international accessibility design requirements.
 
-**Thoughtfully Designed Interface** — Carefully crafted modern frontend with beautiful and intuitive design.
+**Thoughtfully Designed Interface** — Original design aesthetic, modern frontend with beautiful and intuitive usability.
 
 ## Features
 
