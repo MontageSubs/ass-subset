@@ -1,7 +1,7 @@
 {
   "name": "ASS Subsetter",
   "short_name": "ASS Subset",
-  "description": "Online font subsetting tool for ASS/SSA subtitles. Supports drawing subsetting and font embedding, processed locally in your browser.",
+  "description": "Font embedding tool for ASS/SSA subtitles. Supports font subsetting and complete embedding, all processing happens locally in your browser.",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",

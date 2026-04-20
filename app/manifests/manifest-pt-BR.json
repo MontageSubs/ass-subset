@@ -1,7 +1,7 @@
 {
   "name": "Ferramenta ASS Subsetter",
   "short_name": "ASS Subset",
-  "description": "Ferramenta online de subconjunto de fontes para legendas ASS/SSA, processado localmente no navegador.",
+  "description": "Ferramenta de incorporação de fontes para legendas ASS/SSA. Suporta subconjunto de fontes e incorporação completa. Todo o processamento acontece localmente no seu navegador.",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",

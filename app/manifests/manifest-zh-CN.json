@@ -1,7 +1,7 @@
 {
   "name": "ASS 子集化工具",
   "short_name": "ASS子集化",
-  "description": "基于浏览器端实现的 ASS/SSA 字幕优化工具，支持绘图指令子集化与字体子集嵌入，纯前端本地处理。",
+  "description": "ASS/SSA 字幕字体嵌入工具。支持子集化和完整嵌入，所有处理在本地浏览器完成。",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",

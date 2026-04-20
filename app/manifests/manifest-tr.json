@@ -1,7 +1,7 @@
 {
   "name": "ASS Alt Küme Aracı",
   "short_name": "ASS Subset",
-  "description": "ASS/SSA altyazılar için çevrimiçi yazı tipi alt küme aracı, tarayıcınızda yerel olarak işlenir.",
+  "description": "ASS/SSA altyazı dosyaları için yazı tipi gömme aracı. Yazı tipi alt kümeleme ve tam gömmeyi destekler. Tüm işlemler yerel tarayıcınızda gerçekleştirilir.",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",

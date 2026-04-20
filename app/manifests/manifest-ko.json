@@ -1,7 +1,7 @@
 {
   "name": "ASS 서브셋 도구",
   "short_name": "ASS서브셋",
-  "description": "ASS/SSA 자막용 온라인 폰트 서브셋 도구. 브라우저에서 로컬로 처리합니다.",
+  "description": "ASS/SSA 자막용 글꼴 임베딩 도구. 글꼴 서브셋팅 및 완전 임베딩 지원. 모든 처리가 로컬 브라우저에서 수행됩니다.",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",

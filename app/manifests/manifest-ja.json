@@ -1,7 +1,7 @@
 {
   "name": "ASS サブセットツール",
   "short_name": "ASSサブセット",
-  "description": "ASS/SSA 字幕用のオンラインフォントサブセットツール。ブラウザ上でローカル処理します。",
+  "description": "ASS/SSAサブタイトル用フォント埋め込みツール。フォント部分埋め込みと完全埋め込みをサポート。すべての処理はローカルブラウザで行われます。",
   "start_url": "/ass-subset/",
   "scope": "/ass-subset/",
   "display": "standalone",
