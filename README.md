@@ -88,7 +88,7 @@ ass-subset/
 │   │   ├── opentype.min.js        # Local copy of opentype.js
 │   │   └── jszip.min.js           # Local copy of JSZip
 │   └── icons/                     # App icons
-├── LICENSE
+├── LICENSE                        # MIT License
 ├── README.md                      # English documentation (this file)
 └── README.zh-hans.md              # Chinese documentation
 ```
