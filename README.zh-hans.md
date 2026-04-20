@@ -83,7 +83,7 @@ ass-subset/
 │   │   ├── opentype.min.js        # opentype.js 本地副本
 │   │   └── jszip.min.js           # JSZip 本地副本
 │   └── icons/                     # 应用图标
-├── LICENSE
+├── LICENSE                        # MIT 许可证
 ├── README.md                      # 英文说明
 └── README.zh-hans.md              # 中文说明（本文件）
 ```
