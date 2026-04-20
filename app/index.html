@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ASS Subsetter - Font Embedding & Subtitle Tool - MontageSubs</title>
-  <meta name="description" content="Free ASS Online Subsetter for optimizing subtitle files. Embed fonts, subset drawing commands, and compress file size with intelligent data cleaning. Browser-based, local processing, no server upload. Perfect for Aegisub typesetting.">
-  <meta name="keywords" content="ASS subsetter,font subsetting,font embedding,ASS font optimizer,SSA subtitle tool,embedded fonts,font compression,Aegisub,subtitle typesetting,drawing commands,TTF subsetting,OTF subsetting,font subset,UUEncode,subtitle file optimization,subtitle effects,typesetting tool,ASS converter,online subtitle tool,browser-based subtitle editor,MontageSubs">
+  <title>ASS Subsetter · Font Embedding for Subtitles · MontageSubs</title>
+  <meta name="description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Optimize complex subtitle typesetting projects with multiple font files while preserving visual quality.">
+  <meta name="keywords" content="subtitle font embedding,font subsetting,ASS subtitles,SSA subtitles,font compression,subtitle file optimization,Aegisub,subtitle typesetting,embedded fonts,TTF font subset,OTF font subset,font optimization,subtitle effects,drawing commands,subtitle tool,font file compression,video subtitles,typesetting software,fansub">
   <meta name="author" content="MontageSubs">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="https://subs.js.org/ass-subset/">
@@ -21,10 +21,10 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.15">
+  <meta name="version" content="2.5.16">
   <meta property="og:type" content="website">
-  <meta property="og:title" content="ASS Subsetter · MontageSubs">
-  <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
+  <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
+  <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
   <meta property="og:url" content="https://subs.js.org/ass-subset/">
   <meta property="og:site_name" content="MontageSubs">
   <meta property="og:locale" content="en_US">
@@ -33,8 +33,8 @@
   <meta property="og:locale:alternate" content="ja_JP">
   <meta property="og:locale:alternate" content="ko_KR">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:title" content="ASS Subsetter - Font Embedding & Optimization Tool">
-  <meta name="twitter:description" content="Minimize embedded font size in ASS/SSA subtitles with intelligent subsetting. Local browser processing, zero data sharing, free forever.">
+  <meta name="twitter:title" content="Font Embedding for ASS/SSA Subtitles">
+  <meta name="twitter:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Optimize complex subtitle typesetting with multiple font files.">
   <meta name="theme-color" media="(prefers-color-scheme: light)" content="#f6f5f2">
   <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#13151c">
   <link rel="manifest" href="manifests/manifest.json" id="pwa-manifest">
@@ -54,7 +54,7 @@
   "name": "ASS Subsetter",
   "alternateName": ["Font Subsetter", "ASS Font Optimizer", "Subtitle Font Embedding Tool"],
   "url": "https://subs.js.org/ass-subset/",
-  "description": "Open-source browser-based utility for optimizing ASS and SSA subtitle files through intelligent font subsetting and drawing command optimization. Minimize embedded font file sizes while preserving complete font name table entries and drawing command integrity. Purpose-built for Aegisub typesetters. All processing occurs locally in the browser with zero data transmission to any server.",
+  "description": "Font embedding tool for ASS and SSA subtitle files. Subset fonts to compress file size, or embed them fully. Optimize complex subtitle typesetting with multiple font files while preserving complete font compatibility.",
   "applicationCategory": "MultimediaApplication",
   "operatingSystem": "All",
   "browserRequirements": "Modern web browser with JavaScript ES6+ support",
@@ -67,20 +67,20 @@
     "url": "https://github.com/MontageSubs"
   },
   "featureList": [
-    "Intelligent font subsetting for ASS/SSA subtitle files",
-    "Drawing command optimization and cleanup",
-    "Support for TTF, OTF, and TTC font formats",
+    "Font subsetting for ASS/SSA subtitle files",
+    "Complete font embedding option",
+    "Support for TTF, OTF, TTC, OTC, WOFF, and WOFF2 formats",
     "Preserves complete font name table entries for player compatibility",
+    "Drawing command optimization",
+    "Remove embedded fonts",
     "Real-time file preview and validation",
     "Batch processing support",
-    "UUEncoded embedded font compression",
-    "Pure browser-based processing with all data staying local",
-    "No installation required, works offline"
+    "Pure browser-based processing with all data staying local"
   ],
   "potentialAction": {
     "@type": "Action",
     "target": "https://subs.js.org/ass-subset/",
-    "name": "Optimize ASS Subtitles"
+    "name": "Embed Fonts in Subtitles"
   }
 }
 </script>
@@ -1363,7 +1363,7 @@
       <span class="brand-org">蒙太奇字幕组 · MontageSubs</span>
       <h1 class="brand-title" data-i18n="app.title">ASS Subsetter</h1>
     </a>
-    <span class="sub" data-i18n="app.subtitle">Draw Command Subsetting · Font Subset Embedding</span>
+    <span class="sub" data-i18n="app.subtitle">Subtitle Drawing Optimization · Font Embedding and Management</span>
     <div class="header-right">
       <button class="btn-hdr" id="btn-install-pwa" onclick="triggerPwaInstall()" style="display:none"
         data-i18n="btn.install">Install</button>
@@ -1430,7 +1430,7 @@
           <input type="checkbox" id="opt-draw" aria-describedby="opt-draw-desc">
           <div class="opt-label">
             <strong data-i18n="opt.draw.title">Subset Draw Commands</strong>
-            <span id="opt-draw-desc" data-i18n="opt.draw.desc">Extract \p1…\p0 vector draws into an embedded TTF, deduplicating identical shapes to reduce script size</span>
+            <span id="opt-draw-desc" data-i18n="opt.draw.desc">Extract \p1…\p0 vector draws into embedded fonts to reduce redundancy; this option supports intelligent add/delete operations.</span>
           </div>
           <span class="opt-tag">\p1 / \p0</span>
         </label>
@@ -1438,7 +1438,7 @@
           <input type="checkbox" id="opt-font" aria-describedby="opt-font-desc">
           <div class="opt-label">
             <strong data-i18n="opt.font.title">Embed Third-Party Fonts</strong>
-            <span id="opt-font-desc" data-i18n="opt.font.desc">Scan third-party (non-system) fonts referenced in the script, subset to used characters only, and embed them directly into the output</span>
+            <span id="opt-font-desc" data-i18n="opt.font.desc">Scan third-party fonts used in the script, subset to used characters only, and embed them into the output.</span>
           </div>
           <span class="opt-tag">TTF / OTF / TTC / OTC / WOFF / WOFF2</span>
         </label>
@@ -1446,7 +1446,7 @@
           <input type="checkbox" id="opt-sysfont" aria-describedby="opt-sysfont-desc">
           <div class="opt-label">
             <strong data-i18n="opt.sysfont.title">Embed System Fonts</strong>
-            <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">Scan system fonts referenced in the script, subset to used characters only, and embed them into the output</span>
+            <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">Scan system fonts used in the script, subset and embed them for consistent font rendering on all platforms.</span>
           </div>
           <span class="opt-tag">TTF / OTF / TTC / OTC / WOFF / WOFF2</span>
         </label>
@@ -1461,7 +1461,7 @@
           <input type="checkbox" id="opt-fullfont" aria-describedby="opt-fullfont-desc">
           <div class="opt-label">
             <strong data-i18n="opt.fullfont.title">Embed Full Fonts</strong>
-            <span id="opt-fullfont-desc" data-i18n="opt.fullfont.desc">Bypass subsetting and embed the entire font file. This will significantly increase the output file size.</span>
+            <span id="opt-fullfont-desc" data-i18n="opt.fullfont.desc">Embed the complete font without subsetting. Subtitle text changes require no reprocessing, but result in larger file size and longer conversion time.</span>
           </div>
         </label>
         <label class="opt-row disabled" id="opt-row-strip">
@@ -1619,7 +1619,7 @@
         'analysis.font.none': '未发现第三方字体',
         'analysis.font.sys.label': '系统字体',
         'analysis.font.sys.none': '未发现引用的系统字体',
-        'app.subtitle': '字幕绘图指令子集化 · 字幕字体子集嵌入',
+        'app.subtitle': '字幕绘图优化 · 字幕字体嵌入与管理',
         'app.title': 'ASS 子集化工具',
         'aria.dz_ass': '上传字幕文件，支持拖拽或点击选择',
         'aria.dz_font': '上传字体文件',
@@ -1706,16 +1706,16 @@
         'log.rewrite.start': '[ass] 重写字幕文件…',
         'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保你拥有所嵌入字体的分发权利。',
         'notice.drawing': '⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
-        'opt.draw.desc': '将字幕中的 \\p1…\\p0 矢量绘图数据提取为内嵌 TTF 字体，去除重复绘图，减小文件体积',
+        'opt.draw.desc': '将字幕中使用的绘图指令（\\p1…\\p0）转换为字体以减少冗余，此选项支持智能增删等操作',
         'opt.draw.title': '子集化绘图指令',
-        'opt.font.desc': '扫描字幕引用的第三方字体（非系统字体），子集化后嵌入字幕；仅保留实际使用的字符，大幅缩小字体体积',
+        'opt.font.desc': '扫描字幕内使用的第三方字体，子集化后嵌入字幕；仅保留实际使用的字符',
         'opt.font.title': '嵌入第三方字体',
-        'opt.sysfont.desc': '扫描字幕引用的系统字体，子集化后嵌入字幕；仅保留实际使用的字符',
+        'opt.sysfont.desc': '扫描字幕内使用的系统字体，子集化后嵌入，保证字体在不同平台显示效果一致',
         'opt.sysfont.title': '嵌入系统字体',
         'opt.ascii.title': '补全 ASCII 字符',
         'opt.ascii.desc': '在子集字体中保留原字体所有可用 ASCII 字符，提高播放器兼容性',
         'opt.fullfont.title': '完整嵌入字体',
-        'opt.fullfont.desc': '跳过子集化过程，直接嵌入完整的字体文件。警告：这将极大地增加输出文件的体积。',
+        'opt.fullfont.desc': '跳过子集化过程，直接嵌入完整字体；字幕内文字改动无需重新处理，但导致字幕文件体积大、转换耗时较长',
         'notice.fullfont': '⚠ 完整字体警告：完整嵌入字体会导致字幕文件体积剧增，可能引起播放器卡顿或加载缓慢。',
         'opt.strip.desc': '移除字幕中已有的内嵌字体，但保留子集化绘图指令所用的字型',
         'opt.strip.title': '移除内嵌字体',
@@ -1775,7 +1775,7 @@
         'analysis.font.none': '未發現第三方字型',
         'analysis.font.sys.label': '系統字型',
         'analysis.font.sys.none': '未發現引用的系統字型',
-        'app.subtitle': '字幕繪圖指令子集化 · 字幕字型子集嵌入',
+        'app.subtitle': '字幕繪圖優化 · 字幕字型嵌入與管理',
         'app.title': 'ASS 子集化工具',
         'aria.dz_ass': '上傳字幕檔，支援拖曳或點擊選擇',
         'aria.dz_font': '上傳字型檔',
@@ -1862,16 +1862,16 @@
         'log.rewrite.start': '[ass] 重寫字幕檔…',
         'notice.copyright': '⚠ 版權提示：分發未授權的字型檔可能構成侵權。請確保你擁有所嵌入字型的分發權利。',
         'notice.drawing': '⚠ 注意：繪圖指令轉換後，特效的大小和位置可能發生輕微偏移，請手動確認最終效果。',
-        'opt.draw.desc': '將字幕中的 \\p1…\\p0 矢量繪圖數據提取為內嵌 TTF 字型，去除重複繪圖，減小檔案體積',
+        'opt.draw.desc': '將字幕中使用的繪圖指令（\\p1…\\p0）轉換為字型以減少冗餘；此選項支援智慧增刪等操作',
         'opt.draw.title': '子集化繪圖指令',
-        'opt.font.desc': '掃描字幕引用的第三方字型（非系統字型），子集化後嵌入字幕；僅保留實際使用的字元，大幅縮小字型體積',
+        'opt.font.desc': '掃描字幕內使用的第三方字型，子集化後嵌入字幕；僅保留實際使用的字元',
         'opt.font.title': '嵌入第三方字型',
-        'opt.sysfont.desc': '掃描字幕引用的系統字型，子集化後嵌入字幕；僅保留實際使用的字元',
+        'opt.sysfont.desc': '掃描字幕內使用的系統字型，子集化後嵌入，保證字型在不同平臺上顯示效果一致',
         'opt.sysfont.title': '嵌入系統字型',
         'opt.ascii.title': '補全 ASCII 字元',
         'opt.ascii.desc': '在子集字型中保留原字型所有可用 ASCII 字元，提高播放器相容性',
         'opt.fullfont.title': '完整嵌入字型',
-        'opt.fullfont.desc': '跳過子集化過程，直接嵌入完整的字型檔。警告：這將極大地增加輸出檔案的體積。',
+        'opt.fullfont.desc': '跳過子集化過程，直接嵌入完整字型；字幕內文字改動無需重新處理，但導致字幕檔案體積大、轉換耗時較長',
         'notice.fullfont': '⚠ 完整字型警告：完整嵌入字型會導致字幕檔案體積劇增，可能引起播放器卡頓或載入緩慢。',
         'opt.strip.desc': '移除字幕中已有的內嵌字型，但保留子集化繪圖指令所用的字型',
         'opt.strip.title': '移除內嵌字型',
@@ -1931,7 +1931,7 @@
         'analysis.font.none': 'No third-party fonts found',
         'analysis.font.sys.label': 'System Fonts',
         'analysis.font.sys.none': 'No system fonts referenced',
-        'app.subtitle': 'Draw Command Subsetting · Font Subset Embedding',
+        'app.subtitle': 'Subtitle Drawing Optimization · Font Embedding and Management',
         'app.title': 'ASS Subsetter',
         'aria.dz_ass': 'Upload script — drag and drop or click to browse',
         'aria.dz_font': 'Upload font files',
@@ -2018,16 +2018,16 @@
         'log.rewrite.start': '[ass] Rewriting script…',
         'notice.copyright': '⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.',
         'notice.drawing': '⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.',
-        'opt.draw.desc': 'Extract \\p1…\\p0 vector draws into an embedded TTF, deduplicating identical shapes to reduce script size.',
+        'opt.draw.desc': 'Extract \\p1…\\p0 vector draws into embedded fonts to reduce redundancy; this option supports intelligent add/delete operations.',
         'opt.draw.title': 'Subset Draw Commands',
-        'opt.font.desc': 'Scan third-party (non-system) fonts referenced in the script, subset to used characters only, and embed them directly into the output.',
+        'opt.font.desc': 'Scan third-party fonts used in the script, subset to used characters only, and embed them into the output.',
         'opt.font.title': 'Embed Third-Party Fonts',
-        'opt.sysfont.desc': 'Scan system fonts referenced in the script, subset to used characters only, and embed them into the output.',
+        'opt.sysfont.desc': 'Scan system fonts used in the script, subset and embed them for consistent font rendering on all platforms.',
         'opt.sysfont.title': 'Embed System Fonts',
         'opt.ascii.title': 'Include ASCII Characters',
         'opt.ascii.desc': 'Retain all available ASCII characters from the original font in the subset, improving compatibility across media players.',
         'opt.fullfont.title': 'Embed Full Fonts',
-        'opt.fullfont.desc': 'Bypass subsetting and embed the entire font file. Warning: This will significantly increase the output file size.',
+        'opt.fullfont.desc': 'Embed the complete font without subsetting. Subtitle text changes require no reprocessing, but result in larger file size and longer conversion time.',
         'notice.fullfont': '⚠ Full Font Warning: Embedding full fonts will significantly bloat the subtitle file size, potentially causing performance issues in media players.',
         'opt.strip.desc': 'Remove existing embedded fonts from the script while keeping the subsetted draw fonts.',
         'opt.strip.title': 'Strip Embedded Fonts',
@@ -2087,7 +2087,7 @@
         'analysis.font.none': 'サードパーティフォントが見つかりません',
         'analysis.font.sys.label': 'システムフォント',
         'analysis.font.sys.none': '参照されているシステムフォントはありません',
-        'app.subtitle': '描画コマンドのサブセット化・フォントサブセット埋め込み',
+        'app.subtitle': '字幕描画の最適化 · フォント埋め込みと管理',
         'app.title': 'ASS サブセットツール',
         'aria.dz_ass': '字幕ファイルをアップロード（ドラッグ＆ドロップまたはクリック）',
         'aria.dz_font': 'フォントファイルをアップロード',
@@ -2174,16 +2174,16 @@
         'log.rewrite.start': '[ass] スクリプトを書き換え中…',
         'notice.copyright': '⚠ 著作権注意：未許諾フォントの配布は権利侵害となる場合があります。埋め込むフォントの配布権利をご確認ください。',
         'notice.drawing': '⚠ 注意：描画コマンドの変換後、エフェクトの位置やサイズがわずかにずれることがあります。最終的な表示を必ず確認してください。',
-        'opt.draw.desc': 'スクリプトの \\p1…\\p0 ベクター描画データを内蔵 TTF フォントに変換し、重複する描画を削除してファイルサイズを削減します。',
+        'opt.draw.desc': '字幕の \\p1…\\p0 ベクター描画をフォント化して冗長性を削減；このオプションはインテリジェントな追加・削除などの操作に対応。',
         'opt.draw.title': '描画コマンドのサブセット化',
-        'opt.font.desc': 'スクリプトで参照されているサードパーティフォント（システムフォント以外）を走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
+        'opt.font.desc': 'スクリプト内で使用されているサードパーティフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
         'opt.font.title': 'サードパーティフォントの埋め込み',
-        'opt.sysfont.desc': 'スクリプトで参照されているシステムフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
+        'opt.sysfont.desc': 'スクリプト内で使用されているシステムフォントを走査し、サブセット化して埋め込み、すべてのプラットフォームで一貫した表示を保証します。',
         'opt.sysfont.title': 'システムフォントの埋め込み',
         'opt.ascii.title': 'ASCII 文字を補完',
         'opt.ascii.desc': '元フォントに含まれる全 ASCII 文字をサブセットに保持し、メディアプレイヤーとの互換性を向上させます。',
         'opt.fullfont.title': 'フルフォントを埋め込む',
-        'opt.fullfont.desc': 'サブセット化をスキップし、フォントファイル全体を埋め込みます。警告：出力ファイルのサイズが大幅に増加します。',
+        'opt.fullfont.desc': 'サブセット化せず、完全なフォントを埋め込みます。字幕テキストの変更に再処理は不要ですが、ファイルサイズが大きく変換に時間がかかります。',
         'notice.fullfont': '⚠ フルフォント警告：フルフォントを埋め込むと字幕ファイルのサイズが劇的に増加し、プレイヤーのパフォーマンスに影響を与える可能性があります。',
         'opt.strip.desc': 'スクリプト内の既存の埋め込みフォントを削除します（描画サブセット字型は保持）。',
         'opt.strip.title': '埋め込みフォントを削除',
@@ -2243,7 +2243,7 @@
         'analysis.font.none': '서드파티 폰트가 없습니다',
         'analysis.font.sys.label': '시스템 폰트',
         'analysis.font.sys.none': '참조된 시스템 폰트가 없습니다',
-        'app.subtitle': '드로우 명령어 서브셋화 · 폰트 서브셋 삽입',
+        'app.subtitle': '자막 드로우 최적화 · 폰트 삽입 및 관리',
         'app.title': 'ASS 서브셋 도구',
         'aria.dz_ass': '자막 파일 업로드 — 드래그 앤 드롭 또는 클릭',
         'aria.dz_font': '폰트 파일 업로드',
@@ -2330,16 +2330,16 @@
         'log.rewrite.start': '[ass] 자막 스크립트 재작성 중…',
         'notice.copyright': '⚠ 저작권 주의: 허가 없이 폰트를 배포하면 저작권 침해가 될 수 있습니다. 삽입하는 폰트의 배포 권한이 있는지 확인하세요.',
         'notice.drawing': '⚠ 주의: 드로우 명령어 변환 후 효과의 위치나 크기가 약간 변경될 수 있습니다. 항상 최종 결과를 확인하세요.',
-        'opt.draw.desc': '자막의 \\p1…\\p0 벡터 드로우 데이터를 내장 TTF 폰트로 추출하고 중복 도형을 제거하여 파일 크기를 줄입니다.',
+        'opt.draw.desc': '자막의 \\p1…\\p0 벡터 드로우를 폰트로 변환하여 중복을 제거；이 옵션은 지능형 추가/삭제 등의 작업 지원.',
         'opt.draw.title': '드로우 명령어 서브셋화',
-        'opt.font.desc': '자막에서 참조된 서드파티(비시스템) 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 직접 삽입합니다.',
+        'opt.font.desc': '자막 내 사용된 서드파티 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 삽입합니다.',
         'opt.font.title': '서드파티 폰트 삽입',
-        'opt.sysfont.desc': '자막에서 참조된 시스템 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 삽입합니다. 서드파티 폰트 삽입과 독립적으로 작동합니다.',
+        'opt.sysfont.desc': '스크립트에서 사용된 시스템 폰트를 스캔하고 서브셋화하여 모든 플랫폼에서 일관된 폰트 표현을 보장합니다.',
         'opt.sysfont.title': '시스템 폰트 삽입',
         'opt.ascii.title': 'ASCII 문자 보완',
         'opt.ascii.desc': '원본 폰트에 있는 모든 ASCII 문자를 서브셋에 보존하여 미디어 플레이어 호환성을 높입니다.',
         'opt.fullfont.title': '전체 폰트 삽입',
-        'opt.fullfont.desc': '서브셋화를 건너뛰고 전체 폰트 파일을 삽입합니다. 경고: 출력 파일 크기가 크게 증가합니다.',
+        'opt.fullfont.desc': '자막 텍스트 수정 시 재처리 없이 완전한 폰트를 삽입합니다. 다만 파일 크기가 커지고 변환 시간이 늘어납니다.',
         'notice.fullfont': '⚠ 전체 폰트 경고: 전체 폰트를 삽입하면 자막 파일 크기가 급격히 커져 미디어 플레이어 성능 문제가 발생할 수 있습니다.',
         'opt.strip.desc': '자막에 내장된 기존 폰트를 제거합니다(드로우 서브셋 폰트는 유지).',
         'opt.strip.title': '내장 폰트 제거',
@@ -2399,7 +2399,7 @@
         'analysis.font.none': 'No se encontraron fuentes de terceros',
         'analysis.font.sys.label': 'Fuentes del sistema',
         'analysis.font.sys.none': 'No hay referencias a fuentes del sistema',
-        'app.subtitle': 'Subconjunto de comandos de dibujo · Incrustación de fuentes',
+        'app.subtitle': 'Optimización de dibujos de subtítulos · Incrustación y gestión de fuentes',
         'app.title': 'Herramienta ASS de subconjunto',
         'aria.dz_ass': 'Subir archivo de subtítulos — arrastra o haz clic para seleccionar',
         'aria.dz_font': 'Subir archivos de fuentes',
@@ -2486,16 +2486,16 @@
         'log.rewrite.start': '[ass] Reescribiendo el script…',
         'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegurate de tener permiso para distribuir las fuentes que incrustes.',
         'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores. Siempre verificá el resultado final.',
-        'opt.draw.desc': 'Extrae los vectores \\p1…\\p0 en una fuente TTF incrustada, eliminando formas duplicadas para reducir el tamaño del script.',
+        'opt.draw.desc': 'Extrae los vectores \\p1…\\p0 en fuentes incrustadas para reducir redundancia; esta opción admite operaciones inteligentes de adición y eliminación.',
         'opt.draw.title': 'Subconjunto de comandos de dibujo',
-        'opt.font.desc': 'Escanea las fuentes de terceros (no del sistema) referenciadas en el guion, crea subconjunto solo con los caracteres usados y las incrusta directamente en la salida.',
+        'opt.font.desc': 'Escanea las fuentes de terceros usadas en el script, crea un subconjunto solo con los caracteres usados e incrustalas en la salida.',
         'opt.font.title': 'Incrustar fuentes de terceros',
-        'opt.sysfont.desc': 'Escanea las fuentes del sistema referenciadas en el guion, subconjunta solo los caracteres usados y las incrusta en la salida. Opera de forma independiente a la incrustación de fuentes de terceros.',
+        'opt.sysfont.desc': 'Escanea las fuentes del sistema usadas en el script, crealas en subconjunto e incrustalas para garantizar una renderización consistente en todas las plataformas.',
         'opt.sysfont.title': 'Incrustar fuentes del sistema',
         'opt.ascii.title': 'Incluir caracteres ASCII',
         'opt.ascii.desc': 'Conserva todos los caracteres ASCII disponibles de la fuente original en el subconjunto, mejorando la compatibilidad con reproductores.',
         'opt.fullfont.title': 'Incrustar fuentes completas',
-        'opt.fullfont.desc': 'Omitir el subconjunto e incrustar el archivo de fuente completo. Advertencia: Esto aumentará significativamente el tamaño del archivo.',
+        'opt.fullfont.desc': 'Incrusta la fuente completa sin subsetting. Las modificaciones de subtítulos no necesitan reprocesamiento, pero aumentan el tamaño del archivo y la velocidad de conversión.',
         'notice.fullfont': '⚠ Advertencia de fuente completa: Incrustar fuentes completas inflará drásticamente el tamaño del archivo, lo que podría causar problemas de rendimiento en el reproductor.',
         'opt.strip.desc': 'Elimina las fuentes incrustadas existentes en el guion (conserva las fuentes de dibujo).',
         'opt.strip.title': 'Eliminar fuentes incrustadas',
@@ -2555,7 +2555,7 @@
         'analysis.font.none': 'Шрифты третьих сторон не найдены',
         'analysis.font.sys.label': 'Системные шрифты',
         'analysis.font.sys.none': 'Нет ссылок на системные шрифты',
-        'app.subtitle': 'Подмножество команд рисования · Встраивание шрифтов',
+        'app.subtitle': 'Оптимизация отрисовки субтитров · Встраивание и управление шрифтами',
         'app.title': 'ASS субсеттер',
         'aria.dz_ass': 'Загрузить файл субтитров — перетащите или нажмите для выбора',
         'aria.dz_font': 'Загрузить файлы шрифтов',
@@ -2642,16 +2642,16 @@
         'log.rewrite.start': '[ass] Перезапись скрипта…',
         'notice.copyright': '⚠ Авторские права: распространение шрифтов без лицензии может нарушать авторские права. Убедитесь в наличии прав на распространение встраиваемых шрифтов.',
         'notice.drawing': '⚠ Внимание: после конвертации команд рисования возможны незначительные смещения позиций и размеров эффектов. Обязательно проверьте конечный результат.',
-        'opt.draw.desc': 'Извлекает векторные данные \\p1…\\p0 в встроенный TTF-шрифт, устраняя дублирующиеся формы для уменьшения объёма скрипта.',
+        'opt.draw.desc': 'Извлекает векторные данные \\p1…\\p0 в встроенные шрифты для уменьшения избыточности; этот параметр поддерживает интеллектуальные операции добавления и удаления.',
         'opt.draw.title': 'Подмножество команд рисования',
-        'opt.font.desc': 'Сканирует шрифты третьих сторон (не системные), указанные в скрипте, создаёт подмножество только из реально применяемых символов и встраивает их напрямую в вывод.',
+        'opt.font.desc': 'Сканирует шрифты третьих сторон, используемые в скрипте, создаёт подмножество только из используемых символов и встраивает их в вывод.',
         'opt.font.title': 'Встроить шрифты третьих сторон',
-        'opt.sysfont.desc': 'Сканирует системные шрифты, указанные в скрипте, создаёт подмножество только из используемых символов и встраивает их в вывод. Работает независимо от встраивания шрифтов третьих сторон.',
+        'opt.sysfont.desc': 'Сканирует системные шрифты, используемые в скрипте, создаёт подмножество и встраивает их, обеспечивая одинаковое отображение на всех платформах.',
         'opt.sysfont.title': 'Встроить системные шрифты',
         'opt.ascii.title': 'Включить символы ASCII',
         'opt.ascii.desc': 'Сохраняет все доступные ASCII-символы из исходного шрифта в подмножестве, улучшая совместимость с медиаплеерами.',
         'opt.fullfont.title': 'Встроить полные шрифты',
-        'opt.fullfont.desc': 'Пропустить создание подмножества и встроить весь файл шрифта. Предупреждение: Это значительно увеличит размер файла.',
+        'opt.fullfont.desc': 'Встроить полный шрифт без подмножества. Изменения текста в субтитрах не требуют переработки, но увеличивают размер файла и время преобразования.',
         'notice.fullfont': '⚠ Предупреждение о полных шрифтах: Встраивание полных шрифтов радикально увеличит размер файла субтитров, что может вызвать проблемы с производительностью.',
         'opt.strip.desc': 'Удаляет существующие встроенные шрифты (сохраняет шрифты команд рисования).',
         'opt.strip.title': 'Удалить встроенные шрифты',
@@ -2711,7 +2711,7 @@
         'analysis.font.none': 'Nenhuma fonte de terceiros encontrada',
         'analysis.font.sys.label': 'Fontes do sistema',
         'analysis.font.sys.none': 'Nenhuma fonte do sistema referenciada',
-        'app.subtitle': 'Subconjunto de comandos de desenho · Incorporação de fontes',
+        'app.subtitle': 'Otimização de desenho de legendas · Incorporação e gerenciamento de fontes',
         'app.title': 'ASS Subsetter',
         'aria.dz_ass': 'Enviar arquivo de legenda — arraste ou clique para selecionar',
         'aria.dz_font': 'Enviar arquivos de fonte',
@@ -2798,16 +2798,16 @@
         'log.rewrite.start': '[ass] Reescrevendo script…',
         'notice.copyright': '⚠ Direitos autorais: redistribuir fontes sem licença adequada pode constituir infração. Certifique-se de ter permissão para distribuir as fontes que incorporar.',
         'notice.drawing': '⚠ Atenção: a conversão de comandos de desenho pode causar pequenos deslocamentos de posição ou escala. Sempre verifique o resultado final.',
-        'opt.draw.desc': 'Extrai dados vetoriais \\p1…\\p0 para uma TTF incorporada, removendo formas duplicadas para reduzir o tamanho do script.',
+        'opt.draw.desc': 'Extrai dados vetoriais \\p1…\\p0 para fontes incorporadas para reduzir redundância; esta opção suporta operações inteligentes de adição e exclusão.',
         'opt.draw.title': 'Subconjunto de comandos de desenho',
-        'opt.font.desc': 'Escaneia as fontes de terceiros (não do sistema) referenciadas no script, cria subconjunto apenas com os caracteres usados e as incorpora diretamente na saída.',
+        'opt.font.desc': 'Escaneia as fontes de terceiros usadas no script, cria um subconjunto apenas com os caracteres usados e as incorpora na saída.',
         'opt.font.title': 'Incorporar fontes de terceiros',
-        'opt.sysfont.desc': 'Escaneia as fontes do sistema referenciadas no script, cria subconjunto apenas com os caracteres usados e as incorpora na saída. Funciona independentemente da incorporação de fontes de terceiros.',
+        'opt.sysfont.desc': 'Escaneia as fontes do sistema usadas no script, cria subconjunto e as incorpora para garantir uma renderização consistente em todas as plataformas.',
         'opt.sysfont.title': 'Incorporar fontes do sistema',
         'opt.ascii.title': 'Incluir caracteres ASCII',
         'opt.ascii.desc': 'Preserva todos os caracteres ASCII disponíveis da fonte original no subconjunto, melhorando a compatibilidade com players de mídia.',
         'opt.fullfont.title': 'Incorporar Fontes Completas',
-        'opt.fullfont.desc': 'Ignorar o subconjunto e incorporar o arquivo de fonte inteiro. Aviso: Isso aumentará significativamente o tamanho do arquivo de saída.',
+        'opt.fullfont.desc': 'Incorpora a fonte completa sem subsetting. Alterações de texto nas legendas não requerem reprocessamento, mas aumentam o tamanho do arquivo e o tempo de conversão.',
         'notice.fullfont': '⚠ Aviso de Fonte Completa: Incorporar fontes completas aumentará drasticamente o tamanho do arquivo de legenda, podendo causar problemas de desempenho.',
         'opt.strip.desc': 'Remove fontes embutidas não padronizadas existentes para reduzir o tamanho do arquivo (mantém fontes de desenho).',
         'opt.strip.title': 'Remover Fontes Embutidas',
@@ -2867,7 +2867,7 @@
         'analysis.font.none': 'لم يتم العثور على خطوط الطرف الثالث',
         'analysis.font.sys.label': 'خطوط النظام',
         'analysis.font.sys.none': 'لا توجد إشارات إلى خطوط النظام',
-        'app.subtitle': 'تقليص أوامر الرسم · تضمين الخطوط',
+        'app.subtitle': 'تحسين رسم الترجمات · تضمين الخطوط وإدارتها',
         'app.title': 'أداة ASS للتقليص',
         'aria.dz_ass': 'رفع ملف الترجمة — اسحب وأفلت أو انقر للاختيار',
         'aria.dz_font': 'رفع ملفات الخطوط',
@@ -2954,16 +2954,16 @@
         'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص…',
         'notice.copyright': '⚠ حقوق الملكية: قد يُشكّل توزيع الخطوط دون ترخيص انتهاكاً لحقوق النشر. تأكد من امتلاكك حق توزيع الخطوط التي تضمّنها.',
         'notice.drawing': '⚠ ملاحظة: قد يتسبب تحويل أوامر الرسم في انزياحات طفيفة في المواضع والأحجام. تحقق دائماً من النتيجة النهائية.',
-        'opt.draw.desc': 'يستخرج بيانات الرسم المتجه \\p1…\\p0 في خط TTF مضمّن، مع إزالة الأشكال المتكررة للحد من حجم الملف.',
+        'opt.draw.desc': 'استخرج بيانات الرسم المتجه \\p1…\\p0 إلى خطوط مضمنة لتقليل التكرار؛ يدعم هذا الخيار عمليات ذكية للإضافة والحذف.',
         'opt.draw.title': 'تقليص أوامر الرسم',
-        'opt.font.desc': 'يفحص خطوط الطرف الثالث (غير النظامية) المشار إليها في النص، ينشئ مجموعة فرعية من الأحرف المستخدمة فقط، ثم يضمّنها مباشرةً في الملف الناتج.',
+        'opt.font.desc': 'يفحص خطوط الطرف الثالث المستخدمة في النص، ينشئ مجموعة فرعية من الأحرف المستخدمة فقط، ثم يضمّنها في الملف الناتج.',
         'opt.font.title': 'تضمين خطوط الطرف الثالث',
-        'opt.sysfont.desc': 'يفحص خطوط النظام المشار إليها في النص، ينشئ مجموعة فرعية من الأحرف المستخدمة فقط ويضمنها في المخرج. يعمل بشكل مستقل عن تضمين خطوط الطرف الثالث.',
+        'opt.sysfont.desc': 'يفحص خطوط النظام المستخدمة في النص، ينشئ مجموعة فرعية ويضمنها لضمان عرض متسق على جميع الأنظمة الأساسية.',
         'opt.sysfont.title': 'تضمين خطوط النظام',
         'opt.ascii.title': 'تضمين أحرف ASCII',
         'opt.ascii.desc': 'يحتفظ بجميع أحرف ASCII المتاحة من الخط الأصلي في المجموعة الفرعية، مما يحسّن التوافق مع مشغلات الوسائط.',
         'opt.fullfont.title': 'تضمين خطوط كاملة',
-        'opt.fullfont.desc': 'تخطي التقليص وتضمين ملف الخط بالكامل. تحذير: سيؤدي هذا إلى زيادة حجم ملف الإخراج بشكل كبير.',
+        'opt.fullfont.desc': 'أدرج الخط الكامل بدون إنشاء مجموعات فرعية. تعديلات نص الترجمات لا تحتاج إعادة معالجة، لكن تزيد حجم الملف ووقت التحويل.',
         'notice.fullfont': '⚠ تحذير الخط الكامل: سيؤدي تضمين خطوط كاملة إلى تضخم حجم ملف الترجمة بشكل كبير، مما قد يسبب مشاكل في أداء مشغلات الوسائط.',
         'opt.strip.desc': 'يزيل الخطوط المضمنة الموجودة في النص (يحافظ على خطوط الرسم).',
         'opt.strip.title': 'إزالة الخطوط المضمنة',
@@ -3023,7 +3023,7 @@
         'analysis.font.none': 'Üçüncü taraf font bulunamadı',
         'analysis.font.sys.label': 'Sistem fontları',
         'analysis.font.sys.none': 'Sistem fontlarına referans yok',
-        'app.subtitle': 'Çizim komutu alt kümeleme · Font gömme',
+        'app.subtitle': 'Altyazı çizim optimizasyonu · Font gömme ve yönetimi',
         'app.title': 'ASS Alt Kümeleme Aracı',
         'aria.dz_ass': 'Altyazı dosyası yükle — sürükle veya tıkla',
         'aria.dz_font': 'Font dosyaları yükle',
@@ -3110,16 +3110,16 @@
         'log.rewrite.start': '[ass] Script yeniden yazılıyor…',
         'notice.copyright': '⚠ Telif hakkı: Lisanssız font dağıtımı telif hakkı ihlali sayılabilir. Gömdüğünüz fontları dağıtma hakkınız olduğundan emin olun.',
         'notice.drawing': '⚠ Dikkat: çizim komutlarının dönüştürülmesi efektlerde küçük konum veya boyut farklılıklarına yol açabilir. Sonucu mutlaka kontrol edin.',
-        'opt.draw.desc': '\\p1…\\p0 vektör çizim verilerini gömülü TTF fontuna çıkarır; tekrarlayan şekilleri kaldırarak dosya boyutunu küçültür.',
+        'opt.draw.desc': '\\p1…\\p0 vektör çizim verilerini gömülü fontlara çıkararak fazlalığı azaltır; bu seçenek akıllı ekleme ve silme işlemlerini destekler.',
         'opt.draw.title': 'Çizim komutlarını alt kümele',
-        'opt.font.desc': 'Scriptte referans verilen üçüncü taraf (sistem dışı) fontları tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve doğrudan çıktıya gömer.',
+        'opt.font.desc': 'Scriptte kullanılan üçüncü taraf fontlarını tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve çıktıya gömer.',
         'opt.font.title': 'Üçüncü taraf fontları göm',
-        'opt.sysfont.desc': 'Scriptte referans verilen sistem fontlarını tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve çıktıya gömer. Üçüncü taraf font gömme işleminden bağımsız çalışır.',
+        'opt.sysfont.desc': 'Scriptte kullanılan sistem fontlarını tarar, alt küme oluşturur ve gömerek tüm platformlarda tutarlı yazı tipi görüntülemesini sağlar.',
         'opt.sysfont.title': 'Sistem fontlarını göm',
         'opt.ascii.title': 'ASCII karakterleri dahil et',
         'opt.ascii.desc': 'Orijinal fontun mevcut tüm ASCII karakterlerini alt kümede saklayarak medya oynatıcı uyumluluğunu artırır.',
         'opt.fullfont.title': 'Tam Fontları Göm',
-        'opt.fullfont.desc': 'Alt kümelemeyi atlayın ve tüm font dosyasını gömün. Uyarı: Bu, çıktı dosyasının boyutunu önemli ölçüde artıracaktır.',
+        'opt.fullfont.desc': 'Yazı tipinin tamamını gömün; altyazı metni değişiklikleri yeniden işlemeyi gerektirmez. Ancak dosya boyutu artar ve dönüştürme daha uzun sürer.',
         'notice.fullfont': '⚠ Tam Font Uyarısı: Tam fontları gömmek altyazı dosyasının boyutunu büyük ölçüde şişirir ve medya oynatıcılarında performans sorunlarına yol açabilir.',
         'opt.strip.desc': 'Altyazıdaki mevcut gömülü fontları kaldırır (çizim komutu fontlarını korur).',
         'opt.strip.title': 'Gömülü Fontları Kaldır',
