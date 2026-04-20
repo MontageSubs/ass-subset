@@ -74,7 +74,7 @@ The ASS/SSA format allows subtitle creators to use custom fonts to enhance visua
 | Dependency | Version | License | Purpose |
 |------------|---------|---------|---------|
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | Font parsing and construction |
-| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / Dual licensed | Batch output packaging |
+| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / Dual licensed | ZIP file handling and packaging |
 
 The above dependencies are included as local copies in the `app/vendor/` directory of this repository and are licensed under MIT.
 
