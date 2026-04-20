@@ -73,7 +73,7 @@ Removes existing embedded fonts while preserving optimized drawing fonts.
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | Font parsing and construction |
 | [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / Dual licensed | Batch output packaging |
 
-The above dependencies are included as local copies in the `vendor/` directory of this repository and are licensed under MIT.
+The above dependencies are included as local copies in the `app/vendor/` directory of this repository and are licensed under MIT.
 
 opentype.js is used for font file parsing and binary construction. JSZip is used to package batch processing results into a .zip file for download after subtitle files have been processed through the subsetting queue.
 
