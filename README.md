@@ -78,8 +78,7 @@ The ASS/SSA format allows subtitle creators to use custom fonts to enhance visua
 
 The above dependencies are included as local copies in the `app/vendor/` directory of this repository and are licensed under MIT.
 
-opentype.js is used for font file parsing and binary construction. JSZip is used to package batch processing results into a .zip file for download after subtitle files have been processed through the subsetting queue.
-
+opentype.js is used for font file parsing and binary construction. JSZip is used to parse uploaded ZIP archives and package processing results.
 
 ## Repository Structure
 
