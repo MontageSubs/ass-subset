@@ -764,11 +764,19 @@ function matchFontBuffer(buffer, requiredFonts, id) {
           const v = versionField['en'] || Object.values(versionField).find(v => typeof v === 'string' && v.trim()) || '';
           version = typeof v === 'string' ? v.trim() : '';
         }
+        const subfamilyName = (
+          fontObj.names?.preferredSubfamily?.en ||
+          fontObj.tables?.name?.preferredSubfamily?.en ||
+          fontObj.names?.fontSubfamily?.en ||
+          fontObj.tables?.name?.fontSubfamily?.en ||
+          ''
+        ).trim();
         results.push({
           matchedFor: req,
           weight,
           isItalic,
           isFamilyMatch,
+          subfamilyName,
           version,
           allNames: Array.from(allNames),
           familyNames: Array.from(familyNames),
@@ -1553,42 +1561,27 @@ async function doConvert(data, id) {
   } else if (parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
+  const WEIGHT_KW = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'medium', 'normal', 'regular', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
   const ITALIC_KW = ['italic', 'oblique', 'slanted'];
-  const NEUTRAL_KW = ['regular', 'normal', 'medium'];
-  const EXTREME_KW = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
   const nameContainsAny = (n, kws) => kws.some(kw => n.includes(kw));
 
-  const pickBestCandidate = (candidates, hasBoldChars, fontNameStr) => {
+  const pickBestCandidate = (candidates, fontNameStr) => {
     const fLow = fontNameStr.toLowerCase();
-    const nameIsItalic = nameContainsAny(fLow, ITALIC_KW);
-    const nameIsExact = nameContainsAny(fLow, [...NEUTRAL_KW, ...EXTREME_KW, ...ITALIC_KW]);
+    const nameSpecifiesWeight = nameContainsAny(fLow, WEIGHT_KW);
+    const nameSpecifiesItalic = nameContainsAny(fLow, ITALIC_KW);
 
-    const nonItalic = candidates.filter(c => nameIsItalic ? true : !c.isItalic);
-    const pool = nonItalic.length > 0 ? nonItalic : candidates;
-
-    if (nameIsExact) {
-      const exactMatch = pool.filter(c => {
-        const cLow = (c.name || '').toLowerCase();
-        return [...NEUTRAL_KW, ...EXTREME_KW, ...ITALIC_KW].some(kw => fLow.includes(kw) && cLow.includes(kw));
+    if (nameSpecifiesWeight || nameSpecifiesItalic) {
+      const exactMatch = candidates.filter(c => {
+        const sLow = (c.subfamilyName || '').toLowerCase();
+        const weightOk = !nameSpecifiesWeight || WEIGHT_KW.some(kw => fLow.includes(kw) && sLow.includes(kw));
+        const italicOk = !nameSpecifiesItalic || ITALIC_KW.some(kw => fLow.includes(kw) && sLow.includes(kw));
+        return weightOk && italicOk;
       });
       if (exactMatch.length > 0) return exactMatch[0];
-      return pool[0];
     }
 
-    const neutralPool = pool.filter(c => {
-      const cLow = (c.name || '').toLowerCase();
-      return nameContainsAny(cLow, NEUTRAL_KW) && !nameContainsAny(cLow, EXTREME_KW);
-    });
-
-    const workingPool = neutralPool.length > 0 ? neutralPool : pool;
-
-    if (workingPool.length === 1) return workingPool[0];
-
-    return workingPool.slice().sort((a, b) => {
+    return candidates.slice().sort((a, b) => {
       const aW = a.weight || 400, bW = b.weight || 400;
-      if (hasBoldChars) {
-        return bW - aW;
-      }
       const da = Math.abs(aW - 400), db = Math.abs(bW - 400);
       return da !== db ? da - db : aW - bW;
     })[0];
@@ -1608,8 +1601,7 @@ async function doConvert(data, id) {
     ]);
     const charArr = Array.from(allChars);
     if (charArr.length === 0) return;
-    const hasBoldChars = charInfo.bold.length > 0 || (charInfo.boldItalic && charInfo.boldItalic.length > 0);
-    const fontFile = pickBestCandidate(candidates, hasBoldChars, fontNameStr);
+    const fontFile = pickBestCandidate(candidates, fontNameStr);
     const wLabel = (fontFile.weight || 400) >= 600 ? 'bold' : 'normal';
     emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: wLabel, chars: charArr.length });
     try {

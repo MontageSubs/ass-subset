@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.12">
+  <meta name="version" content="2.5.13">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · MontageSubs">
   <meta property="og:description" content="Optimize ASS/SSA subtitle files with intelligent font subsetting and drawing command compression. Embed fonts with zero file bloat. Browser-based, free, open-source.">
@@ -4238,7 +4238,8 @@
           statusEl.className = 'fi-status fi-uploaded';
 
           const fileLabel = document.createElement('span');
-          fileLabel.textContent = t('font.uploaded', { name: uploadedRecord.file.name });
+          const subfamDisplay = uploadedRecord.subfamilyName ? ' [' + uploadedRecord.subfamilyName + ']' : '';
+          fileLabel.textContent = t('font.uploaded', { name: uploadedRecord.file.name }) + subfamDisplay;
           statusEl.appendChild(fileLabel);
 
           const dismissBtn = document.createElement('button');
@@ -4268,14 +4269,9 @@
       }
     }
 
-    function weightScore(w) {
-      w = w || 400;
-      const d400 = Math.abs(w - 400);
-      const d500 = Math.abs(w - 500);
-      if (d400 === 0) return 0;
-      if (d500 < d400) return d500 + 1;
-      return d400 + 2;
-    }
+    const WEIGHT_KW = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'medium', 'normal', 'regular', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
+    const ITALIC_KW = ['italic', 'oblique', 'slanted'];
+
     function parseVersion(s) {
       const m = (s || '').match(/(\d+)\.(\d+)/);
       return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : [0, 0];
@@ -4283,6 +4279,37 @@
     function cmpVersion(a, b) {
       if (a[0] !== b[0]) return a[0] - b[0];
       return a[1] - b[1];
+    }
+
+    function isBetterCandidate(newCand, oldCand, fontNameStr) {
+      const fLow = fontNameStr.toLowerCase();
+      const needsW = WEIGHT_KW.some(kw => fLow.includes(kw));
+      const needsI = ITALIC_KW.some(kw => fLow.includes(kw));
+      
+      const getScore = (c) => {
+        let score = 0;
+        if (needsW || needsI) {
+          const sLow = (c.subfamilyName || '').toLowerCase();
+          const wOk = !needsW || WEIGHT_KW.some(kw => fLow.includes(kw) && sLow.includes(kw));
+          const iOk = !needsI || ITALIC_KW.some(kw => fLow.includes(kw) && sLow.includes(kw));
+          if (wOk && iOk) score -= 10000;
+        }
+        score += Math.abs((c.weight || 400) - 400);
+        return score;
+      };
+
+      const sNew = getScore(newCand);
+      const sOld = getScore(oldCand);
+      if (sNew !== sOld) return sNew < sOld;
+
+      const vNew = parseVersion(newCand.version || '');
+      const vOld = parseVersion(oldCand.version || '');
+      const cmp = cmpVersion(vNew, vOld);
+      if (cmp !== 0) return cmp > 0;
+      const dNew = newCand.file?.lastModified || newCand.lastModified || 0;
+      const dOld = oldCand.file?.lastModified || oldCand.lastModified || 0;
+      if (dNew !== dOld) return dNew > dOld;
+      return (newCand.size || 0) > (oldCand.size || 0);
     }
 
     async function handleFonts(files) {
@@ -4384,6 +4411,7 @@
                 isTTC: result.isTTC, ttcIndex: match.ttcIndex,
                 weight: match.weight, isItalic: match.isItalic || false,
                 isFamilyMatch: match.isFamilyMatch,
+                subfamilyName: match.subfamilyName || '',
                 version: match.version || '', lastModified: entry.file.lastModified || 0,
                 size: entry.file.size || entry.buffer.byteLength
               };
@@ -4391,22 +4419,11 @@
               if (isPendingReplace) {
                 S.pendingReplaceKeys.delete(vk);
                 S.uploadedFonts.set(vk, fontRecord);
-                S.allFontCandidates.push(fontRecord);
                 continue;
               }
-              S.allFontCandidates.push(fontRecord);
               const existing = S.uploadedFonts.get(vk);
-              if (!existing) {
+              if (!existing || isBetterCandidate(fontRecord, existing, match.matchedFor)) {
                 S.uploadedFonts.set(vk, fontRecord);
-              } else {
-                const newVer = parseVersion(match.version || '');
-                const exVer = parseVersion(existing.version || '');
-                const verCmp = cmpVersion(newVer, exVer);
-                if (verCmp > 0 ||
-                    (verCmp === 0 && (entry.file.lastModified || 0) > (existing.lastModified || 0)) ||
-                    (verCmp === 0 && (entry.file.lastModified || 0) === (existing.lastModified || 0) && (entry.file.size || entry.buffer.byteLength) > (existing.size || 0))) {
-                  S.uploadedFonts.set(vk, fontRecord);
-                }
               }
             }
             itemLines.push(t('font.upload.item.ok', { name: entry.file.name, matched: matchNames }));
@@ -4488,9 +4505,16 @@
           if (matched.length === 0) continue;
           let buffer = null;
           const subfamilyLow = (font.style || '').toLowerCase();
-          const isBold = subfamilyLow.includes('bold') || subfamilyLow.includes('heavy') || subfamilyLow.includes('black');
           const isItalic = subfamilyLow.includes('italic') || subfamilyLow.includes('oblique');
-          const weight = isBold ? 700 : 400;
+          let weight = 400;
+          if (subfamilyLow.includes('thin') || subfamilyLow.includes('hairline')) weight = 100;
+          else if (subfamilyLow.includes('extralight') || subfamilyLow.includes('ultralight')) weight = 200;
+          else if (subfamilyLow.includes('light')) weight = 300;
+          else if (subfamilyLow.includes('medium')) weight = 500;
+          else if (subfamilyLow.includes('semibold') || subfamilyLow.includes('demibold')) weight = 600;
+          else if (subfamilyLow.includes('extrabold') || subfamilyLow.includes('ultrabold')) weight = 800;
+          else if (subfamilyLow.includes('black') || subfamilyLow.includes('heavy')) weight = 900;
+          else if (subfamilyLow.includes('bold')) weight = 700;
           for (const matchName of matched) {
             const vk = matchName + '::default';
             if (!buffer) {
@@ -4504,10 +4528,11 @@
               buffer, matchedFor: matchName,
               isTTC, ttcIndex: isTTC ? 0 : -1,
               weight, isItalic,
+              subfamilyName: font.style || '',
               isFamilyMatch: true, isSystem: true
             };
-            S.allFontCandidates.push(record);
-            if (!S.uploadedFonts.has(vk)) {
+            const existing = S.uploadedFonts.get(vk);
+            if (!existing || isBetterCandidate(record, existing, matchName)) {
               S.uploadedFonts.set(vk, record);
             }
             matchedCount++;
@@ -4543,7 +4568,7 @@
       const wantSystemFont = document.getElementById('opt-sysfont').checked;
       const wantStrip = document.getElementById('opt-strip').checked;
 
-      const fonts = S.allFontCandidates.map(info => ({
+      const fonts = Array.from(S.uploadedFonts.values()).map(info => ({
         name: info.file.name,
         buffer: info.buffer,
         isTTC: info.isTTC,
@@ -4551,6 +4576,7 @@
         matchedFor: info.matchedFor,
         weight: info.weight,
         isItalic: info.isItalic || false,
+        subfamilyName: info.subfamilyName || '',
       }));
 
       batchFileIdx = 0;
