@@ -19,33 +19,37 @@
 
 ## Overview
 
-**ASS Subsetter** is an open-source browser tool developed by MontageSubs for optimizing ASS/SSA subtitle files through draw command subsetting and font embedding.
+**ASS Subsetter** is an open-source browser tool developed by MontageSubs for managing font embedding and draw commands in ASS/SSA subtitle files.
 
-The ASS/SSA format supports embedding fonts directly, so users don't need to install additional fonts separately. However, complete font files are often several megabytes, significantly bloating subtitle size after encoding. This tool optimizes through **font subsetting** and **draw command optimization**:
+The ASS/SSA format allows subtitle creators to use custom fonts to enhance visual effects, but installing fonts across different platforms is not easy. This tool implements font embedding directly in the browser, without requiring additional specialized software, and works across all platforms. It also supports **font subsetting**, retaining only the characters actually used in subtitles to further reduce file size. Additionally, it can convert repeated draw commands into fonts to maximize compression.
 
-- Retain only the glyphs actually used in subtitles, compressing font size
-- Fully preserve font name table entries for correct player recognition
-- Extract vector draw commands into fonts, reducing redundant code
+## Key Features
 
-**Cross-platform, completely local processing** — runs in any browser, all files processed locally, works offline.
+**Direct Processing in Browser** — All file processing is done locally, supports offline use, and fully respects user privacy. No need for additional software.
+
+**Preview and Download** — Preview optimization results directly after processing and compare before/after. Download optimized subtitles and embedded fonts for local use.
+
+**Accessibility Standards Compliant** — Full support for keyboard navigation and screen readers, meeting WCAG and international accessibility design requirements.
+
+**Thoughtfully Designed Interface** — Carefully crafted modern frontend with beautiful and intuitive design.
 
 ## Features
 
 **Drawing Command Subsetting**
 
-Extracts `\p1`…`\p0` vector drawings into an embedded font. Identical shapes are stored once and all duplicates are replaced, reducing file size and improving compatibility on low-performance devices. Supports intelligent add/delete operations.
+> Extracts `\p1`…`\p0` vector drawings into an embedded font. Identical shapes are stored once and all duplicates are replaced, reducing file size and improving compatibility on low-performance devices. Supports intelligent add/delete operations.
 
 **Third-Party Font Embedding**
 
-Scans and embeds non-system fonts used in subtitles. Choose between subsetting (retain only used characters) or full embedding. Fully preserves font name table for correct player recognition.
+> Scans and embeds non-system fonts used in subtitles. Choose between subsetting (retain only used characters) or full embedding. Fully preserves font name table for correct player recognition.
 
 **System Font Embedding**
 
-Subsets and embeds system fonts to ensure consistent rendering across platforms without requiring manual font installation.
+> Subsets and embeds system fonts to ensure consistent rendering across platforms without requiring manual font installation.
 
 **Remove Embedded Fonts**
 
-Removes existing embedded fonts while preserving optimized drawing fonts.
+> Removes existing embedded fonts while preserving optimized drawing fonts.
 
 ### Advanced Options
 
@@ -61,8 +65,7 @@ Removes existing embedded fonts while preserving optimized drawing fonts.
 2. Upload `.ass`, `.ssa` files or ZIP archives, supporting folder drag-and-drop and batch processing
 3. Review the analysis results showing detected drawing commands and external fonts
 4. (Optional) Upload font files (TTF / OTF / TTC / OTC / WOFF / WOFF2), or auto-load system fonts in Chromium browsers
-5. Choose whether to add the `_optimized` suffix
-6. Click "Start Conversion" and download the optimized subtitle file
+5. Click "Start Conversion" and download the optimized subtitle file
 
 > **Note:** Converting draw commands may cause minor position or scale shifts. Always verify the final render.
 
