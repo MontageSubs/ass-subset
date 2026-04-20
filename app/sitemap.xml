@@ -2,10 +2,10 @@
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
         xmlns:xhtml="https://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://subs.js.org/ass-subset/?lang=en</loc>
+    <loc>https://subs.js.org/ass-subset/</loc>
     <lastmod>2026-04-20</lastmod>
     <changefreq>weekly</changefreq>
-    <priority>0.6</priority>
+    <priority>1.0</priority>
     <xhtml:link rel="alternate" hreflang="en" href="https://subs.js.org/ass-subset/?lang=en"/>
     <xhtml:link rel="alternate" hreflang="zh-CN" href="https://subs.js.org/ass-subset/?lang=zh-CN"/>
     <xhtml:link rel="alternate" hreflang="zh-TW" href="https://subs.js.org/ass-subset/?lang=zh-TW"/>
