@@ -123,7 +123,6 @@ ass-subset/
 - **Meow P** ([@mtsubs](https://github.com/mtsubs)) — 项目首席开发者，前端样式设计，后端逻辑开发
 
 </details>
-#
 
 ## 许可证
 
