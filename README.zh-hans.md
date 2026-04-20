@@ -120,7 +120,7 @@ ass-subset/
 <details>
 <summary><strong>核心团队</strong></summary>
 
-- **Meow P** ([@mtsubs](https://github.com/mtsubs)) — 项目首席开发者，前端样式设计，后端逻辑开发
+- **小P** ([@mtsubs](https://github.com/mtsubs)) — 项目首席开发者，前端样式设计，后端逻辑开发
 
 </details>
 
