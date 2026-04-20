@@ -1,109 +1,140 @@
-# ASS 在线子集化工具
-**ASS Online Subsetter · MontageSubs**
+# ASS Subsetter
 
-<br/>
+**Subtitle Drawing Optimization · Font Embedding Management**
 
-> **在浏览器中完成 ASS/SSA 字幕的绘图指令子集化与字体嵌入，所有处理均在本地进行。**
->
-> *字幕绘图指令子集化 · 字幕字体子集嵌入*
+> Optimize ASS/SSA subtitles in your browser — subset and embed fonts with all processing happening locally.
 
 <div align="right">
 
-**中文 | [English](./README.en.md)**
+**[中文](./README.zh-hans.md) | English**
 
 </div><br/>
 
 <div align="center">
 
-| [打开工具](https://subs.js.org/ass-subset/) | [提交反馈](https://github.com/MontageSubs/ass-subset/issues) | [参与讨论](https://github.com/MontageSubs/ass-subset/discussions) |
+| [Open Tool](https://subs.js.org/ass-subset/) | [Report an Issue](https://github.com/MontageSubs/ass-subset/issues) | [Join the Discussion](https://github.com/MontageSubs/ass-subset/discussions) |
 | :---: | :---: | :---: |
 
 </div><br/>
 
-## 简介
+## Overview
 
-ASS 在线子集化工具是由蒙太奇字幕组 (MontageSubs) 开发的开源浏览器端工具，用于优化 Advanced SubStation Alpha (.ass) 与 SubStation Alpha (.ssa) 字幕文件。
+**ASS Subsetter** is an open-source browser tool developed by MontageSubs for optimizing ASS/SSA subtitle files through draw command subsetting and font embedding.
 
-ASS/SSA 字幕格式支持将字体文件直接嵌入字幕，无需用户单独安装字体即可正常渲染特效。然而，完整字体动辄数 MB，编码后会使字幕体积大幅膨胀。本工具通过子集化技术，仅保留字幕中实际使用的字形，将嵌入字体压缩至最小体积，同时完整保留所有字体名称引用，确保播放器正确识别。
+The ASS/SSA format supports embedding fonts directly, so users don't need to install additional fonts separately. However, complete font files are often several megabytes, significantly bloating subtitle size after encoding. This tool optimizes through **font subsetting** and **draw command optimization**:
 
-所有处理均在本地浏览器中完成，文件不离开用户设备。
+- Retain only the glyphs actually used in subtitles, compressing font size
+- Fully preserve font name table entries for correct player recognition
+- Extract vector draw commands into fonts, reducing redundant code
 
-## 功能
+**Cross-platform, completely local processing** — runs in any browser, all files processed locally, works offline.
 
-**绘图指令子集化**
+## Features
 
-将字幕中的 `\p1`…`\p0` 矢量绘图数据提取为独立的内嵌 TTF 字体。相同的绘图形状只存储一次，替换全部重复引用，显著减小文件体积，并提升低性能设备（如 Android TV 机顶盒）的渲染兼容性。
+**Drawing Command Subsetting**
 
-**字体子集嵌入**
+Extracts `\p1`…`\p0` vector drawings into an embedded font. Identical shapes are stored once and all duplicates are replaced, reducing file size and improving compatibility on low-performance devices. Supports intelligent add/delete operations.
 
-扫描字幕文件中引用的非系统字体，将上传的字体文件子集化后以 UUEncoding 标准嵌入字幕。仅保留字幕中实际出现的字符，并完整保留字体名称表，确保各播放器正常识别。支持 TTF、OTF、TTC 格式。
+**Third-Party Font Embedding**
 
-## 使用方法
+Scans and embeds non-system fonts used in subtitles. Choose between subsetting (retain only used characters) or full embedding. Fully preserves font name table for correct player recognition.
 
-本工具完全基于浏览器运行，无需安装：
+**System Font Embedding**
 
-1. 打开 [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
-2. 上传 `.ass` 或 `.ssa` 字幕文件，支持批量处理和 ZIP 格式
-3. 查看分析结果，确认检测到的绘图指令与外部字体
-4. 如需嵌入字体，上传对应的字体文件（TTF / OTF / TTC）
-5. 点击"开始转换"，下载优化后的字幕文件
+Subsets and embeds system fonts to ensure consistent rendering across platforms without requiring manual font installation.
 
-转换后的文件名格式为 `原文件名_optimized.ass`。
+**Remove Embedded Fonts**
 
-> **注意：** 绘图指令转换后，特效的大小或位置可能发生轻微偏移，建议手动检查最终效果。
+Removes existing embedded fonts while preserving optimized drawing fonts.
 
-## 技术依赖
+---
 
-| 依赖 | 版本 | 许可证 | 用途 |
-|------|------|--------|------|
-| [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | 字体解析与构建 |
-| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / 双许可证 | 批处理输出打包 |
+### Advanced Options
 
-上述依赖作为本地副本存放在本仓库 `vendor/` 目录中，均采用 MIT 许可。
+**Include ASCII Characters** — Retain all ASCII characters from the original font in the subset, improving media player compatibility.
 
-opentype.js 用于字体文件的解析与二进制构建；JSZip 用于在批处理上传或多个字幕文件队列子集化完成后，将处理结果打包生成 .zip 文件供用户下载。
+**Embed Full Fonts** — Embed complete fonts without reprocessing, though resulting in larger file sizes.
+
+**Supported Formats** — TTF, OTF, TTC, OTC, WOFF, WOFF2 (variable fonts not supported)
+
+## Usage
+
+1. Open [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
+2. Upload `.ass`, `.ssa` files or ZIP archives, supporting folder drag-and-drop and batch processing
+3. Review the analysis results showing detected drawing commands and external fonts
+4. (Optional) Upload font files (TTF / OTF / TTC / OTC / WOFF / WOFF2), or auto-load system fonts in Chromium browsers
+5. Choose whether to add the `_optimized` suffix
+6. Click "Start Conversion" and download the optimized subtitle file
+
+> **Note:** Converting draw commands may cause minor position or scale shifts. Always verify the final render.
+
+## Dependencies
+
+| Dependency | Version | License | Purpose |
+|------------|---------|---------|---------|
+| [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | Font parsing and construction |
+| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / Dual licensed | Batch output packaging |
+
+The above dependencies are included as local copies in the `vendor/` directory of this repository and are licensed under MIT.
+
+opentype.js is used for font file parsing and binary construction. JSZip is used to package batch processing results into a .zip file for download after subtitle files have been processed through the subsetting queue.
 
 
-## 仓库结构
+## Repository Structure
 
 ```
 ass-subset/
-├── app/                           # 工具主体
-│   ├── index.html                 # 工具主文件
-│   ├── worker.js                  # Web Worker（主要处理逻辑）
-│   ├── sw.js                      # Service Worker（缓存策略）
-│   ├── manifests/                 # PWA 配置（10 种语言）
-│   ├── sitemap.xml                # 搜索引擎站点地图
-│   ├── vendor/                    # 第三方依赖
-│   │   ├── opentype.min.js        # opentype.js 本地副本
-│   │   └── jszip.min.js           # JSZip 本地副本
-│   └── icons/                     # 应用图标
+├── app/                           # Tool
+│   ├── index.html                 # Tool main file
+│   ├── worker.js                  # Web Worker (main processing logic)
+│   ├── sw.js                      # Service Worker (caching strategy)
+│   ├── manifests/                 # PWA manifests (10 languages)
+│   ├── sitemap.xml                # Sitemap for search engines
+│   ├── vendor/                    # Third-party dependencies
+│   │   ├── opentype.min.js        # Local copy of opentype.js
+│   │   └── jszip.min.js           # Local copy of JSZip
+│   └── icons/                     # App icons
 ├── LICENSE
-├── README.md                      # 中文说明（本文件）
-└── README.en.md                   # 英文说明
+├── README.md                      # Chinese documentation
+└── README.en.md                   # English documentation (this file)
 ```
 
-## 本地化
+## Localization
 
-本工具目前提供**中文和英文**完整支持，部分支持日语、韩语和西班牙语。如果需要其他语言版本或想参与本地化，欢迎在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 或 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中告诉我们。我们正积极规划添加更多语言，欢迎社区参与！
+This tool fully supports **English and Chinese**, with additional support for Spanish, Portuguese, Russian, Japanese, Korean, Arabic, and Turkish.
 
-## 参与贡献
+If you find translation errors or want to help improve other languages, please open an issue or discussion [here](https://github.com/MontageSubs/ass-subset/issues) or [here](https://github.com/MontageSubs/ass-subset/discussions). Community contributions are welcome!
 
-欢迎任何形式的贡献，包括但不限于：
+## Contributing
 
-- 在 [Issues](https://github.com/MontageSubs/ass-subset/issues) 中提交 Bug 报告或功能请求
-- 在 [Discussions](https://github.com/MontageSubs/ass-subset/discussions) 中分享使用经验或技术讨论
-- 提交 Pull Request 改进代码或文档
+We welcome all kinds of contributions! Including:
 
-## 许可证
+- **Development** — New features, bug fixes, performance improvements
+- **Documentation** — Improve README, usage guides, tutorials
+- **Localization** — Translation improvements, language support expansion
+- **Feedback** — Bug reports, feature requests, user experience suggestions
+- **Promotion** — Share with friends, spread on social media, write usage articles
 
-本项目源代码遵循 [MIT License](./LICENSE) 授权。
+Join us in [Issues](https://github.com/MontageSubs/ass-subset/issues) and [Discussions](https://github.com/MontageSubs/ass-subset/discussions)!
+
+### Contributors
+
+<details>
+<summary><strong>Core Team</strong></summary>
+
+- **Meow P** (@mtsubs) — Lead Developer, Frontend Design, Backend Development
+
+</details>
+
+## License
+
+This project is licensed under the [MIT License](./LICENSE).
 
 ---
 
 <div align="center">
 
-**蒙太奇字幕组 (MontageSubs)**  
-"用爱发电 ❤️ Powered by Love"
+**MontageSubs (蒙太奇字幕组)**  
+"Powered by Love ❤️ 用爱发电"
 
 </div>
