@@ -79,7 +79,7 @@ ASS/SSA 格式支持直接嵌入字体文件，用户无需额外安装字体即
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | 字体解析与构建 |
 | [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / 双许可证 | 批处理输出打包 |
 
-上述依赖作为本地副本存放在本仓库 `vendor/` 目录中，均采用 MIT 许可。
+上述依赖作为本地副本存放在本仓库 `/app/vendor/` 目录中，均采用 MIT 许可。
 
 opentype.js 用于字体文件的解析与二进制构建；JSZip 用于在批处理上传或多个字幕文件队列子集化完成后，将处理结果打包生成 .zip 文件供用户下载。
 
@@ -126,7 +126,7 @@ ass-subset/
 <details>
 <summary><strong>核心团队</strong></summary>
 
-- **Meow P** (@mtsubs) — 项目首席开发者，前端样式设计，后端逻辑开发
+- **Meow P** ([@mtsubs](https://github.com/mtsubs)) — 项目首席开发者，前端样式设计，后端逻辑开发
 
 </details>
 #
