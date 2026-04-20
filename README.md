@@ -25,7 +25,7 @@ The ASS/SSA format allows subtitle creators to use custom fonts to enhance visua
 
 ## Key Features
 
-**Direct Processing in Browser** — All file processing is done locally, supports offline use, and fully respects user privacy. No need for additional software.
+**Direct Processing in Browser** — All file processing is done locally, supports offline use, and privacy-friendly. No need for additional software.
 
 **Preview and Download** — Preview optimization results instantly after processing; download the optimized subtitles and any embedded fonts for local use.
 
