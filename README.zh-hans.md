@@ -74,11 +74,11 @@ ASS/SSA 格式允许字幕创作者使用自定义字体来完善视觉效果，
 | 依赖 | 版本 | 许可证 | 用途 |
 |------|------|--------|------|
 | [opentype.js](https://github.com/opentypejs/opentype.js) | 1.3.4 | MIT | 字体解析与构建 |
-| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / 双许可证 | 批处理输出打包 |
+| [JSZip](https://github.com/Stuk/jszip) | 3.10.1 | MIT / 双许可证 | ZIP 文件处理与打包 |
 
 上述依赖作为本地副本存放在本仓库 `/app/vendor/` 目录中，均采用 MIT 许可。
 
-opentype.js 用于字体文件的解析与二进制构建；JSZip 用于在批处理上传或多个字幕文件队列子集化完成后，将处理结果打包生成 .zip 文件供用户下载。
+opentype.js 用于字体文件的解析与二进制构建；JSZip 用于处理上传的 ZIP 文件和打包处理结果。
 
 
 ## 仓库结构
