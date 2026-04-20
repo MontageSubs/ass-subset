@@ -35,21 +35,15 @@ The ASS/SSA format allows subtitle creators to use custom fonts to enhance visua
 
 ## Features
 
-**Drawing Command Subsetting**
+### Core Capabilities
 
-> Extracts `\p1`…`\p0` vector drawings into an embedded font. Identical shapes are stored once and all duplicates are replaced, reducing file size and improving compatibility on low-performance devices. Supports intelligent add/delete operations.
+**Drawing Command Subsetting** — Extracts `\p1`…`\p0` vector drawings into an embedded font. Identical shapes are stored once and all duplicates are replaced, reducing file size and improving compatibility on low-performance devices. Supports intelligent add/delete operations.
 
-**Third-Party Font Embedding**
+**Third-Party Font Embedding** — Scans and embeds non-system fonts used in subtitles. Choose between subsetting (retain only used characters) or full embedding. Fully preserves font name table for correct player recognition.
 
-> Scans and embeds non-system fonts used in subtitles. Choose between subsetting (retain only used characters) or full embedding. Fully preserves font name table for correct player recognition.
+**System Font Embedding** — Subsets and embeds system fonts to ensure consistent rendering across platforms without requiring manual font installation.
 
-**System Font Embedding**
-
-> Subsets and embeds system fonts to ensure consistent rendering across platforms without requiring manual font installation.
-
-**Remove Embedded Fonts**
-
-> Removes existing embedded fonts while preserving optimized drawing fonts.
+**Remove Embedded Fonts** — Removes existing embedded fonts while preserving optimized drawing fonts.
 
 ### Advanced Options
 
