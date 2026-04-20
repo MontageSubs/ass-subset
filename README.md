@@ -51,14 +51,14 @@ The ASS/SSA format allows subtitle creators to use custom fonts to enhance visua
 
 **Embed Full Fonts** — Embed complete fonts without reprocessing, though resulting in larger file sizes.
 
-**Supported Formats** — TTF, OTF, TTC, OTC, WOFF, WOFF2 (variable fonts not supported)
+**Multiple font formats supported** — TTF, OTF, TTC, OTC, WOFF, WOFF2 (variable fonts temporarily not supported)
 
 ## Usage
 
 1. Open [https://subs.js.org/ass-subset/](https://subs.js.org/ass-subset/)
 2. Upload `.ass`, `.ssa` files or ZIP archives, supporting folder drag-and-drop and batch processing
 3. Review the analysis results showing detected drawing commands and external fonts
-4. (Optional) Upload font files (TTF / OTF / TTC / OTC / WOFF / WOFF2), or auto-load system fonts in Chromium browsers
+4. (Optional) Upload font files, or auto-load system fonts in Chromium browsers
 5. Click "Start Conversion" and download the optimized subtitle file
 
 > **Note:** Converting draw commands may cause minor position or scale shifts. Always verify the final render.
