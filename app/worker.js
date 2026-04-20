@@ -1024,7 +1024,7 @@ function modifyNameTable(buffer, newNames) {
       if (platformID === 3 && alreadyHas3) continue;
       if (platformID === 1 && alreadyHas1) continue;
       const bytes = resolveValue(entries, platformID, 0);
-      newRecords.push({ platformID, encodingID: platformID === 3 ? 1 : 0, languageID: 0, nameID, length: bytes.length, strOff: strPos });
+      newRecords.push({ platformID, encodingID: platformID === 3 ? 1 : 0, languageID: platformID === 3 ? 0x0409 : 0, nameID, length: bytes.length, strOff: strPos });
       stringChunks.push(bytes);
       strPos += bytes.length;
     }
