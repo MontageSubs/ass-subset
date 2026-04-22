@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.1">
+  <meta name="version" content="2.6.2">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -4323,6 +4323,14 @@
       document.getElementById('opt-row-ascii').classList.toggle('hidden', !anyFont || cbFullFont.checked);
       document.getElementById('opt-row-multiweight').classList.toggle('hidden', !anyFont);
       document.getElementById('opt-row-randname').classList.toggle('hidden', !anyFont);
+      const cbRN_init = document.getElementById('opt-randname');
+      if (cbRN_init) {
+        if (!preserveState) {
+          cbRN_init.checked = false;
+          document.getElementById('opt-row-randname').classList.remove('selected');
+        }
+        document.getElementById('randname-notice').classList.toggle('hidden', !anyFont || !cbRN_init.checked);
+      }
       if (anyFont) {
         const cbMW2 = document.getElementById('opt-multiweight');
         if (cbMW2 && !preserveState) { cbMW2.checked = true; }
@@ -4339,7 +4347,11 @@
       if (anyHasRand && !anyRandMissing) {
         const cbRN2 = document.getElementById('opt-randname');
         const rowRN2 = document.getElementById('opt-row-randname');
-        if (cbRN2 && rowRN2) { cbRN2.checked = true; rowRN2.classList.add('selected'); }
+        if (cbRN2 && rowRN2) { 
+          cbRN2.checked = true; 
+          rowRN2.classList.add('selected'); 
+          document.getElementById('randname-notice').classList.toggle('hidden', !anyFont);
+        }
       }
 
       const hasAnyEmbeddedForStep3 = S.assFiles.some(e => e.parsed.embeddedFonts && Object.keys(e.parsed.embeddedFonts).length > 0);
@@ -5419,6 +5431,8 @@
           randNameCb.checked = false;
           randNameRow.classList.remove('selected');
           document.getElementById('randname-notice').classList.add('hidden');
+        } else if (anyFont) {
+          document.getElementById('randname-notice').classList.toggle('hidden', !randNameCb.checked);
         }
       };
 
@@ -5583,10 +5597,15 @@
     }
 
     if (typeof opentype === 'undefined') {
-      document.querySelector('.main').innerHTML =
-        '<div style="padding:2rem;background:rgba(181,42,28,.1);border-radius:3px;font-family:monospace;color:#b52a1c;">' +
-        '⚠ opentype.js 加载失败，请检查网络连接后刷新页面。<br>' +
-        'Failed to load opentype.js — please check your connection and reload.</div>';
+      const el = document.querySelector('.main');
+      if (el) {
+        el.innerHTML =
+          '<div style="padding:2rem;background:rgba(181,42,28,.08);border-left:4px solid #b52a1c;border-radius:3px;font-family:sans-serif;" role="alert" aria-label="Failed to load required library">' +
+            '<p style="font-size:1rem;font-weight:600;color:#b52a1c;margin:0 0 0.75rem 0;" lang="en">⚠ Failed to Load Required Library</p>' +
+            '<p style="font-size:0.9rem;color:#888;line-height:1.6;margin:0 0 0.5rem 0;" lang="en">Unable to initialize OpenType.js. Please check your internet connection and reload the page.</p>' +
+            '<p style="font-size:0.9rem;color:#888;line-height:1.6;margin:0;" lang="zh">opentype.js 加载失败，请检查网络连接后刷新页面。</p>' +
+          '</div>';
+      }
     }
   </script>
 
