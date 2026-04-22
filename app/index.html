@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.3">
+  <meta name="version" content="2.6.4">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -4001,6 +4001,8 @@
       if (resultArea) resultArea.innerHTML = '';
       const btnDownload = document.getElementById('btn-download');
       if (btnDownload) btnDownload.classList.add('hidden');
+      const optOptimizeWrapReset = document.getElementById('opt-optimize-wrap');
+      if (optOptimizeWrapReset) optOptimizeWrapReset.classList.add('hidden');
       const btnConvert = document.getElementById('btn-convert');
       if (btnConvert) {
         btnConvert.disabled = false;
@@ -4812,6 +4814,7 @@
       const resultArea = document.getElementById('result-area');
       resultArea.innerHTML = '';
       btnDownload.classList.add('hidden');
+      document.getElementById('opt-optimize-wrap').classList.add('hidden');
       btnConvert.disabled = true;
       btnConvert.innerHTML = '<span class="spinner"></span> ' + t('btn.converting');
       S.converting = true;

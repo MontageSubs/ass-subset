@@ -1438,6 +1438,10 @@ function rewriteASS(rawContent, opts, id) {
       if (randFontNames && randFontNames.length > 0 && !wantStrip) {
         const mapLines = randFontNames.map(e => `; Font Subset: ${e.rand} - ${e.orig}`);
         cleanLines.splice(insertAfter, 0, ...mapLines);
+      } else {
+        while (insertAfter < cleanLines.length && cleanLines[insertAfter].trim() === '') {
+          cleanLines.splice(insertAfter, 1);
+        }
       }
       processedBlocks.push(cleanLines.join(nl));
     } else if (header.includes('styles')) {
