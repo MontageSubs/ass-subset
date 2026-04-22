@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.5.17">
+  <meta name="version" content="2.6">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -468,7 +468,7 @@
       display: flex;
       align-items: flex-start;
       gap: 0.875rem;
-      padding: 0.875rem 1rem;
+      padding: 0.875rem 5rem 0.875rem 1rem;
       border-radius: var(--r);
       border: 1px solid var(--rule2);
       margin-bottom: 0.625rem;
@@ -538,6 +538,37 @@
     .opt-sub {
       margin-left: 2rem;
       margin-top: 0.5rem;
+    }
+    .opt-row.opt-row-sub {
+      padding: 0.55rem 0.875rem;
+      margin-left: 1.5rem;
+      margin-bottom: 0.375rem;
+      border-color: transparent;
+      background: transparent;
+      border-left: 2px solid var(--rule2);
+      border-radius: 0 var(--r) var(--r) 0;
+    }
+    .opt-row.opt-row-sub:hover:not(.disabled) {
+      border-color: transparent;
+      background: var(--paper);
+      border-left: 2px solid var(--rule);
+    }
+    .opt-row.opt-row-sub.selected {
+      border-color: transparent;
+      background: transparent;
+      border-left: 2px solid var(--ink);
+    }
+    .opt-row.opt-row-sub input[type=checkbox] {
+      width: 13px;
+      height: 13px;
+      margin-top: 2px;
+    }
+    .opt-row.opt-row-sub .opt-label strong {
+      font-size: 0.82rem;
+      font-weight: 600;
+    }
+    .opt-row.opt-row-sub .opt-label span {
+      font-size: 0.73rem;
     }
 
     .stats-bar {
@@ -717,61 +748,102 @@
     }
 
     .font-item {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      padding: 0.625rem 0.875rem;
       border: 1px solid var(--rule2);
       border-radius: var(--r);
       margin-bottom: 0.5rem;
-      font-size: 0.83rem;
       background: var(--card);
+      overflow: hidden;
+      transition: border-color 0.15s;
     }
-
-    .font-item:last-child {
-      margin-bottom: 0;
+    .font-item:last-child { margin-bottom: 0; }
+    .font-item:hover { border-color: var(--rule); }
+    .fi-header {
+      display: flex;
+      align-items: baseline;
+      gap: 0.8rem;
+      padding: 0.65rem 0.875rem;
+      border-bottom: 1px solid var(--rule2);
+      background: color-mix(in srgb, var(--card) 97%, var(--ink));
+      border-left: 2px solid var(--rule);
+      border-radius: var(--r) var(--r) 0 0;
     }
-
-    .font-item .fi-name {
+    .fi-name {
       font-weight: 600;
-      flex: 1;
       font-family: var(--mono);
       font-size: 0.8rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex-shrink: 1;
+      min-width: 0;
+      max-width: 55%;
     }
-
-    .font-item .fi-chars {
+    .fi-chars {
+      font-family: var(--mono);
+      font-size: 0.68rem;
       color: var(--ink2);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+      min-width: 0;
+    }
+    .fi-slots {
+      display: flex;
+      flex-direction: column;
+    }
+    .fi-slot-row {
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      padding: 0.45rem 0.875rem;
+      border-top: 1px solid var(--rule2);
+      min-width: 0;
+    }
+    .fi-slot-row:first-child { border-top: none; }
+    .fi-slot-tag {
       font-family: var(--mono);
       font-size: 0.72rem;
+      font-weight: 600;
+      flex-shrink: 0;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      color: var(--ink2);
     }
-
-    .font-item .fi-status {
-      font-size: 0.78rem;
-      padding: 0.15rem 0.5rem;
-      border-radius: 3px;
-    }
-
-    .fi-missing {
-      background: rgba(181, 42, 28, 0.1);
-      color: var(--err);
-    }
-
-    .fi-uploaded {
-      background: rgba(30, 122, 70, 0.1);
-      color: var(--ok);
+    .fi-fname {
       display: inline-flex;
       align-items: center;
       gap: 0.3rem;
+      background: rgba(30, 122, 70, 0.1);
+      color: var(--ok);
+      font-family: var(--sans);
+      font-size: 0.72rem;
+      font-weight: 500;
+      border-radius: 4px;
+      padding: 3px 7px;
+      flex: 0 1 auto;
+      margin-right: auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
-
+    .fi-fname-missing {
+      background-color: rgba(181, 42, 28, 0.07);
+      color: var(--err);
+      font-size: 12px;
+      font-weight: 400;
+      font-style: normal;
+      border-radius: 4px;
+      padding: 4px 8px;
+    }
     .fi-dismiss {
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      width: 14px;
-      height: 14px;
-      font-size: 0.6rem;
-      line-height: 1;
+      width: 16px;
+      height: 16px;
+      font-size: 0.7rem;
       background: none;
       border: none;
       cursor: pointer;
@@ -779,25 +851,13 @@
       border-radius: 2px;
       padding: 0;
       flex-shrink: 0;
-      transition: color 0.15s, background 0.15s;
+      opacity: 0.5;
+      transition: opacity 0.15s, color 0.15s;
       -webkit-tap-highlight-color: transparent;
     }
-
-    .fi-dismiss:hover {
-      color: var(--err);
-      background: rgba(181, 42, 28, 0.12);
-    }
-
-    .fi-dismiss:active {
-      color: var(--err);
-      background: rgba(181, 42, 28, 0.22);
-    }
-
-    .fi-system {
-      background: var(--rule2);
-      color: var(--ink2);
-      opacity: 0.85;
-    }
+    .fi-dismiss:hover { opacity: 1; color: var(--err); }
+    .fi-system { opacity: 0.72; }
+    .fi-status { display: none; }
 
     .btn {
       display: inline-flex;
@@ -952,6 +1012,11 @@
       background: rgba(138, 80, 16, 0.08);
       color: var(--warn);
     }
+    .notice-rand {
+      border-left-color: var(--err);
+      background: rgba(181, 42, 28, 0.06);
+      color: var(--err);
+    }
 
     .progress-wrap {
       margin-top: 1rem;
@@ -1021,16 +1086,26 @@
     }
 
     .modal-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 22px;
+      height: 22px;
       background: none;
       border: none;
-      font-size: 1.2rem;
+      font-size: 1rem;
       cursor: pointer;
       color: var(--ink2);
-      padding: 0.25rem;
+      border-radius: 3px;
+      padding: 0;
+      opacity: 0.6;
+      transition: opacity 0.15s, color 0.15s;
+      -webkit-tap-highlight-color: transparent;
     }
 
     .modal-close:hover {
-      color: var(--ink);
+      opacity: 1;
+      color: var(--err);
     }
 
     .preview-canvas {
@@ -1450,18 +1525,32 @@
           </div>
           <span class="opt-tag">TTF / OTF / TTC / OTC / WOFF / WOFF2</span>
         </label>
-        <label class="opt-row hidden" id="opt-row-ascii">
+        <label class="opt-row opt-row-sub hidden" id="opt-row-ascii">
           <input type="checkbox" id="opt-ascii" checked aria-describedby="opt-ascii-desc">
           <div class="opt-label">
             <strong data-i18n="opt.ascii.title">Include ASCII Characters</strong>
             <span id="opt-ascii-desc" data-i18n="opt.ascii.desc">Retain all available ASCII characters from the original font in the subset, improving compatibility across media players.</span>
           </div>
         </label>
-        <label class="opt-row hidden" id="opt-row-fullfont">
+        <label class="opt-row opt-row-sub hidden" id="opt-row-multiweight">
+          <input type="checkbox" id="opt-multiweight" aria-describedby="opt-multiweight-desc">
+          <div class="opt-label">
+            <strong data-i18n="opt.multiweight.title">Generate Separate Fonts by Weight</strong>
+            <span id="opt-multiweight-desc" data-i18n="opt.multiweight.desc">Generates a native font for each weight, preventing players from having to synthesize bold or italic styles.</span>
+          </div>
+        </label>
+        <label class="opt-row opt-row-sub hidden" id="opt-row-fullfont">
           <input type="checkbox" id="opt-fullfont" aria-describedby="opt-fullfont-desc">
           <div class="opt-label">
             <strong data-i18n="opt.fullfont.title">Embed Full Fonts</strong>
             <span id="opt-fullfont-desc" data-i18n="opt.fullfont.desc">Embed the complete font without subsetting. Subtitle text changes require no reprocessing, but result in larger file size and longer conversion time.</span>
+          </div>
+        </label>
+        <label class="opt-row opt-row-sub hidden" id="opt-row-randname">
+          <input type="checkbox" id="opt-randname" autocomplete="off" aria-describedby="opt-randname-desc">
+          <div class="opt-label">
+            <strong data-i18n="opt.randname.title">Randomize Font Names</strong>
+            <span id="opt-randname-desc" data-i18n="opt.randname.desc">Assigns random names to embedded font subsets in the subtitle file, preventing playback engines from reusing cached fonts across episodes and causing missing characters.</span>
           </div>
         </label>
         <label class="opt-row disabled" id="opt-row-strip">
@@ -1471,9 +1560,10 @@
             <span id="opt-strip-desc" data-i18n="opt.strip.desc">Remove existing embedded fonts from the script while keeping the subsetted draw fonts</span>
           </div>
         </label>
+        <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.</div>
         <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.</div>
         <div id="fullfont-notice" class="notice notice-warn hidden" data-i18n="notice.fullfont">⚠ Size Warning: Embedding full fonts will drastically inflate the subtitle file size, potentially causing player performance issues.</div>
-        <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.</div>
+        <div id="randname-notice" class="notice notice-rand hidden" data-i18n="notice.randname">⚠ Non-standard: This is a non-standard implementation. If the font mapping table is lost, embedded fonts cannot be restored to their original names.</div>
         <div id="font-section" class="hidden">
           <hr class="divider">
           <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;" data-i18n="font.upload.title">Font Files</p>
@@ -1748,6 +1838,13 @@
         'step1.title': '上传字幕文件',
         'step2.title': '分析结果',
         'step3.title': '选择操作',
+        'opt.multiweight.title': '按字重生成独立字体',
+        'opt.multiweight.desc': '为不同字重各自生成独立字体，确保播放器使用真实字重而非合成字重',
+        'opt.randname.title': '随机化字体名称',
+        'opt.randname.desc': '为字幕内嵌入的字体子集分配随机名称，避免播放器跨集复用缓存导致字符不全',
+        'notice.randname': '⚠ 非标准功能：此功能为非标准实现。若映射表丢失，字体将无法还原至原始名称。',
+        'log.font.rand_missing': '[font] ⚠ 检测到随机化字体名称，但 [Script Info] 中的映射表缺失或不完整，无法继续子集化或移除嵌入字体。',
+        'log.font.rand_applied': '[font] ✓ 已为 {count} 个字体应用随机化名称，并写入映射表。',
         'step4.title': '转换 & 下载',
       },
       'zh-TW': {
@@ -1904,6 +2001,13 @@
         'step1.title': '上傳字幕檔',
         'step2.title': '分析結果',
         'step3.title': '選擇操作',
+        'opt.multiweight.title': '按字重生成獨立字型',
+        'opt.multiweight.desc': '為不同字重各自生成獨立字型，避免播放器自行合成粗體/斜體，確保使用真實字重',
+        'opt.randname.title': '隨機化字型名稱',
+        'opt.randname.desc': '為字幕內嵌入的字型子集分配隨機名稱，避免播放器跨集複用快取導致字元不全。',
+        'notice.randname': '⚠ 非標準功能：此功能為非標準實現。若映射表丟失，字型將無法還原至原始名稱。',
+        'log.font.rand_applied': '[font] ✓ 已為 {count} 個字型套用隨機化名稱，並寫入對照表。',
+        'log.font.rand_missing': '[font] ⚠ 偵測到隨機化字型名稱，但 [Script Info] 中的對照表缺失或不完整，無法繼續子集化或移除內嵌字型。',
         'step4.title': '轉換 & 下載',
       },
       en: {
@@ -2060,6 +2164,13 @@
         'step1.title': 'Upload Script',
         'step2.title': 'Analysis',
         'step3.title': 'Options',
+        'opt.multiweight.title': 'Generate Separate Fonts by Weight',
+        'opt.multiweight.desc': 'Generates a native font for each weight, preventing players from having to synthesize bold or italic styles.',
+        'opt.randname.title': 'Randomize Font Names',
+        'opt.randname.desc': 'Assigns random names to embedded font subsets in the subtitle file, preventing playback engines from reusing cached fonts across episodes and causing missing characters.',
+        'notice.randname': '⚠ Non-standard: This is a non-standard implementation. If the font mapping table is lost, embedded fonts cannot be restored to their original names.',
+        'log.font.rand_applied': '[font] ✓ Applied randomized names to {count} font(s) and wrote mapping table.',
+        'log.font.rand_missing': '[font] ⚠ Randomized font names detected but the mapping table in [Script Info] is missing or incomplete. Cannot subset or strip embedded fonts.',
         'step4.title': 'Run & Download',
       },
       ja: {
@@ -2216,6 +2327,13 @@
         'step1.title': 'スクリプトをアップロード',
         'step2.title': '解析結果',
         'step3.title': 'オプション',
+        'opt.multiweight.title': '字重ごとにフォント生成',
+        'opt.multiweight.desc': 'ウェイト別に個別フォントを作成し、プレイヤーが合成スタイルではなく本来のデザイン字重を使えるようにします。',
+        'opt.randname.title': 'フォント名を無作為に変更',
+        'opt.randname.desc': '字幕に埋め込まれたフォントサブセットに無作為な名称を割り当てることで、プレイヤーが複数話にわたってキャッシュを再利用して文字欠落することを防ぎます。',
+        'notice.randname': '⚠ 非標準機能：非標準的な実装です。フォント対応表が失われた場合、埋め込みフォント名は元の名称に復元できません。',
+        'log.font.rand_applied': '[font] ✓ {count} 個のフォントにランダム名を適用し、マッピングテーブルを書き込みました。',
+        'log.font.rand_missing': '[font] ⚠ ランダム化されたフォント名が検出されましたが、[Script Info] のマッピングテーブルが見つかりません。サブセット化や埋め込みフォントの削除はできません。',
         'step4.title': '変換 & ダウンロード',
       },
       ko: {
@@ -2372,6 +2490,13 @@
         'step1.title': '자막 스크립트 업로드',
         'step2.title': '분석 결과',
         'step3.title': '옵션',
+        'opt.multiweight.title': '굵기별 폰트 생성',
+        'opt.multiweight.desc': '각 굵기마다 독립적인 폰트를 생성해서 플레이어가 굵기를 합성하지 않고 원본 폰트를 사용하게 합니다.',
+        'opt.randname.title': '폰트 이름 무작위 변경',
+        'opt.randname.desc': '자막에 내장된 폰트 서브셋에 무작위 이름을 할당하여 플레이어가 에피소드 간에 캐시를 재사용하지 않도록 방지합니다.',
+        'notice.randname': '⚠ 비표준 기능: 비표준 구현입니다. 폰트 매핑표가 손실되면 내장 폰트는 원래 이름으로 복원할 수 없습니다.',
+        'log.font.rand_applied': '[font] ✓ {count}개 폰트에 무작위 이름을 적용하고 매핑 테이블을 기록했습니다.',
+        'log.font.rand_missing': '[font] ⚠ 무작위화된 폰트 이름이 감지되었으나 [Script Info]의 매핑 테이블이 없습니다. 서브셋 또는 내장 폰트 제거를 계속할 수 없습니다.',
         'step4.title': '변환 & 다운로드',
       },
       es: {
@@ -2528,6 +2653,13 @@
         'step1.title': 'Subir script de subtítulos',
         'step2.title': 'Análisis',
         'step3.title': 'Opciones',
+        'opt.multiweight.title': 'Generar Fuentes por Peso',
+        'opt.multiweight.desc': 'Genera fuentes separadas para cada peso, evitando que el reproductor sintetice estilos artificiales.',
+        'opt.randname.title': 'Aleatorizar nombres de fuentes',
+        'opt.randname.desc': 'Asigna nombres aleatorios a los subconjuntos de fuentes incrustadas en el archivo de subtítulos, evitando que el reproductor reutilice fuentes en caché entre episodios y cause pérdida de caracteres.',
+        'notice.randname': '⚠ No estándar: Esta es una implementación no estándar. Si la tabla de correspondencia de fuentes se pierde, las fuentes incrustadas no se pueden restaurar a sus nombres originales.',
+        'log.font.rand_applied': '[font] ✓ Nombres aleatorios aplicados a {count} fuente(s) y tabla de mapeo escrita.',
+        'log.font.rand_missing': '[font] ⚠ Se detectaron nombres de fuentes aleatorizados pero falta la tabla de mapeo en [Script Info]. No se puede continuar.',
         'step4.title': 'Convertir y descargar',
       },
       ru: {
@@ -2684,6 +2816,13 @@
         'step1.title': 'Загрузить скрипт',
         'step2.title': 'Результаты анализа',
         'step3.title': 'Параметры',
+        'opt.multiweight.title': 'Создание шрифтов по начертанию',
+        'opt.multiweight.desc': 'Создает отдельный шрифт для каждого начертания, чтобы плеер использовал подлинные шрифты вместо искусственно синтезированных.',
+        'opt.randname.title': 'Рандомизация имён шрифтов',
+        'opt.randname.desc': 'Присваивает случайные имена подмножествам встроенных шрифтов в файле субтитров, предотвращая повторное использование плеером кэшированных шрифтов между эпизодами и потерю символов.',
+        'notice.randname': '⚠ Нестандартно: Это нестандартная реализация. Если таблица соответствия шрифтов потеряна, встроенные шрифты невозможно восстановить до исходных имён.',
+        'log.font.rand_applied': '[font] ✓ Случайные имена применены к {count} шрифту(ам), таблица соответствий записана.',
+        'log.font.rand_missing': '[font] ⚠ Обнаружены рандомизированные имена шрифтов, но таблица соответствий в [Script Info] отсутствует. Продолжение невозможно.',
         'step4.title': 'Обработка и скачивание',
       },
       'pt-BR': {
@@ -2840,6 +2979,13 @@
         'step1.title': 'Enviar script',
         'step2.title': 'Análise',
         'step3.title': 'Opções',
+        'opt.multiweight.title': 'Gerar Fontes por Peso',
+        'opt.multiweight.desc': 'Cria uma fonte independente para cada peso, para que o reprodutor use os pesos reais em vez de falsificar negrito e itálico.',
+        'opt.randname.title': 'Randomizar nomes de fontes',
+        'opt.randname.desc': 'Atribui nomes aleatórios aos subconjuntos de fontes incorporadas no arquivo de legendas, impedindo que o reprodutor reutilize fontes em cache entre episódios e cause perda de caracteres.',
+        'notice.randname': '⚠ Não-padrão: Esta é uma implementação não padrão. Se a tabela de mapeamento de fontes for perdida, as fontes incorporadas não podem ser restauradas aos seus nomes originais.',
+        'log.font.rand_applied': '[font] ✓ Nomes aleatórios aplicados a {count} fonte(s) e tabela de mapeamento gravada.',
+        'log.font.rand_missing': '[font] ⚠ Nomes de fontes randomizados detectados, mas a tabela de mapeamento em [Script Info] está ausente. Não é possível continuar.',
         'step4.title': 'Executar e baixar',
       },
       ar: {
@@ -2996,6 +3142,13 @@
         'step1.title': 'رفع النص',
         'step2.title': 'نتائج التحليل',
         'step3.title': 'الخيارات',
+        'opt.multiweight.title': 'إنشاء خطوط منفصلة لكل وزن',
+        'opt.multiweight.desc': 'ينشئ خطًا مستقلًا لكل وزن، مما يسمح لمشغل التشغيل باستخدام الأوزان الأصلية بدلاً من محاكاة الخط الغامق والمائل.',
+        'opt.randname.title': 'عشوائية أسماء الخطوط',
+        'opt.randname.desc': 'تعيين أسماء عشوائية لمجموعات الخطوط المضمنة في ملف الترجمة، مما يمنع مشغل الفيديو من إعادة استخدام الخطوط المحفوظة مؤقتاً عبر الحلقات وسبب فقدان الأحرف.',
+        'notice.randname': '⚠ غير قياسي: هذه عملية غير قياسية. إذا فُقدت جدول تعيين الخطوط، فلا يمكن استعادة الخطوط المضمنة إلى أسمائها الأصلية.',
+        'log.font.rand_applied': '[font] ✓ تم تطبيق أسماء عشوائية على {count} خط وكتابة جدول التعيين.',
+        'log.font.rand_missing': '[font] ⚠ تم اكتشاف أسماء خطوط عشوائية لكن جدول التعيين في [Script Info] مفقود. لا يمكن المتابعة.',
         'step4.title': 'تشغيل وتحميل',
       },
       tr: {
@@ -3152,6 +3305,13 @@
         'step1.title': 'Script yükle',
         'step2.title': 'Analiz',
         'step3.title': 'Seçenekler',
+        'opt.multiweight.title': 'Ağırlığa Göre Yazı Tipi Oluştur',
+        'opt.multiweight.desc': 'Her ağırlık için bağımsız bir yazı tipi oluşturur, böylece oynatıcı yapay kalın ve eğik stilleri taklit etmek yerine gerçek yazı tipi ağırlıklarını kullanır.',
+        'opt.randname.title': 'Yazı Tipi Adlarını Rastgele Değiştir',
+        'opt.randname.desc': 'Yazı tipi dosyasına gömülü yazı tipi alt kümelerine rasgele adlar atayarak, oynatıcının bölümler arasında önbelleğe alınmış yazı tiplerini yeniden kullanmasını ve karakter kaybına neden olmasını engeller.',
+        'notice.randname': '⚠ Standart dışı: Bu standart olmayan bir uygulamadır. Yazı tipi eşleme tablosu kaybolursa, gömülü yazı tipleri orijinal adlarına geri yüklenemez.',
+        'log.font.rand_applied': '[font] ✓ {count} fonta rastgele ad uygulandı ve eşleme tablosu yazıldı.',
+        'log.font.rand_missing': '[font] ⚠ Rastgele font adları tespit edildi ancak [Script Info] içindeki eşleme tablosu eksik. Devam edilemiyor.',
         'step4.title': 'Çalıştır ve indir',
       },
     };
@@ -3529,10 +3689,11 @@
     }
 
     function handleWorkerLog(msg) {
+      const wMap = { bold: 'font.weight.bold', italic: 'font.weight.italic', boldItalic: 'font.weight.boldItalic', normal: 'font.weight.normal' };
       const text = t(msg.key, {
         ...msg.params,
         skippedText: msg.params.skipped > 0 ? ` [${msg.params.skipped} ${t('font.skipped')}]` : '',
-        weight: msg.params.weight === 'bold' ? t('font.weight.bold') : t('font.weight.normal'),
+        weight: t(wMap[msg.params.weight] || 'font.weight.normal'),
       });
       log(text, msg.level);
     }
@@ -3897,7 +4058,7 @@
           if (!extFontsDetails.includes(k)) extFontsDetails.push(k);
         });
         for (const info of Object.values(p.externalFonts)) {
-          totalChars += info.normal.length + info.bold.length + (info.italic||[]).length + (info.boldItalic||[]).length;
+          totalChars += new Set([...info.normal, ...info.bold, ...(info.italic||[]), ...(info.boldItalic||[])]).size;
         }
 
         const sysKeys = Object.keys(p.systemFontsReferenced || {});
@@ -3906,7 +4067,7 @@
           if (!sysFontsDetails.includes(k)) sysFontsDetails.push(k);
         });
         for (const info of Object.values(p.systemFontsReferenced || {})) {
-          totalSysChars += info.normal.length + info.bold.length + (info.italic||[]).length + (info.boldItalic||[]).length;
+          totalSysChars += new Set([...info.normal, ...info.bold, ...(info.italic||[]), ...(info.boldItalic||[])]).size;
         }
 
         if (p.embeddedFonts) {
@@ -4056,10 +4217,12 @@
       const cbStrip = document.getElementById('opt-strip');
 
       let hasStripFonts = false;
+      let hasRandMapMissing = false;
       for (const entry of S.assFiles) {
+        if (entry.parsed.randMapMissing) hasRandMapMissing = true;
         if (entry.parsed.embeddedFonts) {
           for (const efName of Object.keys(entry.parsed.embeddedFonts)) {
-            const baseName = efName.replace(/_\d+\.ttf$/i, '');
+            const baseName = efName.replace(/(_B|_I|_BI)?_\d+\.ttf$/i, '').replace(/_\d+\.ttf$/i, '');
             if (!baseName.toLowerCase().startsWith('assdrawsubset')) {
               hasStripFonts = true;
               break;
@@ -4067,6 +4230,9 @@
           }
         }
         if (hasStripFonts) break;
+      }
+      if (hasRandMapMissing) {
+        hasStripFonts = false;
       }
 
       cbStrip.dataset.hasStripFonts = hasStripFonts ? 'true' : 'false';
@@ -4114,13 +4280,35 @@
       const anyFont = cbFont.checked || cbSys.checked;
       rowFullFont.classList.toggle('hidden', !anyFont);
       noticeFullFont.classList.toggle('hidden', !cbFullFont.checked);
+      if (!preserveState && anyFont) {
+        const _cbMW = document.getElementById('opt-multiweight');
+        if (_cbMW) { _cbMW.checked = true; }
+      }
       
       document.getElementById('drawing-notice').classList.toggle('hidden', !cbDraw.checked);
       document.getElementById('copyright-notice').classList.toggle('hidden', !anyFont);
       document.getElementById('font-section').classList.toggle('hidden', !anyFont);
       document.getElementById('opt-row-ascii').classList.toggle('hidden', !anyFont || cbFullFont.checked);
+      document.getElementById('opt-row-multiweight').classList.toggle('hidden', !anyFont);
+      document.getElementById('opt-row-randname').classList.toggle('hidden', !anyFont);
+      if (anyFont) {
+        const cbMW2 = document.getElementById('opt-multiweight');
+        if (cbMW2 && !preserveState) { cbMW2.checked = true; }
+      }
 
       if (hasFonts || hasSysFonts) renderFontList();
+      const anyRandMissing = S.assFiles.some(e => e.parsed.randMapMissing);
+      const anyHasRand = S.assFiles.some(e => e.parsed.hasRandFonts);
+      if (anyRandMissing) {
+        const logBox = document.getElementById('log-box');
+        if (logBox) { logBox.classList.remove('hidden'); }
+        log(t('log.font.rand_missing'), 'warn');
+      }
+      if (anyHasRand && !anyRandMissing) {
+        const cbRN2 = document.getElementById('opt-randname');
+        const rowRN2 = document.getElementById('opt-row-randname');
+        if (cbRN2 && rowRN2) { cbRN2.checked = true; rowRN2.classList.add('selected'); }
+      }
 
       const hasAnyEmbeddedForStep3 = S.assFiles.some(e => e.parsed.embeddedFonts && Object.keys(e.parsed.embeddedFonts).length > 0);
       if (shouldDraw || hasFonts || hasSysFonts || hasStripFonts || hasAnyEmbeddedForStep3) {
@@ -4192,79 +4380,99 @@
       const allFonts = {};
       const wantFont = document.getElementById('opt-font').checked;
       const wantSys = document.getElementById('opt-sysfont').checked;
+      const wantMultiWeight = document.getElementById('opt-multiweight') && document.getElementById('opt-multiweight').checked;
       for (const entry of S.assFiles) {
         const sources = [];
         if (wantFont) sources.push(...Object.entries(entry.parsed.externalFonts).map(([n,i]) => [n,i,false]));
         if (wantSys && entry.parsed.systemFontsReferenced)
           sources.push(...Object.entries(entry.parsed.systemFontsReferenced).map(([n,i]) => [n,i,true]));
         for (const [name, info, isSys] of sources) {
-          if (!allFonts[name]) allFonts[name] = { normal: 0, bold: 0, italic: 0, boldItalic: 0, isSystem: isSys };
-          allFonts[name].normal += info.normal.length;
-          allFonts[name].bold += info.bold.length;
-          allFonts[name].italic += (info.italic || []).length;
-          allFonts[name].boldItalic += (info.boldItalic || []).length;
+          if (!allFonts[name]) allFonts[name] = { normal: new Set(), bold: new Set(), italic: new Set(), boldItalic: new Set(), isSystem: isSys };
+          info.normal.forEach(c => allFonts[name].normal.add(c));
+          info.bold.forEach(c => allFonts[name].bold.add(c));
+          (info.italic || []).forEach(c => allFonts[name].italic.add(c));
+          (info.boldItalic || []).forEach(c => allFonts[name].boldItalic.add(c));
         }
       }
       const list = document.getElementById('font-list');
       list.innerHTML = '';
       for (const [name, info] of Object.entries(allFonts)) {
         const key = name.toLowerCase();
-        const totalChars = info.normal + info.bold + info.italic + info.boldItalic;
+        const totalChars = new Set([...info.normal, ...info.bold, ...info.italic, ...info.boldItalic]).size;
         const variants = [];
-        if (info.normal > 0) variants.push(t('font.weight.normal'));
-        if (info.bold > 0) variants.push(t('font.weight.bold'));
-        if (info.italic > 0) variants.push(t('font.weight.italic'));
-        if (info.boldItalic > 0) variants.push(t('font.weight.boldItalic'));
+        if (info.normal.size > 0) variants.push(t('font.weight.normal'));
+        if (info.bold.size > 0) variants.push(t('font.weight.bold'));
+        if (info.italic.size > 0) variants.push(t('font.weight.italic'));
+        if (info.boldItalic.size > 0) variants.push(t('font.weight.boldItalic'));
 
-        const vk = key + '::default';
-        const uploadedRecord = S.uploadedFonts.get(vk);
-        const anyUploaded = !!uploadedRecord;
+        const weightSlots = wantMultiWeight
+          ? [
+              { slot: 'normal', vk: key + '::normal', label: t('font.weight.normal'), active: info.normal.size > 0 },
+              { slot: 'bold', vk: key + '::bold', label: t('font.weight.bold'), active: info.bold.size > 0 },
+              { slot: 'italic', vk: key + '::italic', label: t('font.weight.italic'), active: info.italic.size > 0 },
+              { slot: 'boldItalic', vk: key + '::boldItalic', label: t('font.weight.boldItalic'), active: info.boldItalic.size > 0 },
+            ].filter(s => s.active)
+          : [{ slot: 'default', vk: key + '::default', label: null, active: true }];
 
         const div = document.createElement('div');
         div.className = 'font-item' + (info.isSystem ? ' fi-system' : '');
 
+        const hdr = document.createElement('div');
+        hdr.className = 'fi-header';
         const nameEl = document.createElement('span');
         nameEl.className = 'fi-name';
+        nameEl.title = name;
         nameEl.textContent = name;
-        div.appendChild(nameEl);
-
+        hdr.appendChild(nameEl);
         const charsEl = document.createElement('span');
         charsEl.className = 'fi-chars';
-        charsEl.textContent = t('font.chars', { n: totalChars }) + ' [' + variants.join('+') + ']';
-        div.appendChild(charsEl);
+        charsEl.textContent = t('font.chars', { n: totalChars }) + (variants.length ? ' [' + variants.join('+') + ']' : '');
+        hdr.appendChild(charsEl);
+        div.appendChild(hdr);
 
-        if (anyUploaded) {
-          const statusEl = document.createElement('span');
-          statusEl.className = 'fi-status fi-uploaded';
+        const rightEl = document.createElement('div');
+        rightEl.className = 'fi-slots';
 
-          const fileLabel = document.createElement('span');
-          const subfamDisplay = uploadedRecord.subfamilyName ? ' [' + uploadedRecord.subfamilyName + ']' : '';
-          fileLabel.textContent = t('font.uploaded', { name: uploadedRecord.file.name }) + subfamDisplay;
-          statusEl.appendChild(fileLabel);
-
-          const dismissBtn = document.createElement('button');
-          dismissBtn.className = 'fi-dismiss';
-          dismissBtn.setAttribute('aria-label', t('font.replace.aria', { name: uploadedRecord.file.name }));
-          dismissBtn.textContent = '✕';
-          dismissBtn.onclick = (e) => {
-            e.stopPropagation();
-            const dismissedName = key;
-            S.uploadedFonts.delete(vk);
-            S.allFontCandidates = S.allFontCandidates.filter(c => c.matchedFor.toLowerCase() !== dismissedName);
-            S.pendingReplaceKeys.add(vk);
-            const inp = document.getElementById('inp-font');
-            if (inp) inp.value = '';
-            renderFontList();
-          };
-          statusEl.appendChild(dismissBtn);
-          div.appendChild(statusEl);
-        } else {
-          const statusEl = document.createElement('span');
-          statusEl.className = 'fi-status fi-missing';
-          statusEl.textContent = t('font.missing');
-          div.appendChild(statusEl);
+        for (const ws of weightSlots) {
+          const uploadedRecord = S.uploadedFonts.get(ws.vk);
+          const slotRow = document.createElement('div');
+          slotRow.className = 'fi-slot-row';
+          if (ws.label) {
+            const tag = document.createElement('span');
+            tag.className = 'fi-slot-tag';
+            tag.textContent = ws.label;
+            slotRow.appendChild(tag);
+          }
+          if (uploadedRecord) {
+            const fname = document.createElement('span');
+            fname.className = 'fi-fname';
+            const sub = uploadedRecord.subfamilyName ? ' [' + uploadedRecord.subfamilyName + ']' : '';
+            const prefix = ws.label ? '' : '✓ ';
+            fname.textContent = prefix + uploadedRecord.file.name + sub;
+            fname.title = uploadedRecord.file.name + sub;
+            slotRow.appendChild(fname);
+            const btn = document.createElement('button');
+            btn.className = 'fi-dismiss';
+            btn.setAttribute('aria-label', t('font.replace.aria', { name: uploadedRecord.file.name }));
+            btn.textContent = '✕';
+            btn.onclick = (e) => {
+              e.stopPropagation();
+              S.uploadedFonts.delete(ws.vk);
+              S.pendingReplaceKeys.add(ws.vk);
+              const inp = document.getElementById('inp-font');
+              if (inp) inp.value = '';
+              renderFontList();
+            };
+            slotRow.appendChild(btn);
+          } else {
+            const miss = document.createElement('span');
+            miss.className = 'fi-fname fi-fname-missing';
+            miss.textContent = t('font.missing');
+            slotRow.appendChild(miss);
+          }
+          rightEl.appendChild(slotRow);
         }
-
+                div.appendChild(rightEl);
         list.appendChild(div);
       }
     }
@@ -4404,9 +4612,9 @@
           const result = await workerCall('matchFont', { buffer: entry.buffer, requiredFonts: reqArr });
           if (result.results && result.results.length > 0) {
             const matchNames = result.results.map(r => r.matchedFor).join(', ');
+            const wantMultiWeight = document.getElementById('opt-multiweight') && document.getElementById('opt-multiweight').checked;
             for (const match of result.results) {
               const nameKey = match.matchedFor.toLowerCase();
-              const vk = nameKey + '::default';
               const fontRecord = {
                 file: entry.file, buffer: entry.buffer.slice(0), matchedFor: match.matchedFor,
                 isTTC: result.isTTC, ttcIndex: match.ttcIndex,
@@ -4416,15 +4624,19 @@
                 version: match.version || '', lastModified: entry.file.lastModified || 0,
                 size: entry.file.size || entry.buffer.byteLength
               };
-              const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
-              if (isPendingReplace) {
-                S.pendingReplaceKeys.delete(vk);
-                S.uploadedFonts.set(vk, fontRecord);
-                continue;
-              }
-              const existing = S.uploadedFonts.get(vk);
-              if (!existing || isBetterCandidate(fontRecord, existing, match.matchedFor)) {
-                S.uploadedFonts.set(vk, fontRecord);
+              if (wantMultiWeight) {
+                const slotKey = match.isItalic && match.weight >= 600 ? 'boldItalic' : match.weight >= 600 ? 'bold' : match.isItalic ? 'italic' : 'normal';
+                const vk = nameKey + '::' + slotKey;
+                const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
+                if (isPendingReplace) { S.pendingReplaceKeys.delete(vk); S.uploadedFonts.set(vk, fontRecord); continue; }
+                const existing = S.uploadedFonts.get(vk);
+                if (!existing || isBetterCandidate(fontRecord, existing, match.matchedFor)) S.uploadedFonts.set(vk, fontRecord);
+              } else {
+                const vk = nameKey + '::default';
+                const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
+                if (isPendingReplace) { S.pendingReplaceKeys.delete(vk); S.uploadedFonts.set(vk, fontRecord); continue; }
+                const existing = S.uploadedFonts.get(vk);
+                if (!existing || isBetterCandidate(fontRecord, existing, match.matchedFor)) S.uploadedFonts.set(vk, fontRecord);
               }
             }
             itemLines.push(t('font.upload.item.ok', { name: entry.file.name, matched: matchNames }));
@@ -4464,7 +4676,6 @@
       for (const key of S.uploadedFonts.keys()) {
         if (!requiredKeys.has(key.split('::')[0])) S.uploadedFonts.delete(key);
       }
-      S.allFontCandidates = S.allFontCandidates.filter(c => requiredKeys.has(c.matchedFor.toLowerCase()));
 
       renderFontList();
     }
@@ -4569,6 +4780,8 @@
       const wantSystemFont = document.getElementById('opt-sysfont').checked;
       const wantStrip = document.getElementById('opt-strip').checked;
 
+      const wantMultiWeight = document.getElementById('opt-multiweight') && document.getElementById('opt-multiweight').checked;
+      const wantRandFont = document.getElementById('opt-randname') && document.getElementById('opt-randname').checked;
       const fonts = Array.from(S.uploadedFonts.values()).map(info => ({
         name: info.file.name,
         buffer: info.buffer,
@@ -4601,7 +4814,8 @@
           const needStrip = wantStrip;
 
           let result;
-          if (!needDraw && !needFont && !needStrip) {
+          const needRandRestore = wantStrip && p.hasRandFonts && !p.randMapMissing;
+          if (!needDraw && !needFont && !needStrip && !needRandRestore) {
             result = {
               isDirect: true,
               finalBlob: new Blob([entry.rawBuffer]),
@@ -4616,7 +4830,7 @@
               forceHasBOM: entry.hasBOM,
               fonts,
               fileName: entry.file.name,
-              options: { wantDraw, wantFont, wantSystemFont, wantStrip, wantAscii: document.getElementById('opt-ascii').checked, wantFullFont: document.getElementById('opt-fullfont').checked },
+              options: { wantDraw, wantFont, wantSystemFont, wantStrip, wantAscii: document.getElementById('opt-ascii').checked, wantFullFont: document.getElementById('opt-fullfont').checked, wantMultiWeight, wantRandFont },
             });
           }
 
@@ -4892,7 +5106,9 @@
             ? fbItem.buffer.slice(0)
             : (fbItem.buffer && fbItem.buffer.buffer instanceof ArrayBuffer ? fbItem.buffer.buffer.slice(0) : null);
           if (!rawBuf) return;
-          const name = fbItem.name + '_0.ttf';
+          const wSlot = fbItem.weightSlot || 'normal';
+          const nameSuffix = wSlot === 'bold' ? '_B0.ttf' : wSlot === 'italic' ? '_I0.ttf' : wSlot === 'boldItalic' ? '_BI0.ttf' : '_0.ttf';
+          const name = fbItem.name + nameSuffix;
           const blob = new Blob([rawBuf], { type: 'font/ttf' });
           downloadBlob(blob, name);
         };
@@ -5134,16 +5350,51 @@
         document.getElementById('font-section').classList.toggle('hidden', !anyFont);
         document.getElementById('copyright-notice').classList.toggle('hidden', !anyFont);
         rowFullFont.classList.toggle('hidden', !anyFont);
-        
+        document.getElementById('opt-row-multiweight').classList.toggle('hidden', !anyFont);
+        document.getElementById('opt-row-randname').classList.toggle('hidden', !anyFont);
         if (!anyFont) {
           cbFullFont.checked = false;
-          rowFullFont.classList.remove('selected');
           noticeFullFont.classList.add('hidden');
+          const cbMW = document.getElementById('opt-multiweight');
+          if (cbMW) { cbMW.checked = false; }
+          const cbRN = document.getElementById('opt-randname');
+          if (cbRN) { cbRN.checked = false; document.getElementById('opt-row-randname').classList.remove('selected'); document.getElementById('randname-notice').classList.add('hidden'); }
         }
         
-        const showAscii = anyFont && !cbFullFont.checked;
-        document.getElementById('opt-row-ascii').classList.toggle('hidden', !showAscii);
+        const asciiRow = document.getElementById('opt-row-ascii');
+        const asciiCb = document.getElementById('opt-ascii');
+        asciiRow.classList.toggle('hidden', !anyFont);
+        const asciiDisabled = cbFullFont.checked;
+        asciiRow.classList.toggle('disabled', asciiDisabled);
+        asciiCb.disabled = asciiDisabled;
+        if (asciiDisabled) {
+          asciiRow._savedChecked = asciiCb.checked;
+          asciiCb.checked = false;
+          asciiRow.classList.remove('selected');
+        } else {
+          if (asciiRow._savedChecked !== undefined) {
+                    asciiCb.checked = asciiRow._savedChecked;
+            asciiRow._savedChecked = undefined;
+          }
+          asciiRow.classList.toggle('selected', asciiCb.checked);
+        }
+        const randNameRow = document.getElementById('opt-row-randname');
+        const randNameCb = document.getElementById('opt-randname');
+        const randDisabled = cbFullFont.checked;
+        randNameRow.classList.toggle('disabled', randDisabled);
+        randNameCb.disabled = randDisabled;
+        if (randDisabled) {
+          randNameCb.checked = false;
+          randNameRow.classList.remove('selected');
+          document.getElementById('randname-notice').classList.add('hidden');
+        }
       };
+
+      const cbAscii = document.getElementById('opt-ascii');
+      const rowAscii = document.getElementById('opt-row-ascii');
+      cbAscii.addEventListener('change', () => {
+        rowAscii.classList.toggle('selected', cbAscii.checked);
+      });
 
       cbFont.addEventListener('change', () => {
         rowFont.classList.toggle('selected', cbFont.checked);
@@ -5162,6 +5413,24 @@
       cbFullFont.addEventListener('change', () => {
         noticeFullFont.classList.toggle('hidden', !cbFullFont.checked);
         updateFontOptionsVisibility();
+        rowFullFont.classList.toggle('selected', cbFullFont.checked);
+      });
+      const cbMultiWeight = document.getElementById('opt-multiweight');
+      const rowMultiWeight = document.getElementById('opt-row-multiweight');
+      cbMultiWeight.addEventListener('change', () => {
+        S.uploadedFonts.clear();
+        S.pendingReplaceKeys.clear();
+        renderFontList();
+        rowMultiWeight.classList.toggle('selected', cbMultiWeight.checked);
+      });
+      const cbRandName = document.getElementById('opt-randname');
+      const rowRandName = document.getElementById('opt-row-randname');
+      cbRandName.checked = false;
+      rowRandName.classList.remove('selected');
+      document.getElementById('randname-notice').classList.add('hidden');
+      cbRandName.addEventListener('change', () => {
+        document.getElementById('randname-notice').classList.toggle('hidden', !cbRandName.checked);
+        rowRandName.classList.toggle('selected', cbRandName.checked);
       });
       cbStrip.addEventListener('change', () => {
         rowStrip.classList.toggle('selected', cbStrip.checked);
