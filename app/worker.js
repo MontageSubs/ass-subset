@@ -286,6 +286,36 @@ function parseASSText(text, id, forceHasBOM) {
     const ekKey = Object.keys(embeddedFonts).find(k => k.toLowerCase().startsWith(rkL));
     if (ekKey) { embeddedFonts[ekKey.replace(new RegExp('^' + rk, 'i'), ov)] = embeddedFonts[ekKey]; delete embeddedFonts[ekKey]; }
   }
+  const fontInternalMapRe = /FontSubsetMap:\s*\{original:\s*(.+?),\s*subset:\s*([A-Z]{6,10}),\s*ass-subset:\s*([\d.]+)\}/;
+  for (const [embName, lines] of Object.entries(embeddedFonts)) {
+    if (isAnyDrawFont(embName)) continue;
+    try {
+      const buf = assUUDecode(lines);
+      const fontObj = opentype.parse(buf.buffer);
+      const descField = fontObj.names?.description || fontObj.tables?.name?.description;
+      if (descField) {
+        for (const v of Object.values(descField)) {
+          if (typeof v !== 'string') continue;
+          const m = v.match(fontInternalMapRe);
+          if (m) {
+            const origName = m[1].trim();
+            const subsetName = m[2].trim();
+            if (!randFontMap[subsetName]) {
+              randFontMap[subsetName] = origName;
+              const rkL2 = subsetName.toLowerCase();
+              if (fontChars[subsetName]) { fontChars[origName] = fontChars[subsetName]; delete fontChars[subsetName]; }
+              const ekKey2 = Object.keys(embeddedFonts).find(k => k.toLowerCase().startsWith(rkL2));
+              if (ekKey2 && !embeddedFonts[ekKey2.replace(new RegExp('^' + subsetName, 'i'), origName)]) {
+                embeddedFonts[ekKey2.replace(new RegExp('^' + subsetName, 'i'), origName)] = embeddedFonts[ekKey2];
+                delete embeddedFonts[ekKey2];
+              }
+            }
+            break;
+          }
+        }
+      }
+    } catch (_) { }
+  }
   for (const [name] of Object.entries(fontChars)) {
     if (/^[A-Z]{6,10}$/.test(name) && !randFontMap[name] && !isAnyDrawFont(name.toLowerCase()) && !SYSTEM_FONTS.has(name.toLowerCase())) randMapMissing = true;
   }
@@ -1179,10 +1209,22 @@ async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, 
       seen.add(cp);
     }
   }
-  const subfamilyName = isTargetBold && isTargetItalic ? 'Bold Italic' : isTargetBold ? 'Bold' : isTargetItalic ? 'Italic' : 'Regular';
+  const origSubfamilyField = getOrigNameField(orig, 'preferredSubfamily') || getOrigNameField(orig, 'fontSubfamily');
+  let origSubfamilyStr = '';
+  if (origSubfamilyField) {
+    const enVal = origSubfamilyField['en'];
+    if (typeof enVal === 'string' && enVal.trim()) {
+      origSubfamilyStr = enVal.trim();
+    } else {
+      const anyVal = Object.values(origSubfamilyField).find(v => typeof v === 'string' && v.trim());
+      if (anyVal) origSubfamilyStr = anyVal.trim();
+    }
+  }
+  const canonicalSubfamily = isTargetBold && isTargetItalic ? 'Bold Italic' : isTargetBold ? 'Bold' : isTargetItalic ? 'Italic' : 'Regular';
+  const subfamilyName = origSubfamilyStr || canonicalSubfamily;
   const newFont = new opentype.Font({
     familyName: fontName,
-    styleName: subfamilyName,
+    styleName: canonicalSubfamily,
     unitsPerEm: orig.unitsPerEm,
     ascender: orig.ascender,
     descender: orig.descender,
@@ -1202,10 +1244,12 @@ async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, 
   const familyEntry = {};
   const fullNameEntry = {};
   const subfamilyEntry = {};
+  const preferredSubfamilyEntry = {};
   for (const lk of langKeysForFamily) {
     familyEntry[lk] = fontName;
     fullNameEntry[lk] = fontName + (subfamilyName !== 'Regular' ? ' ' + subfamilyName : '');
-    subfamilyEntry[lk] = subfamilyName;
+    subfamilyEntry[lk] = canonicalSubfamily;
+    preferredSubfamilyEntry[lk] = subfamilyName;
   }
   const origPsField = getOrigNameField(orig, 'postScriptName');
   let origPsName = '';
@@ -1223,7 +1267,7 @@ async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, 
     }
   }
   const asciiFamilyBase = origPsName
-    ? origPsName.replace(/-(?:Bold|Regular|Italic|BoldItalic)$/i, '')
+    ? origPsName.replace(/-(?:Bold|Regular|Italic|BoldItalic|Heavy|Black|Light|Thin|Medium|SemiBold|ExtraLight|ExtraBold|UltraLight|UltraBold)$/i, '')
     : fontName.replace(/[^\x20-\x7E]/g, '').replace(/\s+/g, '') || 'Font';
   const psName = asciiFamilyBase + '-' + subfamilyName.replace(/\s+/g, '');
   const origVersion = getOrigNameField(orig, 'version');
@@ -1294,6 +1338,7 @@ async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, 
     copyright: copyrightEntry,
     fontFamily: familyEntry,
     fontSubfamily: subfamilyEntry,
+    preferredSubfamily: preferredSubfamilyEntry,
     fullName: fullNameEntry,
     version: normalizedVersion,
     postScriptName: { en: psName },
@@ -1689,7 +1734,7 @@ async function doConvert(data, id) {
     ];
     const fileKeyFor = (c) => (c.file?.name || c.name || '') + '::' + (c.ttcIndex ?? -1);
     const libassScore = (c, reqW, reqI) => Math.abs((c.weight || 400) - reqW) + (!!c.isItalic === !!reqI ? 0 : 10000);
-    const fileMap = new Map();
+    const slotBestMap = new Map();
     for (const slot of weightSlots) {
       if (slot.chars.length === 0) continue;
       let best = null, bestScore = Infinity;
@@ -1698,19 +1743,45 @@ async function doConvert(data, id) {
         if (s < bestScore) { bestScore = s; best = c; }
       }
       if (!best) continue;
-      const fk = fileKeyFor(best);
-      if (!fileMap.has(fk)) fileMap.set(fk, { candidate: best, slots: [] });
+      slotBestMap.set(slot.key, { candidate: best, slot, score: bestScore });
+    }
+    const fileMap = new Map();
+    for (const [slotKey, { candidate, slot }] of slotBestMap) {
+      const fk = fileKeyFor(candidate);
+      if (!fileMap.has(fk)) fileMap.set(fk, { candidate, slots: [] });
       fileMap.get(fk).slots.push(slot);
+    }
+    const hasExactItalicMatch = candidates.some(c => c.isItalic);
+    if (!hasExactItalicMatch && fileMap.size > 1) {
+      const slotOrder = { normal: 0, bold: 1, italic: 2, boldItalic: 3 };
+      const italicFallbackKeys = ['italic', 'boldItalic'];
+      for (const italicSlotKey of italicFallbackKeys) {
+        const entry = slotBestMap.get(italicSlotKey);
+        if (!entry) continue;
+        const italicFk = fileKeyFor(entry.candidate);
+        const otherFileKey = Array.from(fileMap.keys()).find(fk => fk !== italicFk);
+        if (!otherFileKey) continue;
+        fileMap.get(italicFk).slots = fileMap.get(italicFk).slots.filter(s => s.key !== italicSlotKey);
+        const targetGroup = fileMap.get(otherFileKey);
+        if (!targetGroup.slots.some(s => s.key === italicSlotKey)) {
+          const mergeIntoSlot = italicSlotKey === 'boldItalic'
+            ? (targetGroup.slots.find(s => s.key === 'bold') || targetGroup.slots[0])
+            : (targetGroup.slots.find(s => s.key === 'normal') || targetGroup.slots[0]);
+          if (mergeIntoSlot) {
+            const italicChars = entry.slot.chars;
+            const existing = mergeIntoSlot.chars;
+            mergeIntoSlot.chars = Array.from(new Set([...existing, ...italicChars]));
+          }
+        }
+        if (fileMap.get(italicFk).slots.length === 0) fileMap.delete(italicFk);
+      }
     }
     for (const [, { candidate, slots }] of fileMap) {
       const mergedChars = Array.from(new Set(slots.flatMap(s => s.chars)));
       if (mergedChars.length === 0) continue;
-      const slotKeys = slots.map(s => s.key);
-      const wLabel = slotKeys.includes('boldItalic') ? 'boldItalic' : slotKeys.includes('bold') ? 'bold' : slotKeys.includes('italic') ? 'italic' : 'normal';
-      const primarySlot = slots.reduce((a, b) => {
-        const order = { normal: 0, bold: 1, italic: 2, boldItalic: 3 };
-        return (order[a.key] ?? 9) <= (order[b.key] ?? 9) ? a : b;
-      });
+      const slotOrder = { normal: 0, bold: 1, italic: 2, boldItalic: 3 };
+      const primarySlot = slots.reduce((a, b) => (slotOrder[a.key] ?? 9) <= (slotOrder[b.key] ?? 9) ? a : b);
+      const wLabel = primarySlot.key;
       emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: wLabel, chars: mergedChars.length });
       try {
         const result = await subsetFont(candidate.buffer, mergedChars, fontNameStr, candidate.isTTC, primarySlot.key, candidate.ttcIndex, id, options.wantAscii, options.wantFullFont);
@@ -1722,7 +1793,7 @@ async function doConvert(data, id) {
     }
   };
 
-  if (parsed.randMapMissing && (options.wantStrip || options.wantFont || options.wantSystemFont)) {
+  if (parsed.randMapMissing) {
     emitLog(id, 'log.font.rand_missing', 'warn', {});
     if (options.wantStrip) {
       options = Object.assign({}, options, { wantStrip: false });
@@ -1776,6 +1847,13 @@ async function doConvert(data, id) {
   }
   const pureOriginalText = text.startsWith('\uFEFF') ? text.slice(1) : text;
   emitLog(id, 'log.rewrite.start', 'info', {});
+  const APP_VERSION = (function () {
+    if (typeof document !== 'undefined') {
+      const m = document.querySelector('meta[name="version"]');
+      if (m) return m.getAttribute('content') || '2.6';
+    }
+    return '2.6';
+  })();
   let randFontNames = null;
   if (options.wantRandFont && !options.wantStrip) {
     const usedNames = new Set();
@@ -1805,8 +1883,21 @@ async function doConvert(data, id) {
       randFontNames.push({ orig, rand });
     }
     for (const ef of finalEmbeddedFonts) {
-      const entry = randFontNames.find(e => e.orig.toLowerCase() === ef.name.replace(/(_B|_I|_BI)$/, '').toLowerCase());
-      if (entry) ef.name = ef.name.replace(new RegExp('^' + entry.orig.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), entry.rand);
+      const baseName = ef.name.replace(/(_B|_I|_BI)$/, '');
+      const entry = randFontNames.find(e => e.orig.toLowerCase() === baseName.toLowerCase());
+      if (entry) {
+        const newBaseName = ef.name.replace(new RegExp('^' + entry.orig.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), entry.rand);
+        const mapLine = `FontSubsetMap: {original: ${entry.orig}, subset: ${entry.rand}, ass-subset: ${APP_VERSION}}`;
+        const descEntry = { en: mapLine };
+        ef.ttf = repairFontBuffer(new Uint8Array(modifyNameTable(ef.ttf.buffer, {
+          fontFamily: { en: entry.rand },
+          preferredFamily: { en: entry.rand },
+          fullName: { en: entry.rand },
+          postScriptName: { en: entry.rand.replace(/\s+/g, '') },
+          description: descEntry,
+        })));
+        ef.name = newBaseName;
+      }
     }
     if (randFontNames.length > 0) emitLog(id, 'log.font.rand_applied', 'info', { count: randFontNames.length });
   } else if (options.wantStrip && parsed.hasRandFonts && !parsed.randMapMissing) {

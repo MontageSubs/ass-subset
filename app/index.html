@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6">
+  <meta name="version" content="2.6.1">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -799,6 +799,7 @@
       padding: 0.45rem 0.875rem;
       border-top: 1px solid var(--rule2);
       min-width: 0;
+      min-height: 36px;
     }
     .fi-slot-row:first-child { border-top: none; }
     .fi-slot-tag {
@@ -831,11 +832,11 @@
     .fi-fname-missing {
       background-color: rgba(181, 42, 28, 0.07);
       color: var(--err);
-      font-size: 12px;
+      font-size: 0.72rem;
       font-weight: 400;
       font-style: normal;
       border-radius: 4px;
-      padding: 4px 8px;
+      padding: 3px 7px;
     }
     .fi-dismiss {
       display: inline-flex;
@@ -4072,10 +4073,24 @@
 
         if (p.embeddedFonts) {
           Object.keys(p.embeddedFonts).forEach(k => {
-            const base = k.replace(/_\d+\.ttf$/i, '');
+            const slotMatch = k.match(/^(.+?)(_B0|_I0|_BI0|_0)\.ttf$/i);
+            const base = slotMatch ? slotMatch[1] : k.replace(/_\d+\.ttf$/i, '');
+            const slotSuffix = slotMatch ? slotMatch[2].toUpperCase() : '_0';
             if (!base.toLowerCase().startsWith('assdrawsubset')) {
               totalEmbedded.add(k);
-              if (!embeddedDetails.includes(k)) embeddedDetails.push(k);
+              const isRandFont = /^[A-Z]{6,10}$/.test(base);
+              const hasMappedName = isRandFont && (p.randFontMap?.[base]);
+              const isMissingMap = isRandFont && !hasMappedName;
+              let displayName;
+              if (hasMappedName) {
+                const weightLabel = slotSuffix === '_B0' ? t('font.weight.bold') : slotSuffix === '_I0' ? t('font.weight.italic') : slotSuffix === '_BI0' ? t('font.weight.boldItalic') : null;
+                displayName = base + ' → ' + p.randFontMap[base] + (weightLabel ? ' [' + weightLabel + ']' : '');
+              } else {
+                displayName = base;
+              }
+              if (!embeddedDetails.some(e => e.key === k)) {
+                embeddedDetails.push({ key: k, displayName, isMissingMap });
+              }
             }
           });
         }
@@ -4201,10 +4216,20 @@
         hasSysFonts ? sysFontsDetails : [t('analysis.font.sys.none')]
       );
 
+      const missingMapCount = embeddedDetails.filter(e => e.isMissingMap).length;
+      const embeddedBadgeCls = totalEmbedded.size === 0 ? 'badge-info' : missingMapCount === embeddedDetails.length ? 'badge-err' : missingMapCount > 0 ? 'badge-warn' : 'badge-warn';
+      const embeddedDetailLines = totalEmbedded.size > 0
+        ? embeddedDetails.map(e => {
+            if (e.isMissingMap) {
+              return `<span class="fi-fname fi-fname-missing" style="display:inline-flex;margin:1px 0;">${e.displayName}</span>`;
+            }
+            return e.displayName;
+          })
+        : [t('analysis.font.embedded.none')];
       createExpandableRow(t('analysis.font.embedded.label'),
-        totalEmbedded.size > 0 ? 'badge-warn' : 'badge-info',
+        embeddedBadgeCls,
         totalEmbedded.size > 0 ? t('analysis.font.embedded.found', { count: totalEmbedded.size }) : t('analysis.font.embedded.none'),
-        totalEmbedded.size > 0 ? embeddedDetails : [t('analysis.font.embedded.none')]
+        embeddedDetailLines
       );
 
       const cbDraw = document.getElementById('opt-draw');
@@ -4218,20 +4243,27 @@
 
       let hasStripFonts = false;
       let hasRandMapMissing = false;
+      let hasPartialRandMissing = false;
       for (const entry of S.assFiles) {
         if (entry.parsed.randMapMissing) hasRandMapMissing = true;
         if (entry.parsed.embeddedFonts) {
+          let hasNonDrawEmbedded = false;
+          let hasNonDrawWithMap = false;
           for (const efName of Object.keys(entry.parsed.embeddedFonts)) {
             const baseName = efName.replace(/(_B|_I|_BI)?_\d+\.ttf$/i, '').replace(/_\d+\.ttf$/i, '');
             if (!baseName.toLowerCase().startsWith('assdrawsubset')) {
+              hasNonDrawEmbedded = true;
+              if (!/^[A-Z]{6,10}$/.test(baseName) || entry.parsed.randFontMap?.[baseName]) {
+                hasNonDrawWithMap = true;
+              }
               hasStripFonts = true;
-              break;
             }
           }
+          if (hasNonDrawEmbedded && !hasNonDrawWithMap) hasPartialRandMissing = true;
         }
         if (hasStripFonts) break;
       }
-      if (hasRandMapMissing) {
+      if (hasRandMapMissing && !hasPartialRandMissing) {
         hasStripFonts = false;
       }
 
