@@ -218,7 +218,7 @@ function parseASSText(text, id, forceHasBOM) {
       if (resXM) playResX = parseInt(resXM[1]);
       const resYM = t.match(/^PlayResY\s*:\s*(\d+)/i);
       if (resYM) playResY = parseInt(resYM[1]);
-      const randM = t.match(/^;\s*Font Subset:\s*([A-Z]{6,10})\s*-\s*(.+)$/);
+      const randM = t.match(/^;\s*Font Subset:\s*([A-Z]{7,8})\s*-\s*(.+)$/);
       if (randM) { randFontMap[randM[1].trim()] = randM[2].trim(); }
     }
     if (section.includes('styles')) {
@@ -280,46 +280,73 @@ function parseASSText(text, id, forceHasBOM) {
   }
   emitProgress(id, 'parse', totalLines, totalLines);
   const uniqueDrawings = buildUniqueDrawings(drawings);
-  for (const [rk, ov] of Object.entries(randFontMap)) {
-    const rkL = rk.toLowerCase();
-    if (fontChars[rk]) { fontChars[ov] = fontChars[rk]; delete fontChars[rk]; }
-    const ekKey = Object.keys(embeddedFonts).find(k => k.toLowerCase().startsWith(rkL));
-    if (ekKey) { embeddedFonts[ekKey.replace(new RegExp('^' + rk, 'i'), ov)] = embeddedFonts[ekKey]; delete embeddedFonts[ekKey]; }
-  }
-  const fontInternalMapRe = /FontSubsetMap:\s*\{original:\s*(.+?),\s*subset:\s*([A-Z]{6,10}),\s*ass-subset:\s*([\d.]+)\}/;
-  for (const [embName, lines] of Object.entries(embeddedFonts)) {
-    if (isAnyDrawFont(embName)) continue;
-    try {
-      const buf = assUUDecode(lines);
-      const fontObj = opentype.parse(buf.buffer);
-      const descField = fontObj.names?.description || fontObj.tables?.name?.description;
-      if (descField) {
-        for (const v of Object.values(descField)) {
-          if (typeof v !== 'string') continue;
-          const m = v.match(fontInternalMapRe);
-          if (m) {
-            const origName = m[1].trim();
-            const subsetName = m[2].trim();
-            if (!randFontMap[subsetName]) {
-              randFontMap[subsetName] = origName;
-              const rkL2 = subsetName.toLowerCase();
-              if (fontChars[subsetName]) { fontChars[origName] = fontChars[subsetName]; delete fontChars[subsetName]; }
-              const ekKey2 = Object.keys(embeddedFonts).find(k => k.toLowerCase().startsWith(rkL2));
-              if (ekKey2 && !embeddedFonts[ekKey2.replace(new RegExp('^' + subsetName, 'i'), origName)]) {
-                embeddedFonts[ekKey2.replace(new RegExp('^' + subsetName, 'i'), origName)] = embeddedFonts[ekKey2];
-                delete embeddedFonts[ekKey2];
-              }
+
+  const applyRandResolution = (map) => {
+    for (const [rk, ov] of Object.entries(map)) {
+      const rkL = rk.toLowerCase();
+      if (fontChars[rk]) {
+        if (!fontChars[ov]) fontChars[ov] = fontChars[rk];
+        delete fontChars[rk];
+      }
+      const matchingKeys = Object.keys(embeddedFonts).filter(k => k.toLowerCase().startsWith(rkL));
+      for (const ekKey of matchingKeys) {
+        const newKey = ov + ekKey.slice(rk.length);
+        if (!embeddedFonts[newKey]) embeddedFonts[newKey] = embeddedFonts[ekKey];
+        delete embeddedFonts[ekKey];
+      }
+    }
+  };
+
+  applyRandResolution(randFontMap);
+
+  const isRandFontName = (n) => /^[A-Z]{7,8}$/.test(n);
+  const fontInternalMapRe = /FontSubsetMap:\s*\{original:\s*(.+?),\s*subset:\s*([A-Z]{7,8}),\s*ass-subset:\s*([\d.]+)\}/;
+
+  const potentialRandEmbedded = Object.keys(embeddedFonts).some(embName => {
+    const baseEmbName = embName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
+    return !isAnyDrawFont(baseEmbName) && isRandFontName(baseEmbName);
+  });
+
+  if (Object.keys(randFontMap).length > 0 || potentialRandEmbedded) {
+    hasRandFonts = true;
+    const discoveredFromId10 = {};
+    for (const [embName, embLines] of Object.entries(embeddedFonts)) {
+      const baseEmbName = embName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
+      if (isAnyDrawFont(baseEmbName)) continue;
+      if (!isRandFontName(baseEmbName) && !randFontMap[baseEmbName]) continue;
+      try {
+        const buf = assUUDecode(embLines);
+        const fontObj = opentype.parse(buf.buffer);
+        const descField = fontObj.names?.description || fontObj.tables?.name?.description;
+        if (descField) {
+          for (const v of Object.values(descField)) {
+            if (typeof v !== 'string') continue;
+            const m = v.match(fontInternalMapRe);
+            if (m) {
+              const origName = m[1].trim();
+              const subsetName = m[2].trim();
+              if (!discoveredFromId10[subsetName]) discoveredFromId10[subsetName] = origName;
+              break;
             }
-            break;
           }
         }
+      } catch (_) { }
+    }
+    for (const [rk, ov] of Object.entries(discoveredFromId10)) {
+      if (randFontMap[rk] !== ov) {
+        randFontMap[rk] = ov;
+        applyRandResolution({ [rk]: ov });
       }
-    } catch (_) { }
+    }
+    const resolvedRandKeys = new Set(Object.keys(randFontMap).map(v => v.toLowerCase()));
+    for (const [embName] of Object.entries(embeddedFonts)) {
+      const baseEmbName = embName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
+      if (isAnyDrawFont(baseEmbName)) continue;
+      if (isRandFontName(baseEmbName) && !resolvedRandKeys.has(baseEmbName.toLowerCase())) {
+        randMapMissing = true;
+      }
+    }
   }
-  for (const [name] of Object.entries(fontChars)) {
-    if (/^[A-Z]{6,10}$/.test(name) && !randFontMap[name] && !isAnyDrawFont(name.toLowerCase()) && !SYSTEM_FONTS.has(name.toLowerCase())) randMapMissing = true;
-  }
-  if (Object.keys(randFontMap).length > 0) hasRandFonts = true;
   const externalFonts = {};
   for (const [name, weights] of Object.entries(fontChars)) {
     if (!SYSTEM_FONTS.has(name.toLowerCase()) && !isAnyDrawFont(name)) {
@@ -1411,7 +1438,7 @@ function applyRandFontNamesInLine(line, randFontNames) {
   return result;
 }
 function rewriteASS(rawContent, opts, id) {
-  const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts, drawCharRemap, targetNewline, randFontNames, wantStrip } = opts;
+  const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts, drawCharRemap, targetNewline, randFontNames, wantStrip, retainRawFonts } = opts;
   const nl = targetNewline || '\n';
   const blocks = rawContent.split(SECTION_SPLIT_RE);
   const totalBlocks = blocks.length;
@@ -1506,6 +1533,7 @@ function rewriteASS(rawContent, opts, id) {
   }
 
   let finalSec = null;
+  const hasRetainFonts = retainRawFonts && retainRawFonts.length > 0;
   if (!wantStrip && (drawTTF || (embeddedFonts && embeddedFonts.length > 0))) {
     const newFontLines = ['[Fonts]'];
     const encodeAndAppend = (embName, ttfData) => {
@@ -1521,6 +1549,14 @@ function rewriteASS(rawContent, opts, id) {
         const baseName = ef.name.replace(/(_B|_I|_BI)$/, '');
         encodeAndAppend(baseName + slotSuffix, ef.ttf);
       });
+    }
+    finalSec = newFontLines.join(nl);
+  } else if (wantStrip && hasRetainFonts) {
+    const newFontLines = ['[Fonts]'];
+    for (const { name, lines } of retainRawFonts) {
+      newFontLines.push(`fontname: ${name}`);
+      for (const l of lines) newFontLines.push(l);
+      newFontLines.push('');
     }
     finalSec = newFontLines.join(nl);
   }
@@ -1797,10 +1833,15 @@ async function doConvert(data, id) {
     }
   };
 
-  if (parsed.randMapMissing) {
-    emitLog(id, 'log.font.rand_missing', 'warn', {});
-    if (options.wantStrip) {
-      options = Object.assign({}, options, { wantStrip: false });
+  const unresolvableRandBases = new Set();
+  if (parsed.randMapMissing && parsed.embeddedFonts) {
+    const isRandFontNameLocal = (n) => /^[A-Z]{7,8}$/.test(n);
+    for (const embName of Object.keys(parsed.embeddedFonts)) {
+      const baseEmbName = embName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
+      if (isAnyDrawFont(baseEmbName)) continue;
+      if (isRandFontNameLocal(baseEmbName) && !parsed.randFontMap?.[baseEmbName]) {
+        unresolvableRandBases.add(baseEmbName.toLowerCase());
+      }
     }
   }
   if (options.wantFont) {
@@ -1818,12 +1859,11 @@ async function doConvert(data, id) {
   const strippedNames = [];
   embeddedFonts.forEach(ef => {
     finalEmbeddedFonts.push(ef);
-    const _ns = ef.weightSlot === 'bold' ? '_B0.ttf' : ef.weightSlot === 'italic' ? '_I0.ttf' : ef.weightSlot === 'boldItalic' ? '_BI0.ttf' : '_0.ttf';
-    processedNames.add(ef.name.toLowerCase() + _ns);
-    processedNames.add(ef.name.toLowerCase() + '_0.ttf');
-    processedNames.add(ef.name.toLowerCase() + '_B0.ttf');
-    processedNames.add(ef.name.toLowerCase() + '_I0.ttf');
-    processedNames.add(ef.name.toLowerCase() + '_BI0.ttf');
+    const n = ef.name.toLowerCase();
+    processedNames.add(n + '_0.ttf');
+    processedNames.add(n + '_b0.ttf');
+    processedNames.add(n + '_i0.ttf');
+    processedNames.add(n + '_bi0.ttf');
   });
   if (parsed.embeddedFonts) {
     for (const [name, lines] of Object.entries(parsed.embeddedFonts)) {
@@ -1834,7 +1874,9 @@ async function doConvert(data, id) {
       const baseNameLower = baseName.toLowerCase();
       if (isAnyDrawFont(baseNameLower)) continue;
       if (processedNames.has(name.toLowerCase())) continue;
-      if (options.wantStrip) {
+      if (unresolvableRandBases.has(baseNameLower)) {
+        if (options.wantStrip) continue;
+      } else if (options.wantStrip) {
         if (!strippedNames.includes(baseName)) strippedNames.push(baseName);
         continue;
       }
@@ -1863,7 +1905,7 @@ async function doConvert(data, id) {
     const usedNames = new Set();
     randFontNames = [];
 
-    const subsettedFontNames = new Set(finalEmbeddedFonts.map(ef => ef.name.replace(/(_B|_I|_BI)$/, '')));
+    const freshlySubsettedNames = new Set(embeddedFonts.map(ef => ef.name.replace(/(_B|_I|_BI)$/, '')));
 
     const oldOrigToRand = {};
     if (parsed.hasRandFonts && !parsed.randMapMissing) {
@@ -1873,7 +1915,7 @@ async function doConvert(data, id) {
       }
     }
 
-    for (const orig of subsettedFontNames) {
+    for (const orig of freshlySubsettedNames) {
       if (isAnyDrawFont(orig.toLowerCase())) continue;
       let rand;
       const origLower = orig.toLowerCase();
@@ -1886,13 +1928,17 @@ async function doConvert(data, id) {
       }
       randFontNames.push({ orig, rand });
     }
+
+    const origToRandMap = new Map(randFontNames.map(e => [e.orig.toLowerCase(), e]));
+
     for (const ef of finalEmbeddedFonts) {
       const baseName = ef.name.replace(/(_B|_I|_BI)$/, '');
-      const entry = randFontNames.find(e => e.orig.toLowerCase() === baseName.toLowerCase());
-      if (entry) {
+      const isFresh = freshlySubsettedNames.has(baseName) || freshlySubsettedNames.has(baseName.toLowerCase());
+      const entry = origToRandMap.get(baseName.toLowerCase());
+      if (entry && isFresh) {
         const newBaseName = ef.name.replace(new RegExp('^' + entry.orig.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'), entry.rand);
         const mapLine = `FontSubsetMap: {original: ${entry.orig}, subset: ${entry.rand}, ass-subset: ${APP_VERSION}}`;
-        const descEntry = { en: mapLine };
+        const descEntry = { en: `${mapLine}; ASS Subsetter (${PROJECT_URL})` };
         ef.ttf = repairFontBuffer(new Uint8Array(modifyNameTable(ef.ttf.buffer, {
           fontFamily: { en: entry.rand },
           preferredFamily: { en: entry.rand },
@@ -1903,8 +1949,15 @@ async function doConvert(data, id) {
         ef.name = newBaseName;
       }
     }
-    if (randFontNames.length > 0) emitLog(id, 'log.font.rand_applied', 'info', { count: randFontNames.length });
-  } else if (options.wantStrip && parsed.hasRandFonts && !parsed.randMapMissing) {
+
+    for (const [r, o] of Object.entries(parsed.randFontMap || {})) {
+      if (!randFontNames.some(e => e.orig.toLowerCase() === o.toLowerCase())) {
+        randFontNames.push({ orig: o, rand: r });
+      }
+    }
+
+    if (randFontNames.length > 0) emitLog(id, 'log.font.rand_applied', 'info', { count: randFontNames.filter(e => freshlySubsettedNames.has(e.orig) || freshlySubsettedNames.has(e.orig.toLowerCase())).length });
+  } else if (options.wantStrip && parsed.hasRandFonts && Object.keys(parsed.randFontMap || {}).length > 0) {
     randFontNames = Object.entries(parsed.randFontMap).map(([rand, orig]) => ({ rand, orig, restoring: true }));
     for (const ef of finalEmbeddedFonts) {
       const entry = randFontNames.find(e => e.rand.toLowerCase() === ef.name.replace(/(_B|_I|_BI)$/, '').toLowerCase());
@@ -1912,9 +1965,20 @@ async function doConvert(data, id) {
     }
   }
   let rewriteRandFontNames = randFontNames;
-  if (options.wantStrip && parsed.hasRandFonts && !parsed.randMapMissing) {
+  if (options.wantStrip && parsed.hasRandFonts && Object.keys(parsed.randFontMap || {}).length > 0) {
     rewriteRandFontNames = Object.entries(parsed.randFontMap).map(([rand, orig]) => ({ rand, orig, restoring: true }));
   }
+  const retainRawFonts = [];
+  if (options.wantStrip && unresolvableRandBases.size > 0 && parsed.embeddedFonts) {
+    for (const [name, lines] of Object.entries(parsed.embeddedFonts)) {
+      const slotMatch = name.match(/^(.+?)(_B0|_I0|_BI0|_0)\.ttf$/i);
+      const baseName = slotMatch ? slotMatch[1] : name.replace(/_\d+\.ttf$/i, '');
+      if (unresolvableRandBases.has(baseName.toLowerCase())) {
+        retainRawFonts.push({ name, lines });
+      }
+    }
+  }
+
   const finalText = rewriteASS(pureOriginalText, {
     drawingDataToChar: drawingDataToChar,
     drawFontFamily,
@@ -1924,6 +1988,7 @@ async function doConvert(data, id) {
     targetNewline: parsed.detectedNewline,
     wantStrip: options.wantStrip,
     randFontNames: rewriteRandFontNames,
+    retainRawFonts,
   }, id);
 
   const finalOutput = parsed.hasBOM ? '\uFEFF' + finalText : finalText;

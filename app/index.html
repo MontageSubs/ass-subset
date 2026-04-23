@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.4">
+  <meta name="version" content="2.6.5">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -1844,8 +1844,9 @@
         'opt.randname.title': '随机化字体名称',
         'opt.randname.desc': '为字幕内嵌入的字体子集分配随机名称，避免播放器跨集复用缓存导致字符不全',
         'notice.randname': '⚠ 非标准功能：此功能为非标准实现。若映射表丢失，字体将无法还原至原始名称。',
-        'log.font.rand_missing': '[font] ⚠ 检测到随机化字体名称，但 [Script Info] 中的映射表缺失或不完整，无法继续子集化或移除嵌入字体。',
+        'log.font.rand_missing': '[font] ⚠ 检测到随机化字体名称，映射表丢失，无法处理该字体。',
         'log.font.rand_applied': '[font] ✓ 已为 {count} 个字体应用随机化名称，并写入映射表。',
+        'analysis.font.rand_missing_warn': '检测到映射表缺失的随机化字体，该字体无法处理。',
         'step4.title': '转换 & 下载',
       },
       'zh-TW': {
@@ -2008,7 +2009,8 @@
         'opt.randname.desc': '為字幕內嵌入的字型子集分配隨機名稱，避免播放器跨集複用快取導致字元不全。',
         'notice.randname': '⚠ 非標準功能：此功能為非標準實現。若映射表丟失，字型將無法還原至原始名稱。',
         'log.font.rand_applied': '[font] ✓ 已為 {count} 個字型套用隨機化名稱，並寫入對照表。',
-        'log.font.rand_missing': '[font] ⚠ 偵測到隨機化字型名稱，但 [Script Info] 中的對照表缺失或不完整，無法繼續子集化或移除內嵌字型。',
+        'analysis.font.rand_missing_warn': '偵測到對照表遺失的隨機化字型，無法處理。',
+        'log.font.rand_missing': '[font] ⚠ 偵測到隨機化字型名稱，對照表遺失，無法處理該字型。',
         'step4.title': '轉換 & 下載',
       },
       en: {
@@ -2171,7 +2173,8 @@
         'opt.randname.desc': 'Assigns random names to embedded font subsets in the subtitle file, preventing playback engines from reusing cached fonts across episodes and causing missing characters.',
         'notice.randname': '⚠ Non-standard: This is a non-standard implementation. If the font mapping table is lost, embedded fonts cannot be restored to their original names.',
         'log.font.rand_applied': '[font] ✓ Applied randomized names to {count} font(s) and wrote mapping table.',
-        'log.font.rand_missing': '[font] ⚠ Randomized font names detected but the mapping table in [Script Info] is missing or incomplete. Cannot subset or strip embedded fonts.',
+        'analysis.font.rand_missing_warn': 'Randomized font(s) detected with missing mapping table. Cannot be processed.',
+        'log.font.rand_missing': '[font] ⚠ Randomized font detected. Mapping table missing — cannot process this font.',
         'step4.title': 'Run & Download',
       },
       ja: {
@@ -2334,7 +2337,8 @@
         'opt.randname.desc': '字幕に埋め込まれたフォントサブセットに無作為な名称を割り当てることで、プレイヤーが複数話にわたってキャッシュを再利用して文字欠落することを防ぎます。',
         'notice.randname': '⚠ 非標準機能：非標準的な実装です。フォント対応表が失われた場合、埋め込みフォント名は元の名称に復元できません。',
         'log.font.rand_applied': '[font] ✓ {count} 個のフォントにランダム名を適用し、マッピングテーブルを書き込みました。',
-        'log.font.rand_missing': '[font] ⚠ ランダム化されたフォント名が検出されましたが、[Script Info] のマッピングテーブルが見つかりません。サブセット化や埋め込みフォントの削除はできません。',
+        'analysis.font.rand_missing_warn': 'マッピングテーブルのないランダム化フォントが検出されました。処理不可。',
+        'log.font.rand_missing': '[font] ⚠ ランダム化フォントを検出。マッピングテーブルがなく、処理できません。',
         'step4.title': '変換 & ダウンロード',
       },
       ko: {
@@ -2497,7 +2501,8 @@
         'opt.randname.desc': '자막에 내장된 폰트 서브셋에 무작위 이름을 할당하여 플레이어가 에피소드 간에 캐시를 재사용하지 않도록 방지합니다.',
         'notice.randname': '⚠ 비표준 기능: 비표준 구현입니다. 폰트 매핑표가 손실되면 내장 폰트는 원래 이름으로 복원할 수 없습니다.',
         'log.font.rand_applied': '[font] ✓ {count}개 폰트에 무작위 이름을 적용하고 매핑 테이블을 기록했습니다.',
-        'log.font.rand_missing': '[font] ⚠ 무작위화된 폰트 이름이 감지되었으나 [Script Info]의 매핑 테이블이 없습니다. 서브셋 또는 내장 폰트 제거를 계속할 수 없습니다.',
+        'analysis.font.rand_missing_warn': '매핑 테이블이 누락된 랜덤화 폰트 발견. 처리 불가.',
+        'log.font.rand_missing': '[font] ⚠ 랜덤화된 폰트 발견. 매핑 테이블 누락 — 해당 폰트를 처리할 수 없습니다.',
         'step4.title': '변환 & 다운로드',
       },
       es: {
@@ -2660,7 +2665,8 @@
         'opt.randname.desc': 'Asigna nombres aleatorios a los subconjuntos de fuentes incrustadas en el archivo de subtítulos, evitando que el reproductor reutilice fuentes en caché entre episodios y cause pérdida de caracteres.',
         'notice.randname': '⚠ No estándar: Esta es una implementación no estándar. Si la tabla de correspondencia de fuentes se pierde, las fuentes incrustadas no se pueden restaurar a sus nombres originales.',
         'log.font.rand_applied': '[font] ✓ Nombres aleatorios aplicados a {count} fuente(s) y tabla de mapeo escrita.',
-        'log.font.rand_missing': '[font] ⚠ Se detectaron nombres de fuentes aleatorizados pero falta la tabla de mapeo en [Script Info]. No se puede continuar.',
+        'analysis.font.rand_missing_warn': 'Fuente(s) aleatorizada(s) con tabla de mapeo ausente. No se puede procesar.',
+        'log.font.rand_missing': '[font] ⚠ Fuente aleatorizada detectada. Tabla de mapeo ausente — no se puede procesar.',
         'step4.title': 'Convertir y descargar',
       },
       ru: {
@@ -2823,7 +2829,8 @@
         'opt.randname.desc': 'Присваивает случайные имена подмножествам встроенных шрифтов в файле субтитров, предотвращая повторное использование плеером кэшированных шрифтов между эпизодами и потерю символов.',
         'notice.randname': '⚠ Нестандартно: Это нестандартная реализация. Если таблица соответствия шрифтов потеряна, встроенные шрифты невозможно восстановить до исходных имён.',
         'log.font.rand_applied': '[font] ✓ Случайные имена применены к {count} шрифту(ам), таблица соответствий записана.',
-        'log.font.rand_missing': '[font] ⚠ Обнаружены рандомизированные имена шрифтов, но таблица соответствий в [Script Info] отсутствует. Продолжение невозможно.',
+        'analysis.font.rand_missing_warn': 'Обнаружены рандомизированные шрифты без таблицы соответствия. Обработка невозможна.',
+        'log.font.rand_missing': '[font] ⚠ Обнаружен рандомизированный шрифт. Таблица соответствия отсутствует — обработка невозможна.',
         'step4.title': 'Обработка и скачивание',
       },
       'pt-BR': {
@@ -2986,7 +2993,8 @@
         'opt.randname.desc': 'Atribui nomes aleatórios aos subconjuntos de fontes incorporadas no arquivo de legendas, impedindo que o reprodutor reutilize fontes em cache entre episódios e cause perda de caracteres.',
         'notice.randname': '⚠ Não-padrão: Esta é uma implementação não padrão. Se a tabela de mapeamento de fontes for perdida, as fontes incorporadas não podem ser restauradas aos seus nomes originais.',
         'log.font.rand_applied': '[font] ✓ Nomes aleatórios aplicados a {count} fonte(s) e tabela de mapeamento gravada.',
-        'log.font.rand_missing': '[font] ⚠ Nomes de fontes randomizados detectados, mas a tabela de mapeamento em [Script Info] está ausente. Não é possível continuar.',
+        'analysis.font.rand_missing_warn': 'Fonte(s) aleatorizada(s) com tabela de mapeamento ausente. Não é possível processar.',
+        'log.font.rand_missing': '[font] ⚠ Fonte aleatorizada detectada. Tabela de mapeamento ausente — não é possível processar.',
         'step4.title': 'Executar e baixar',
       },
       ar: {
@@ -3149,7 +3157,8 @@
         'opt.randname.desc': 'تعيين أسماء عشوائية لمجموعات الخطوط المضمنة في ملف الترجمة، مما يمنع مشغل الفيديو من إعادة استخدام الخطوط المحفوظة مؤقتاً عبر الحلقات وسبب فقدان الأحرف.',
         'notice.randname': '⚠ غير قياسي: هذه عملية غير قياسية. إذا فُقدت جدول تعيين الخطوط، فلا يمكن استعادة الخطوط المضمنة إلى أسمائها الأصلية.',
         'log.font.rand_applied': '[font] ✓ تم تطبيق أسماء عشوائية على {count} خط وكتابة جدول التعيين.',
-        'log.font.rand_missing': '[font] ⚠ تم اكتشاف أسماء خطوط عشوائية لكن جدول التعيين في [Script Info] مفقود. لا يمكن المتابعة.',
+        'analysis.font.rand_missing_warn': 'تم اكتشاف خطوط عشوائية بدون جدول تعيين. المعالجة مستحيلة.',
+        'log.font.rand_missing': '[font] ⚠ تم اكتشاف خط عشوائي. جدول التعيين مفقود — لا يمكن المعالجة.',
         'step4.title': 'تشغيل وتحميل',
       },
       tr: {
@@ -3312,7 +3321,8 @@
         'opt.randname.desc': 'Yazı tipi dosyasına gömülü yazı tipi alt kümelerine rasgele adlar atayarak, oynatıcının bölümler arasında önbelleğe alınmış yazı tiplerini yeniden kullanmasını ve karakter kaybına neden olmasını engeller.',
         'notice.randname': '⚠ Standart dışı: Bu standart olmayan bir uygulamadır. Yazı tipi eşleme tablosu kaybolursa, gömülü yazı tipleri orijinal adlarına geri yüklenemez.',
         'log.font.rand_applied': '[font] ✓ {count} fonta rastgele ad uygulandı ve eşleme tablosu yazıldı.',
-        'log.font.rand_missing': '[font] ⚠ Rastgele font adları tespit edildi ancak [Script Info] içindeki eşleme tablosu eksik. Devam edilemiyor.',
+        'analysis.font.rand_missing_warn': 'Eşleme tablosu eksik rastgeleştirilmiş font(lar) tespit edildi. İşleme yapılamıyor.',
+        'log.font.rand_missing': '[font] ⚠ Rastgeleştirilmiş font tespit edildi. Eşleme tablosu eksik — işlenemiyor.',
         'step4.title': 'Çalıştır ve indir',
       },
     };
@@ -4074,21 +4084,28 @@
         }
 
         if (p.embeddedFonts) {
+          const origToRand = {};
+          if (p.randFontMap) {
+            for (const [r, o] of Object.entries(p.randFontMap)) origToRand[o.toLowerCase()] = r;
+          }
           Object.keys(p.embeddedFonts).forEach(k => {
             const slotMatch = k.match(/^(.+?)(_B0|_I0|_BI0|_0)\.ttf$/i);
             const base = slotMatch ? slotMatch[1] : k.replace(/_\d+\.ttf$/i, '');
             const slotSuffix = slotMatch ? slotMatch[2].toUpperCase() : '_0';
             if (!base.toLowerCase().startsWith('assdrawsubset')) {
               totalEmbedded.add(k);
-              const isRandFont = /^[A-Z]{6,10}$/.test(base);
+              const isRandFont = /^[A-Z]{7,8}$/.test(base);
               const hasMappedName = isRandFont && (p.randFontMap?.[base]);
+              const hasOrigToRand = !isRandFont && origToRand[base.toLowerCase()];
               const isMissingMap = isRandFont && !hasMappedName;
               let displayName;
+              const weightLabel = slotSuffix === '_B0' ? t('font.weight.bold') : slotSuffix === '_I0' ? t('font.weight.italic') : slotSuffix === '_BI0' ? t('font.weight.boldItalic') : null;
               if (hasMappedName) {
-                const weightLabel = slotSuffix === '_B0' ? t('font.weight.bold') : slotSuffix === '_I0' ? t('font.weight.italic') : slotSuffix === '_BI0' ? t('font.weight.boldItalic') : null;
-                displayName = base + ' → ' + p.randFontMap[base] + (weightLabel ? ' [' + weightLabel + ']' : '');
+                displayName = p.randFontMap[base] + (weightLabel ? ' [' + weightLabel + ']' : '') + ' (' + base + ')';
+              } else if (hasOrigToRand) {
+                displayName = base + (weightLabel ? ' [' + weightLabel + ']' : '') + ' (' + origToRand[base.toLowerCase()] + ')';
               } else {
-                displayName = base;
+                displayName = base + (weightLabel ? ' [' + weightLabel + ']' : '');
               }
               if (!embeddedDetails.some(e => e.key === k)) {
                 embeddedDetails.push({ key: k, displayName, isMissingMap });
@@ -4221,12 +4238,15 @@
       const missingMapCount = embeddedDetails.filter(e => e.isMissingMap).length;
       const embeddedBadgeCls = totalEmbedded.size === 0 ? 'badge-info' : missingMapCount === embeddedDetails.length ? 'badge-err' : missingMapCount > 0 ? 'badge-warn' : 'badge-warn';
       const embeddedDetailLines = totalEmbedded.size > 0
-        ? embeddedDetails.map(e => {
-            if (e.isMissingMap) {
-              return `<span class="fi-fname fi-fname-missing" style="display:inline-flex;margin:1px 0;">${e.displayName}</span>`;
-            }
-            return e.displayName;
-          })
+        ? [
+            ...embeddedDetails.map(e => {
+              if (e.isMissingMap) {
+                return `<span class="fi-fname fi-fname-missing" style="display:inline-flex;margin:1px 0;">${e.displayName}</span>`;
+              }
+              return e.displayName;
+            }),
+            ...(missingMapCount > 0 ? [`<div class="notice notice-rand" style="margin-top:8px;margin-bottom:2px;">⚠ ${t('analysis.font.rand_missing_warn')}</div>`] : [])
+          ]
         : [t('analysis.font.embedded.none')];
       createExpandableRow(t('analysis.font.embedded.label'),
         embeddedBadgeCls,
@@ -4245,28 +4265,20 @@
 
       let hasStripFonts = false;
       let hasRandMapMissing = false;
-      let hasPartialRandMissing = false;
       for (const entry of S.assFiles) {
         if (entry.parsed.randMapMissing) hasRandMapMissing = true;
         if (entry.parsed.embeddedFonts) {
-          let hasNonDrawEmbedded = false;
-          let hasNonDrawWithMap = false;
+          let strippableCount = 0;
+          let unknownRandCount = 0;
           for (const efName of Object.keys(entry.parsed.embeddedFonts)) {
-            const baseName = efName.replace(/(_B|_I|_BI)?_\d+\.ttf$/i, '').replace(/_\d+\.ttf$/i, '');
-            if (!baseName.toLowerCase().startsWith('assdrawsubset')) {
-              hasNonDrawEmbedded = true;
-              if (!/^[A-Z]{6,10}$/.test(baseName) || entry.parsed.randFontMap?.[baseName]) {
-                hasNonDrawWithMap = true;
-              }
-              hasStripFonts = true;
-            }
+            const baseName = efName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
+            if (baseName.toLowerCase().startsWith('assdrawsubset')) continue;
+            strippableCount++;
+            const isUnknownRand = /^[A-Z]{7,8}$/.test(baseName) && !entry.parsed.randFontMap?.[baseName];
+            if (isUnknownRand) unknownRandCount++;
           }
-          if (hasNonDrawEmbedded && !hasNonDrawWithMap) hasPartialRandMissing = true;
+          if (strippableCount > 0 && unknownRandCount < strippableCount) hasStripFonts = true;
         }
-        if (hasStripFonts) break;
-      }
-      if (hasRandMapMissing && !hasPartialRandMissing) {
-        hasStripFonts = false;
       }
 
       cbStrip.dataset.hasStripFonts = hasStripFonts ? 'true' : 'false';
@@ -4341,11 +4353,6 @@
       if (hasFonts || hasSysFonts) renderFontList();
       const anyRandMissing = S.assFiles.some(e => e.parsed.randMapMissing);
       const anyHasRand = S.assFiles.some(e => e.parsed.hasRandFonts);
-      if (anyRandMissing) {
-        const logBox = document.getElementById('log-box');
-        if (logBox) { logBox.classList.remove('hidden'); }
-        log(t('log.font.rand_missing'), 'warn');
-      }
       if (anyHasRand && !anyRandMissing) {
         const cbRN2 = document.getElementById('opt-randname');
         const rowRN2 = document.getElementById('opt-row-randname');
@@ -4856,6 +4863,7 @@
           if (S.assFiles.length > 1) log('--- ' + entry.file.name + ' ---', 'info');
 
           const p = entry.parsed;
+          if (p.randMapMissing) log(t('log.font.rand_missing'), 'warn');
           const needDraw = wantDraw && (p.subsetNeedsUpdate || p.drawings > 0 || p.hasExistingDrawSubset);
           const needFont = (wantFont && p.externalFonts && Object.keys(p.externalFonts).length > 0) || (wantSystemFont && p.systemFontsReferenced && Object.keys(p.systemFontsReferenced).length > 0);
           const needStrip = wantStrip;
