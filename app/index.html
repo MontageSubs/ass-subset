@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.6">
+  <meta name="version" content="2.6.7">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -374,14 +374,15 @@
       padding: 1.25rem;
     }
 
-    .upload-error {
+    .upload-error,
+    .upload-warn {
       margin-top: 0.75rem;
-      padding: 0.75rem 1rem;
-      background: rgba(181, 42, 28, 0.08);
-      border: 1px solid rgba(181, 42, 28, 0.3);
+      padding: 0.6rem 0.875rem;
+      background: rgba(138, 80, 16, 0.08);
+      border-left: 3px solid var(--warn);
       border-radius: var(--r);
-      color: var(--err);
-      font-size: 0.83rem;
+      color: var(--warn);
+      font-size: 0.78rem;
       line-height: 1.5;
       white-space: pre-line;
     }
@@ -620,6 +621,57 @@
       border-bottom: none;
     }
 
+    .ii-detail-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75em;
+      min-width: 0;
+      overflow: hidden;
+      width: 100%;
+    }
+    .ii-font-name {
+      flex-shrink: 0;
+      flex-grow: 0;
+      max-width: 55%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ii-src-list {
+      color: var(--ink2);
+      font-size: 0.88em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+    .ii-draw-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.75em;
+      min-width: 0;
+      overflow: hidden;
+      width: 100%;
+    }
+    .ii-draw-status {
+      flex-shrink: 0;
+      flex-grow: 0;
+      max-width: 55%;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .ii-draw-src {
+      color: var(--ink2);
+      font-size: 0.88em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1 1 0;
+      min-width: 0;
+    }
+
     .info-item .ii-label {
       color: var(--ink2);
       flex: 1;
@@ -644,9 +696,10 @@
       font-size: 0.78rem;
       color: var(--ink2);
       font-family: var(--mono);
-      line-height: 1.6;
+      line-height: 1.8;
       border-top: 1px dashed var(--rule2);
       padding-top: 0.5rem;
+      overflow: hidden;
     }
 
     .info-item.expandable.open .ii-details {
@@ -1567,7 +1620,10 @@
         <div id="randname-notice" class="notice notice-rand hidden" data-i18n="notice.randname">⚠ Non-standard: This is a non-standard implementation. If the font mapping table is lost, embedded fonts cannot be restored to their original names.</div>
         <div id="font-section" class="hidden">
           <hr class="divider">
-          <p style="font-size:0.85rem;font-weight:600;margin-bottom:0.75rem;" data-i18n="font.upload.title">Font Files</p>
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
+            <p style="font-size:0.85rem;font-weight:600;margin:0;" data-i18n="font.upload.title">Font Files</p>
+            <button class="btn btn-outline hidden" id="btn-local-font" data-i18n="font.local.btn" style="font-size:0.75rem;padding:0.3rem 0.75rem;height:auto;">Load System Fonts</button>
+          </div>
           <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="Upload font files">
             <span data-i18n="font.upload.drop">Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC…, multi-select; variable fonts not supported)</span>
           </label>
@@ -1585,7 +1641,6 @@
             <summary data-i18n="font.path.summary">💡 Common font directories</summary>
             <div class="paths" id="font-paths"></div>
           </details>
-          <button class="btn btn-outline hidden" id="btn-local-font" data-i18n="font.local.btn">Load System Fonts</button>
           <div id="font-list"></div>
         </div>
       </div>
@@ -1847,6 +1902,7 @@
         'log.font.rand_missing': '[font] ⚠ 检测到随机化字体名称，映射表丢失，无法处理该字体。',
         'log.font.rand_applied': '[font] ✓ 已为 {count} 个字体应用随机化名称，并写入映射表。',
         'analysis.font.rand_missing_warn': '检测到映射表缺失的随机化字体，该字体无法处理。',
+        'err.unsupported_archive': '不支持该格式的压缩档，请使用 ZIP 格式',
         'step4.title': '转换 & 下载',
       },
       'zh-TW': {
@@ -2006,11 +2062,12 @@
         'opt.multiweight.title': '按字重生成獨立字型',
         'opt.multiweight.desc': '為不同字重各自生成獨立字型，避免播放器自行合成粗體/斜體，確保使用真實字重',
         'opt.randname.title': '隨機化字型名稱',
-        'opt.randname.desc': '為字幕內嵌入的字型子集分配隨機名稱，避免播放器跨集複用快取導致字元不全。',
+        'opt.randname.desc': '為字幕內嵌入的字型子集分配隨機名稱，避免播放器跨集複用快取導致字元不全',
         'notice.randname': '⚠ 非標準功能：此功能為非標準實現。若映射表丟失，字型將無法還原至原始名稱。',
         'log.font.rand_applied': '[font] ✓ 已為 {count} 個字型套用隨機化名稱，並寫入對照表。',
         'analysis.font.rand_missing_warn': '偵測到對照表遺失的隨機化字型，無法處理。',
         'log.font.rand_missing': '[font] ⚠ 偵測到隨機化字型名稱，對照表遺失，無法處理該字型。',
+        'err.unsupported_archive': '不支援該格式的壓縮檔，請使用 ZIP 格式',
         'step4.title': '轉換 & 下載',
       },
       en: {
@@ -2175,6 +2232,7 @@
         'log.font.rand_applied': '[font] ✓ Applied randomized names to {count} font(s) and wrote mapping table.',
         'analysis.font.rand_missing_warn': 'Randomized font(s) detected with missing mapping table. Cannot be processed.',
         'log.font.rand_missing': '[font] ⚠ Randomized font detected. Mapping table missing — cannot process this font.',
+        'err.unsupported_archive': 'Unsupported archive format. Please use ZIP instead',
         'step4.title': 'Run & Download',
       },
       ja: {
@@ -2339,6 +2397,7 @@
         'log.font.rand_applied': '[font] ✓ {count} 個のフォントにランダム名を適用し、マッピングテーブルを書き込みました。',
         'analysis.font.rand_missing_warn': 'マッピングテーブルのないランダム化フォントが検出されました。処理不可。',
         'log.font.rand_missing': '[font] ⚠ ランダム化フォントを検出。マッピングテーブルがなく、処理できません。',
+        'err.unsupported_archive': 'このアーカイブ形式はサポートされていません。ZIP をご使用ください',
         'step4.title': '変換 & ダウンロード',
       },
       ko: {
@@ -2503,6 +2562,7 @@
         'log.font.rand_applied': '[font] ✓ {count}개 폰트에 무작위 이름을 적용하고 매핑 테이블을 기록했습니다.',
         'analysis.font.rand_missing_warn': '매핑 테이블이 누락된 랜덤화 폰트 발견. 처리 불가.',
         'log.font.rand_missing': '[font] ⚠ 랜덤화된 폰트 발견. 매핑 테이블 누락 — 해당 폰트를 처리할 수 없습니다.',
+        'err.unsupported_archive': '지원되지 않는 압축 형식입니다. ZIP을 사용해 주세요',
         'step4.title': '변환 & 다운로드',
       },
       es: {
@@ -2667,6 +2727,7 @@
         'log.font.rand_applied': '[font] ✓ Nombres aleatorios aplicados a {count} fuente(s) y tabla de mapeo escrita.',
         'analysis.font.rand_missing_warn': 'Fuente(s) aleatorizada(s) con tabla de mapeo ausente. No se puede procesar.',
         'log.font.rand_missing': '[font] ⚠ Fuente aleatorizada detectada. Tabla de mapeo ausente — no se puede procesar.',
+        'err.unsupported_archive': 'Formato de archivo comprimido no compatible. Use ZIP',
         'step4.title': 'Convertir y descargar',
       },
       ru: {
@@ -2831,6 +2892,7 @@
         'log.font.rand_applied': '[font] ✓ Случайные имена применены к {count} шрифту(ам), таблица соответствий записана.',
         'analysis.font.rand_missing_warn': 'Обнаружены рандомизированные шрифты без таблицы соответствия. Обработка невозможна.',
         'log.font.rand_missing': '[font] ⚠ Обнаружен рандомизированный шрифт. Таблица соответствия отсутствует — обработка невозможна.',
+        'err.unsupported_archive': 'Формат архива не поддерживается. Используйте ZIP',
         'step4.title': 'Обработка и скачивание',
       },
       'pt-BR': {
@@ -2995,6 +3057,7 @@
         'log.font.rand_applied': '[font] ✓ Nomes aleatórios aplicados a {count} fonte(s) e tabela de mapeamento gravada.',
         'analysis.font.rand_missing_warn': 'Fonte(s) aleatorizada(s) com tabela de mapeamento ausente. Não é possível processar.',
         'log.font.rand_missing': '[font] ⚠ Fonte aleatorizada detectada. Tabela de mapeamento ausente — não é possível processar.',
+        'err.unsupported_archive': 'Formato de arquivo compactado não suportado. Use ZIP',
         'step4.title': 'Executar e baixar',
       },
       ar: {
@@ -3159,6 +3222,7 @@
         'log.font.rand_applied': '[font] ✓ تم تطبيق أسماء عشوائية على {count} خط وكتابة جدول التعيين.',
         'analysis.font.rand_missing_warn': 'تم اكتشاف خطوط عشوائية بدون جدول تعيين. المعالجة مستحيلة.',
         'log.font.rand_missing': '[font] ⚠ تم اكتشاف خط عشوائي. جدول التعيين مفقود — لا يمكن المعالجة.',
+        'err.unsupported_archive': 'تنسيق الأرشيف غير مدعوم. يُرجى استخدام ZIP',
         'step4.title': 'تشغيل وتحميل',
       },
       tr: {
@@ -3323,6 +3387,7 @@
         'log.font.rand_applied': '[font] ✓ {count} fonta rastgele ad uygulandı ve eşleme tablosu yazıldı.',
         'analysis.font.rand_missing_warn': 'Eşleme tablosu eksik rastgeleştirilmiş font(lar) tespit edildi. İşleme yapılamıyor.',
         'log.font.rand_missing': '[font] ⚠ Rastgeleştirilmiş font tespit edildi. Eşleme tablosu eksik — işlenemiyor.',
+        'err.unsupported_archive': 'Bu arşiv biçimi desteklenmiyor. Lütfen ZIP kullanın',
         'step4.title': 'Çalıştır ve indir',
       },
     };
@@ -3605,7 +3670,7 @@
       let errDiv = fontSection.querySelector('.font-upload-error');
       if (!errDiv) {
         errDiv = document.createElement('div');
-        errDiv.className = 'upload-error font-upload-error';
+        errDiv.className = 'upload-warn font-upload-error';
         errDiv.style.marginBottom = '0.75rem';
         const dz = document.getElementById('dz-font');
         if (dz) dz.insertAdjacentElement('afterend', errDiv);
@@ -3898,6 +3963,8 @@
           } catch (e) {
             fileErrors.push({ name: f.name, key: 'err.invalid' });
           }
+        } else if (/\.(rar|7z|gz|bz2|xz|tar|lzma|lz|cab|iso|arj|ace)$/i.test(f.name)) {
+          fileErrors.push({ name: f.name, key: 'err.unsupported_archive' });
         } else {
           fileErrors.push({ name: f.name, key: 'err.format' });
         }
@@ -4056,8 +4123,11 @@
       let totalExistingSubsetShapes = 0;
 
       const drawingsDetails = [];
+      const drawSources = [];
       const extFontsDetails = [];
+      const extFontSources = new Map();
       const sysFontsDetails = [];
+      const sysFontSources = new Map();
       const embeddedDetails = [];
 
       for (const entry of S.assFiles) {
@@ -4068,7 +4138,8 @@
         const extKeys = Object.keys(p.externalFonts);
         extKeys.forEach(k => {
           totalExtFonts.add(k);
-          if (!extFontsDetails.includes(k)) extFontsDetails.push(k);
+          if (!extFontSources.has(k)) extFontSources.set(k, new Set());
+          extFontSources.get(k).add(entry.file.name);
         });
         for (const info of Object.values(p.externalFonts)) {
           totalChars += new Set([...info.normal, ...info.bold, ...(info.italic||[]), ...(info.boldItalic||[])]).size;
@@ -4077,7 +4148,8 @@
         const sysKeys = Object.keys(p.systemFontsReferenced || {});
         sysKeys.forEach(k => {
           totalSysFonts.add(k);
-          if (!sysFontsDetails.includes(k)) sysFontsDetails.push(k);
+          if (!sysFontSources.has(k)) sysFontSources.set(k, new Set());
+          sysFontSources.get(k).add(entry.file.name);
         });
         for (const info of Object.values(p.systemFontsReferenced || {})) {
           totalSysChars += new Set([...info.normal, ...info.bold, ...(info.italic||[]), ...(info.boldItalic||[])]).size;
@@ -4108,7 +4180,10 @@
                 displayName = base + (weightLabel ? ' [' + weightLabel + ']' : '');
               }
               if (!embeddedDetails.some(e => e.key === k)) {
-                embeddedDetails.push({ key: k, displayName, isMissingMap });
+                embeddedDetails.push({ key: k, displayName, isMissingMap, sources: [entry.file.name] });
+              } else {
+                const existing = embeddedDetails.find(e => e.key === k);
+                if (existing && !existing.sources.includes(entry.file.name)) existing.sources.push(entry.file.name);
               }
             }
           });
@@ -4121,6 +4196,7 @@
             if (orphans > 0) {
               hasOrphanDrawings = true;
               drawingsDetails.push(t('analysis.draw.status.orphan', { new: p.uniqueDrawings.length, orphan: orphans }));
+            drawSources.push(entry.file.name);
             } else {
               const oldCount = p.subsetReferencedChars.length;
               const newCount = p.uniqueDrawings.length;
@@ -4128,12 +4204,15 @@
               const removed = Math.max(0, oldCount - newCount);
               if (added > 0 && removed > 0) {
                 drawingsDetails.push(t('analysis.draw.status.delta', { added, removed, old: oldCount, new: newCount }));
+              drawSources.push(entry.file.name);
               } else {
                 drawingsDetails.push(t('analysis.draw.status.update', { added, old: oldCount, new: newCount }));
+              drawSources.push(entry.file.name);
               }
             }
           } else {
             drawingsDetails.push(t('analysis.draw.status.new', { count: p.drawings }));
+          drawSources.push(entry.file.name);
           }
         } else if (p.hasExistingDrawSubset) {
           if (p.subsetNeedsUpdate) {
@@ -4142,15 +4221,18 @@
             if (orphans > 0) {
               hasOrphanDrawings = true;
               drawingsDetails.push(t('analysis.draw.status.orphan_only', { orphan: orphans, total: p.existingGlyphCount }));
+            drawSources.push(entry.file.name);
             } else {
               const embCount = p.existingGlyphCount || p.subsetReferencedChars.length;
               const refCount = p.subsetReferencedChars.length;
               drawingsDetails.push(t('analysis.draw.status.sync', { embedded: embCount, referenced: refCount }));
+            drawSources.push(entry.file.name);
             }
           } else {
             hasExistingDrawOnly = true;
             totalExistingSubsetShapes += p.subsetReferencedChars.length;
             drawingsDetails.push(t('analysis.draw.status.existing', { count: p.subsetReferencedChars.length }));
+          drawSources.push(entry.file.name);
           }
         }
         if (extKeys.length > 0) hasFonts = true;
@@ -4166,6 +4248,36 @@
         '<div class="stat"><div class="stat-val">' + totalSysFonts.size + '</div><div class="stat-lbl">' + t('stat.sysFonts') + '</div></div>' +
         '<div class="stat"><div class="stat-val">' + totalEmbedded.size + '</div><div class="stat-lbl">' + t('stat.embeddedFonts') + '</div></div>' +
         '</div>';
+
+      const isMultiFile = S.assFiles.length > 1;
+
+      const baseName = (n) => {
+        const s = n.replace(/\\/g, '/');
+        const slash = s.lastIndexOf('/');
+        const base = slash >= 0 ? s.slice(slash + 1) : s;
+        const dot = base.lastIndexOf('.');
+        return dot > 0 ? base.slice(0, dot) : base;
+      };
+
+      const buildFontDetailLines = (fontNames, sourcesMap) => {
+        return fontNames.map(name => {
+          if (!isMultiFile) return name;
+          const srcs = sourcesMap && sourcesMap.has(name) ? Array.from(sourcesMap.get(name)) : [];
+          if (srcs.length === 0) return name;
+          const stems = srcs.map(baseName);
+          const srcStr = stems.join(', ');
+          const safeName = name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          return `<span class="ii-detail-row"><span class="ii-font-name" title="${safeName}">${safeName}</span><span class="ii-src-list" title="(${srcStr})">(${srcStr})</span></span>`;
+        });
+      };
+
+      const buildDrawDetailLines = (details, sources) => {
+        return details.map((d, i) => {
+          if (!isMultiFile || !sources || !sources[i]) return d;
+          const stem = baseName(sources[i]);
+          return `<span class="ii-draw-row"><span class="ii-draw-status">${d}</span><span class="ii-draw-src">${stem}</span></span>`;
+        });
+      };
 
       const createExpandableRow = (label, badgeCls, badgeText, details) => {
         const row = document.createElement('div');
@@ -4220,28 +4332,33 @@
       createExpandableRow(t('analysis.draw.label'),
         drawBadgeCls,
         drawBadgeText,
-        hasDrawings ? [`<strong>${t('stat.uniqueShapes')}:</strong> ${totalUnique}`, `<strong>${t('stat.totalDrawings')}:</strong> ${totalDrawings}`, ...drawingsDetails] : [t('analysis.draw.none')]
+        hasDrawings ? [`<strong>${t('stat.uniqueShapes')}:</strong> ${totalUnique}`, `<strong>${t('stat.totalDrawings')}:</strong> ${totalDrawings}`, ...buildDrawDetailLines(drawingsDetails, drawSources)] : [t('analysis.draw.none')]
       );
 
       createExpandableRow(t('analysis.font.label'),
         hasFonts ? 'badge-ok' : 'badge-info',
         hasFonts ? t('font.chars', { n: totalChars }) : t('analysis.font.none'),
-        hasFonts ? extFontsDetails : [t('analysis.font.none')]
+        hasFonts ? buildFontDetailLines(Array.from(totalExtFonts), extFontSources) : [t('analysis.font.none')]
       );
 
       createExpandableRow(t('analysis.font.sys.label'),
         hasSysFonts ? 'badge-ok' : 'badge-info',
         hasSysFonts ? t('font.chars', { n: totalSysChars }) : t('analysis.font.sys.none'),
-        hasSysFonts ? sysFontsDetails : [t('analysis.font.sys.none')]
+        hasSysFonts ? buildFontDetailLines(Array.from(totalSysFonts), sysFontSources) : [t('analysis.font.sys.none')]
       );
 
       const missingMapCount = embeddedDetails.filter(e => e.isMissingMap).length;
-      const embeddedBadgeCls = totalEmbedded.size === 0 ? 'badge-info' : missingMapCount === embeddedDetails.length ? 'badge-err' : missingMapCount > 0 ? 'badge-warn' : 'badge-warn';
+      const embeddedBadgeCls = totalEmbedded.size === 0 ? 'badge-info' : missingMapCount === embeddedDetails.length ? 'badge-err' : missingMapCount > 0 ? 'badge-warn' : 'badge-ok';
       const embeddedDetailLines = totalEmbedded.size > 0
         ? [
             ...embeddedDetails.map(e => {
               if (e.isMissingMap) {
                 return `<span class="fi-fname fi-fname-missing" style="display:inline-flex;margin:1px 0;">${e.displayName}</span>`;
+              }
+              if (isMultiFile && e.sources && e.sources.length > 0) {
+                const stems = e.sources.map(baseName).join(', ');
+                const safeName = e.displayName.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+                return `<span class="ii-detail-row"><span class="ii-font-name" title="${safeName}">${safeName}</span><span class="ii-src-list" title="(${stems})">(${stems})</span></span>`;
               }
               return e.displayName;
             }),
@@ -4499,7 +4616,14 @@
           if (uploadedRecord) {
             const fname = document.createElement('span');
             fname.className = 'fi-fname';
-            const sub = uploadedRecord.subfamilyName ? ' [' + uploadedRecord.subfamilyName + ']' : '';
+            const rawSub = uploadedRecord.subfamilyName || '';
+            const subLow = rawSub.toLowerCase();
+            const i18nSub = (subLow === 'bold italic' || subLow === 'bolditalic') ? t('font.weight.boldItalic')
+              : (subLow === 'bold') ? t('font.weight.bold')
+              : (subLow === 'italic' || subLow === 'oblique') ? t('font.weight.italic')
+              : (subLow === 'regular' || subLow === 'normal' || subLow === '') ? t('font.weight.normal')
+              : rawSub;
+            const sub = i18nSub ? ' [' + i18nSub + ']' : '';
             const prefix = ws.label ? '' : '✓ ';
             fname.textContent = prefix + uploadedRecord.file.name + sub;
             fname.title = uploadedRecord.file.name + sub;
@@ -4623,6 +4747,8 @@
               params: key === 'err.zip_depth' ? { limit: ZIP_MAX_DEPTH } : null
             });
           }
+        } else if (/\.(rar|7z|gz|bz2|xz|tar|lzma|lz|cab|iso|arj|ace)$/i.test(f.name)) {
+          errors.push({ name: f.name, key: 'err.unsupported_archive' });
         } else {
           try {
             const buffer = await new Promise((resolve, reject) => {
@@ -4720,10 +4846,11 @@
       notice.classList.add('hidden');
       dz.style.display = '';
 
-      logExpandable(t('font.upload.expand', { total: totalEntries }), itemLines, null);
-
-      log(t('font.upload.done', { matched }), 'ok');
-      if (notMatched > 0) log(t('font.match_fail', { n: notMatched }), 'warn');
+      if (totalEntries > 0) {
+        logExpandable(t('font.upload.expand', { total: totalEntries }), itemLines, null);
+        log(t('font.upload.done', { matched }), 'ok');
+        if (notMatched > 0) log(t('font.match_fail', { n: notMatched }), 'warn');
+      }
 
       const requiredKeys = new Set(Array.from(requiredFonts).map(n => n.toLowerCase()));
       for (const key of S.uploadedFonts.keys()) {
@@ -5228,7 +5355,11 @@
             limitMsg = t('preview.total', { total: allGlyphs.length });
           }
 
-          title.textContent = fb.name + (fb.weight && fb.weight !== 400 && fb.weight !== 'Merged' ? ' - ' + fb.weight : '') + limitMsg;
+          const _wSlot = fb.weightSlot || (fb.weight >= 600 && fb.isItalic ? 'boldItalic' : fb.weight >= 600 ? 'bold' : fb.isItalic ? 'italic' : 'normal');
+          const _wLabel = _wSlot === 'boldItalic' ? t('font.weight.boldItalic') : _wSlot === 'bold' ? t('font.weight.bold') : _wSlot === 'italic' ? t('font.weight.italic') : null;
+          const _hasSibling = buffers.some(b => b.name === fb.name && b !== fb);
+          const _finalLabel = _wLabel || (_hasSibling ? t('font.weight.normal') : null);
+          title.textContent = fb.name + (_finalLabel ? ' [' + _finalLabel + ']' : '') + limitMsg;
 
           ctx.clearRect(0, 0, logicalW, logicalH);
 
@@ -5368,7 +5499,7 @@
         dzASS.classList.remove('drag-over');
         try {
           if (e.dataTransfer.items) {
-            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ass', '.ssa', '.zip']);
+            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ass', '.ssa', '.zip', '.rar', '.7z', '.gz', '.bz2', '.xz', '.tar']);
             if (files.length) handleASSFiles(files);
           } else if (e.dataTransfer.files.length) {
             handleASSFiles(e.dataTransfer.files);
@@ -5410,8 +5541,11 @@
         if (!anyFont) {
           cbFullFont.checked = false;
           noticeFullFont.classList.add('hidden');
+          document.getElementById('opt-row-fullfont').classList.remove('selected');
           const cbMW = document.getElementById('opt-multiweight');
+          const rowMW = document.getElementById('opt-row-multiweight');
           if (cbMW) { cbMW.checked = false; }
+          if (rowMW) { rowMW.classList.remove('selected'); }
           const cbRN = document.getElementById('opt-randname');
           if (cbRN) { cbRN.checked = false; document.getElementById('opt-row-randname').classList.remove('selected'); document.getElementById('randname-notice').classList.add('hidden'); }
         }
@@ -5505,7 +5639,7 @@
         dzFont.style.borderColor = '';
         try {
           if (e.dataTransfer.items) {
-            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ttf', '.otf', '.ttc', '.otc', '.woff', '.woff2', '.zip']);
+            const files = await getFilesFromDataTransfer(e.dataTransfer.items, 10, ['.ttf', '.otf', '.ttc', '.otc', '.woff', '.woff2', '.zip', '.rar', '.7z', '.gz', '.bz2', '.xz', '.tar']);
             if (files.length) handleFonts(files);
           } else if (e.dataTransfer.files.length) {
             handleFonts(Array.from(e.dataTransfer.files));
