@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.8">
+  <meta name="version" content="2.6.9">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -375,8 +375,10 @@
       font-family: var(--mono);
     }
 
-    .step.active .step-subtitle {
-      color: rgba(246, 245, 242, 0.7);
+    .step.active .step-subtitle,
+    .step.done .step-subtitle {
+      color: inherit;
+      opacity: 0.7;
     }
 
     .step-body {
@@ -1645,8 +1647,8 @@
         <div id="font-section" class="hidden">
           <hr class="divider">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.75rem;">
-            <p style="font-size:0.85rem;font-weight:600;margin:0;" data-i18n="font.upload.title">Font Files</p>
-            <button class="btn btn-outline hidden" id="btn-local-font" data-i18n="font.local.btn" style="font-size:0.75rem;padding:0.3rem 0.75rem;height:auto;">Load System Fonts</button>
+            <p style="font-size:0.95rem;font-weight:600;margin:0;" data-i18n="font.upload.title">Font Files</p>
+            <button class="btn btn-outline hidden" id="btn-local-font" data-i18n="font.local.btn" style="font-size:0.8rem;padding:0.45rem 1rem;">Load System Fonts</button>
           </div>
           <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="Upload font files">
             <span data-i18n="font.upload.drop">Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC..., multi-select; variable fonts not supported)</span>
@@ -5085,6 +5087,7 @@
         const localFonts = await window.queryLocalFonts();
         const normReq = new Set();
         const wantSys = document.getElementById('opt-sysfont').checked;
+        const wantMultiWeight = document.getElementById('opt-multiweight')?.checked;
         for (const entry of S.assFiles) {
           for (const name of Object.keys(entry.parsed.externalFonts)) normReq.add(normFont(name).toLowerCase());
           if (wantSys && entry.parsed.systemFontsReferenced) {
@@ -5114,8 +5117,9 @@
           else if (subfamilyLow.includes('extrabold') || subfamilyLow.includes('ultrabold')) weight = 800;
           else if (subfamilyLow.includes('black') || subfamilyLow.includes('heavy')) weight = 900;
           else if (subfamilyLow.includes('bold')) weight = 700;
+          const slotKey = isItalic && weight >= 600 ? 'boldItalic' : weight >= 600 ? 'bold' : isItalic ? 'italic' : 'normal';
           for (const matchName of matched) {
-            const vk = matchName + '::default';
+            const vk = wantMultiWeight ? matchName + '::' + slotKey : matchName + '::default';
             if (!buffer) {
               const blob = await font.blob();
               buffer = await blob.arrayBuffer();
