@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.10">
+  <meta name="version" content="2.6.11">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -1637,7 +1637,7 @@
         <label class="opt-row disabled" id="opt-row-strip">
           <input type="checkbox" id="opt-strip" disabled aria-describedby="opt-strip-desc">
           <div class="opt-label">
-            <strong data-i18n="opt.strip.title">Strip Embedded Fonts</strong>
+            <strong data-i18n="opt.strip.title">Remove Embedded Fonts</strong>
             <span id="opt-strip-desc" data-i18n="opt.strip.desc">Remove existing embedded fonts from the script while keeping the subsetted draw fonts</span>
           </div>
         </label>
@@ -2263,7 +2263,7 @@
         'opt.fullfont.desc': 'Embed the complete font without subsetting. Subtitle text changes require no reprocessing, but result in larger file size and longer conversion time.',
         'notice.fullfont': '⚠ Full Font Warning: Embedding full fonts will significantly bloat the subtitle file size, potentially causing performance issues in media players.',
         'opt.strip.desc': 'Remove existing embedded fonts from the script while keeping the subsetted draw fonts.',
-        'opt.strip.title': 'Strip Embedded Fonts',
+        'opt.strip.title': 'Remove Embedded Fonts',
         'opt.append_optimize': 'Add _optimized suffix',
         'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
         'path.mac': 'macOS: /Library/Fonts (copy to Desktop before uploading)',
