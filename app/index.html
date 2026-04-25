@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.7">
+  <meta name="version" content="2.6.8">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -325,8 +325,17 @@
     }
 
     .step.done .step-head {
-      background: var(--card);
-      border-color: var(--rule2);
+      background: var(--hd-bg);
+      color: var(--hd-fg);
+      border-color: var(--hd-bg);
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .step.done .step-head {
+        background: var(--card);
+        color: var(--ink);
+        border-color: var(--rule2);
+      }
     }
 
     .step-num {
@@ -599,6 +608,8 @@
       color: var(--accent);
       line-height: 1;
       margin-bottom: 0.25rem;
+      word-break: break-all;
+      overflow-wrap: anywhere;
     }
 
     .stat-lbl {
@@ -621,55 +632,57 @@
       border-bottom: none;
     }
 
-    .ii-detail-row {
-      display: flex;
-      align-items: baseline;
-      gap: 0.75em;
-      min-width: 0;
-      overflow: hidden;
-      width: 100%;
-    }
-    .ii-font-name {
-      flex-shrink: 0;
-      flex-grow: 0;
-      max-width: 55%;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .ii-src-list {
-      color: var(--ink2);
-      font-size: 0.88em;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1 1 0;
-      min-width: 0;
-    }
+    .ii-detail-row,
     .ii-draw-row {
       display: flex;
-      align-items: baseline;
-      gap: 0.75em;
+      align-items: center;
+      width: 100%;
       min-width: 0;
       overflow: hidden;
-      width: 100%;
     }
+    .ii-font-name,
     .ii-draw-status {
-      flex-shrink: 0;
-      flex-grow: 0;
-      max-width: 55%;
+      flex: 0 0 50%;
+      max-width: 50%;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      padding-right: 0.5em;
     }
+    .ii-src-list,
     .ii-draw-src {
+      flex: 0 0 50%;
+      max-width: 50%;
       color: var(--ink2);
       font-size: 0.88em;
       white-space: nowrap;
       overflow: hidden;
-      text-overflow: ellipsis;
-      flex: 1 1 0;
+      display: flex;
+      align-items: center;
       min-width: 0;
+    }
+
+    .ii-src-prefix {
+      flex-shrink: 0;
+    }
+
+    .ii-src-names {
+      display: flex;
+      min-width: 0;
+      overflow: hidden;
+      flex-shrink: 1;
+    }
+
+    .ii-src-name {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      flex: 0 1 auto;
+      min-width: 1ch;
+    }
+
+    .ii-src-suffix {
+      flex-shrink: 0;
     }
 
     .info-item .ii-label {
@@ -692,14 +705,21 @@
 
     .info-item.expandable .ii-details {
       display: none;
-      padding: 0 0 0.875rem 1.75rem;
+      padding: 0 1.75rem 0.5rem 1.75rem;
       font-size: 0.78rem;
       color: var(--ink2);
       font-family: var(--mono);
-      line-height: 1.8;
       border-top: 1px dashed var(--rule2);
-      padding-top: 0.5rem;
       overflow: hidden;
+    }
+
+    .ii-detail-line {
+      padding: 0.18em 0.25rem;
+      border-radius: 2px;
+    }
+
+    .ii-detail-line:nth-child(odd) {
+      background: color-mix(in srgb, var(--card) 97%, var(--ink));
     }
 
     .info-item.expandable.open .ii-details {
@@ -1421,6 +1441,10 @@
         border-bottom: 1px solid var(--rule);
       }
 
+      .stat-val {
+        font-size: 1.2rem;
+      }
+
       .site-footer {
         flex-direction: column;
         align-items: center;
@@ -1559,7 +1583,7 @@
           <input type="checkbox" id="opt-draw" aria-describedby="opt-draw-desc">
           <div class="opt-label">
             <strong data-i18n="opt.draw.title">Subset Draw Commands</strong>
-            <span id="opt-draw-desc" data-i18n="opt.draw.desc">Extract \p1…\p0 vector draws into embedded fonts to reduce redundancy; this option supports intelligent add/delete operations.</span>
+            <span id="opt-draw-desc" data-i18n="opt.draw.desc">Extract \p1...\p0 vector draws into embedded fonts to reduce redundancy; this option supports intelligent add/delete operations.</span>
           </div>
           <span class="opt-tag">\p1 / \p0</span>
         </label>
@@ -1625,7 +1649,7 @@
             <button class="btn btn-outline hidden" id="btn-local-font" data-i18n="font.local.btn" style="font-size:0.75rem;padding:0.3rem 0.75rem;height:auto;">Load System Fonts</button>
           </div>
           <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="Upload font files">
-            <span data-i18n="font.upload.drop">Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC…, multi-select; variable fonts not supported)</span>
+            <span data-i18n="font.upload.drop">Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC..., multi-select; variable fonts not supported)</span>
           </label>
           <div id="font-loading-notice" class="font-loading-notice hidden" role="status" aria-live="polite">
             <div id="fln-text" class="fln-text"></div>
@@ -1695,7 +1719,7 @@
 
   <div id="discuss-section" class="hidden">
     <div class="discuss-header" data-i18n="discuss.header">Discussion</div>
-    <div id="discuss-loading" data-i18n="discuss.loading">Loading…</div>
+    <div id="discuss-loading" data-i18n="discuss.loading">Loading...</div>
   </div>
 
   <footer class="site-footer">
@@ -1775,7 +1799,7 @@
         'aria.expand': '点击展开详情',
         'aria.preview_dl_font': '下载字体 {name}',
         'btn.convert': '开始转换',
-        'btn.converting': '处理中…',
+        'btn.converting': '处理中...',
         'btn.discuss': '讨论',
         'btn.download': '下载优化后的字幕',
         'btn.download_zip': '下载全部 (ZIP)',
@@ -1785,7 +1809,7 @@
         'btn.svg': 'SVG 转 ASS 绘图指令',
         'change': '更换文件',
         'discuss.header': '讨论 · Discussion',
-        'discuss.loading': '加载中…',
+        'discuss.loading': '加载中...',
         'err.format': '请上传 .ass 或 .ssa 格式的字幕文件。',
         'err.invalid': '不是有效的 ASS/SSA 字幕文件',
         'err.no_events': '[Events] 区块缺少 Format 或 Dialogue 行，无法解析',
@@ -1794,16 +1818,16 @@
         'err.zip_corrupt': 'ZIP 文件已损坏或格式不受支持，无法读取',
         'err.file_too_large': '文件超过 2 GB，浏览器内存限制，请拆分后上传',
         'err.ass_too_large': '单个 ASS/SSA 文件超过 512 MB，无法处理',
-        'ass.loading': '正在读取字幕文件，请稍候…',
+        'ass.loading': '正在读取字幕文件，请稍候...',
         'font.chars': '{n} 字符',
         'font.local.btn': '从系统自动加载字体',
-        'log.sysfont.scanning': '[font] 正在扫描系统字体…',
+        'log.sysfont.scanning': '[font] 正在扫描系统字体...',
         'log.sysfont.done': '[font] ✓ 已从系统加载 {n} 个字体。',
         'log.sysfont.none': '[font] ⚠ 未找到与当前字幕匹配的系统字体。',
         'log.sysfont.error': '[font] 系统字体访问出错: {error}',
         'log.sysfont.unsupported': '[font] ⚠ 当前浏览器不支持系统字体访问 API。',
         'font.match_fail': '[font] ⚠ {n} 个字体文件未能匹配到字幕中的引用字体名，请检查字体是否正确。',
-        'font.upload.summary': '[font] 已读取 {total} 个字体文件，正在识别…',
+        'font.upload.summary': '[font] 已读取 {total} 个字体文件，正在识别...',
         'font.upload.done': '[font] ✓ 字体识别完成，共 {matched} 个已匹配。',
         'font.upload.expand': '[font] {total} 个文件的识别详情（点击展开）',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -1811,9 +1835,9 @@
         'font.missing': '待上传',
         'font.path.summary': '💡 常见字体安装路径',
         'font.skipped': '缺失',
-        'font.upload.drop': '点击选择字体或 .zip 压缩包，或拖拽文件/文件夹到此处（支持 TTF / OTF / TTC…，可多选；不支持可变字体）',
+        'font.upload.drop': '点击选择字体或 .zip 压缩包，或拖拽文件/文件夹到此处（支持 TTF / OTF / TTC...，可多选；不支持可变字体）',
         'font.upload.title': '上传字体文件',
-        'font.loading.label': '正在读取字体文件，请稍候…',
+        'font.loading.label': '正在读取字体文件，请稍候...',
         'font.loading.matching': '正在识别字体 {current} / {total}',
         'font.loading.aria': '字体文件读取中，请勿关闭页面',
         'font.uploaded': '✓ {name}',
@@ -1822,6 +1846,20 @@
         'font.weight.boldItalic': '粗斜体',
         'font.replace.aria': '移除字体文件 {name}',
         'font.weight.normal': '常规',
+        'font.weight.thin': '极细',
+        'font.weight.extraLight': '超细',
+        'font.weight.light': '细体',
+        'font.weight.medium': '中等',
+        'font.weight.semiBold': '半粗',
+        'font.weight.extraBold': '特粗',
+        'font.weight.black': '超粗',
+        'font.weight.thinItalic': '极细斜体',
+        'font.weight.extraLightItalic': '超细斜体',
+        'font.weight.lightItalic': '细斜体',
+        'font.weight.mediumItalic': '中等斜体',
+        'font.weight.semiBoldItalic': '半粗斜体',
+        'font.weight.extraBoldItalic': '特粗斜体',
+        'font.weight.blackItalic': '超粗斜体',
         'footer.feedback': '反馈',
         'footer.home': '主页',
         'footer.license_html': '以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 开源 · 基于 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
@@ -1831,11 +1869,11 @@
         'footer.tool': 'ASS 子集化工具 (ass-subset)',
         'leave.confirm': '转换正在进行中，确定要离开吗？',
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
-        'log.convert.start': '[convert] 开始转换…',
-        'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体…',
-        'log.draw.building.incremental': '[draw] 增量更新：新增 {added} 个形状（共 {total} 个），正在构建字体…',
-        'log.draw.building.delete': '[draw] 增量更新：移除全部绘图形状，正在更新字体…',
-        'log.draw.building.delta': '[draw] 增量更新：{added} 增 / {removed} 减（共 {total} 个形状），正在构建字体…',
+        'log.convert.start': '[convert] 开始转换...',
+        'log.draw.building': '[draw] 发现 {unique} 个唯一绘图形状，共 {total} 处引用，正在构建字体...',
+        'log.draw.building.incremental': '[draw] 增量更新：新增 {added} 个形状（共 {total} 个），正在构建字体...',
+        'log.draw.building.delete': '[draw] 增量更新：移除全部绘图形状，正在更新字体...',
+        'log.draw.building.delta': '[draw] 增量更新：{added} 增 / {removed} 减（共 {total} 个形状），正在构建字体...',
         'log.draw.detail.expand': '[draw] {count} 个字形详情（点击展开）',
         'log.draw.done': '[draw] 绘图字体生成完毕：{size} KB',
         'log.draw.item': '  - 字符: {char} | 计数: {count} | 时间轴: [{start} -> {end}]',
@@ -1848,11 +1886,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（缩减 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」处理失败: {error}',
-        'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字符)…',
-        'log.rewrite.start': '[ass] 重写字幕文件…',
+        'log.font.subsetting': '[font] 正在处理「{name}」({weight}，{chars} 字符)...',
+        'log.rewrite.start': '[ass] 重写字幕文件...',
         'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保你拥有所嵌入字体的分发权利。',
         'notice.drawing': '⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
-        'opt.draw.desc': '将字幕中使用的绘图指令（\\p1…\\p0）转换为字体以减少冗余，此选项支持智能增删等操作',
+        'opt.draw.desc': '将字幕中使用的绘图指令（\\p1...\\p0）转换为字体以减少冗余，此选项支持智能增删等操作',
         'opt.draw.title': '子集化绘图指令',
         'opt.font.desc': '扫描字幕内使用的第三方字体，子集化后嵌入字幕；仅保留实际使用的字符',
         'opt.font.title': '嵌入第三方字体',
@@ -1883,10 +1921,10 @@
         'stat.extFonts': '第三方字体',
         'stat.sysFonts': '系统字体',
         'stat.uniqueShapes': '唯一形状',
-        'status.draw': '正在生成绘图字体…',
-        'status.parsing': '正在解析字幕…',
-        'status.rewrite': '正在重写字幕…',
-        'status.subset': '正在子集化…',
+        'status.draw': '正在生成绘图字体...',
+        'status.parsing': '正在解析字幕...',
+        'status.rewrite': '正在重写字幕...',
+        'status.subset': '正在子集化...',
         'step.active': '（正在进行）',
         'step.done': '（已完成）',
         'step1.drop': '拖拽字幕文件到此，或点击选择',
@@ -1940,7 +1978,7 @@
         'aria.expand': '點擊展開詳情',
         'aria.preview_dl_font': '下載字型 {name}',
         'btn.convert': '開始轉換',
-        'btn.converting': '處理中…',
+        'btn.converting': '處理中...',
         'btn.discuss': '討論',
         'btn.download': '下載優化後的字幕',
         'btn.download_zip': '下載全部 (ZIP)',
@@ -1950,7 +1988,7 @@
         'btn.svg': 'SVG 轉 ASS 繪圖指令',
         'change': '更換檔案',
         'discuss.header': '討論 · Discussion',
-        'discuss.loading': '載入中…',
+        'discuss.loading': '載入中...',
         'err.format': '請上傳 .ass 或 .ssa 格式的字幕檔',
         'err.invalid': '不是有效的 ASS/SSA 字幕檔',
         'err.no_events': '[Events] 區塊缺少 Format 或 Dialogue 行，無法解析',
@@ -1959,16 +1997,16 @@
         'err.zip_corrupt': 'ZIP 檔案已損毀或格式不受支援，無法讀取',
         'err.file_too_large': '檔案超過 2 GB，瀏覽器記憶體限制，請拆分後上傳',
         'err.ass_too_large': '單個 ASS/SSA 檔案超過 512 MB，無法處理',
-        'ass.loading': '正在讀取字幕檔，請稍候…',
+        'ass.loading': '正在讀取字幕檔，請稍候...',
         'font.chars': '{n} 字元',
         'font.local.btn': '從系統自動載入字型',
-        'log.sysfont.scanning': '[font] 正在掃描系統字型…',
+        'log.sysfont.scanning': '[font] 正在掃描系統字型...',
         'log.sysfont.done': '[font] ✓ 已從系統載入 {n} 個字型。',
         'log.sysfont.none': '[font] ⚠ 未找到與目前字幕匹配的系統字型。',
         'log.sysfont.error': '[font] 系統字型存取錯誤: {error}',
         'log.sysfont.unsupported': '[font] ⚠ 目前瀏覽器不支援系統字型存取 API。',
         'font.match_fail': '[font] ⚠ {n} 個字型檔未能匹配到字幕中的引用字型名，請確認字型是否正確。',
-        'font.upload.summary': '[font] 已讀取 {total} 個字型檔案，正在識別…',
+        'font.upload.summary': '[font] 已讀取 {total} 個字型檔案，正在識別...',
         'font.upload.done': '[font] ✓ 字型識別完成，共 {matched} 個已匹配。',
         'font.upload.expand': '[font] {total} 個檔案的識別詳情（點擊展開）',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -1976,9 +2014,9 @@
         'font.missing': '待上傳',
         'font.path.summary': '💡 常見字型安裝路徑',
         'font.skipped': '缺失',
-        'font.upload.drop': '點擊選擇字型或 .zip 壓縮包，或拖曳檔案/資料夾到此處（支援 TTF / OTF / TTC…，可多選；不支援可變字型）',
+        'font.upload.drop': '點擊選擇字型或 .zip 壓縮包，或拖曳檔案/資料夾到此處（支援 TTF / OTF / TTC...，可多選；不支援可變字型）',
         'font.upload.title': '上傳字型檔',
-        'font.loading.label': '正在讀取字型檔，請稍候…',
+        'font.loading.label': '正在讀取字型檔，請稍候...',
         'font.loading.matching': '正在識別字型 {current} / {total}',
         'font.loading.aria': '字型檔讀取中，請勿關閉頁面',
         'font.uploaded': '✓ {name}',
@@ -1987,6 +2025,20 @@
         'font.weight.boldItalic': '粗斜體',
         'font.replace.aria': '移除字型檔 {name}',
         'font.weight.normal': '常規',
+        'font.weight.thin': '極細',
+        'font.weight.extraLight': '超細',
+        'font.weight.light': '細體',
+        'font.weight.medium': '中等',
+        'font.weight.semiBold': '半粗',
+        'font.weight.extraBold': '特粗',
+        'font.weight.black': '超粗',
+        'font.weight.thinItalic': '極細斜體',
+        'font.weight.extraLightItalic': '超細斜體',
+        'font.weight.lightItalic': '細斜體',
+        'font.weight.mediumItalic': '中等斜體',
+        'font.weight.semiBoldItalic': '半粗斜體',
+        'font.weight.extraBoldItalic': '特粗斜體',
+        'font.weight.blackItalic': '超粗斜體',
         'footer.feedback': '回報問題',
         'footer.home': '首頁',
         'footer.license_html': '以 <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 開源 · 基於 <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
@@ -1996,11 +2048,11 @@
         'footer.tool': 'ASS 子集化工具 (ass-subset)',
         'leave.confirm': '轉換正在進行中，確定要離開嗎？',
         'log.convert.done': '[done] 完成。{origKB} KB → {newKB} KB（{delta} KB）',
-        'log.convert.start': '[convert] 開始轉換…',
-        'log.draw.building': '[draw] 發現 {unique} 個唯一繪圖形狀，共 {total} 處引用，正在建構字型…',
-        'log.draw.building.incremental': '[draw] 增量更新：新增 {added} 個形狀（共 {total} 個），正在建構字型…',
-        'log.draw.building.delete': '[draw] 增量更新：移除全部繪圖形狀，正在更新字型…',
-        'log.draw.building.delta': '[draw] 增量更新：{added} 增 / {removed} 減（共 {total} 個形狀），正在建構字型…',
+        'log.convert.start': '[convert] 開始轉換...',
+        'log.draw.building': '[draw] 發現 {unique} 個唯一繪圖形狀，共 {total} 處引用，正在建構字型...',
+        'log.draw.building.incremental': '[draw] 增量更新：新增 {added} 個形狀（共 {total} 個），正在建構字型...',
+        'log.draw.building.delete': '[draw] 增量更新：移除全部繪圖形狀，正在更新字型...',
+        'log.draw.building.delta': '[draw] 增量更新：{added} 增 / {removed} 減（共 {total} 個形狀），正在建構字型...',
         'log.draw.detail.expand': '[draw] {count} 個字形詳情（點擊展開）',
         'log.draw.done': '[draw] 繪圖字型生成完畢：{size} KB',
         'log.draw.item': '  - 字元: {char} | 計數: {count} | 時間軸: [{start} -> {end}]',
@@ -2013,11 +2065,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（縮減 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」處理失敗: {error}',
-        'log.font.subsetting': '[font] 子集化「{name}」({weight}，{chars} 字元)…',
-        'log.rewrite.start': '[ass] 重寫字幕檔…',
+        'log.font.subsetting': '[font] 正在處理「{name}」({weight}，{chars} 字元)...',
+        'log.rewrite.start': '[ass] 重寫字幕檔...',
         'notice.copyright': '⚠ 版權提示：分發未授權的字型檔可能構成侵權。請確保你擁有所嵌入字型的分發權利。',
         'notice.drawing': '⚠ 注意：繪圖指令轉換後，特效的大小和位置可能發生輕微偏移，請手動確認最終效果。',
-        'opt.draw.desc': '將字幕中使用的繪圖指令（\\p1…\\p0）轉換為字型以減少冗餘；此選項支援智慧增刪等操作',
+        'opt.draw.desc': '將字幕中使用的繪圖指令（\\p1...\\p0）轉換為字型以減少冗餘；此選項支援智慧增刪等操作',
         'opt.draw.title': '子集化繪圖指令',
         'opt.font.desc': '掃描字幕內使用的第三方字型，子集化後嵌入字幕；僅保留實際使用的字元',
         'opt.font.title': '嵌入第三方字型',
@@ -2048,10 +2100,10 @@
         'stat.extFonts': '第三方字型',
         'stat.sysFonts': '系統字型',
         'stat.uniqueShapes': '唯一形狀',
-        'status.draw': '正在生成繪圖字型…',
-        'status.parsing': '正在解析字幕…',
-        'status.rewrite': '正在重寫字幕…',
-        'status.subset': '正在子集化…',
+        'status.draw': '正在生成繪圖字型...',
+        'status.parsing': '正在解析字幕...',
+        'status.rewrite': '正在重寫字幕...',
+        'status.subset': '正在子集化...',
         'step.active': '（進行中）',
         'step.done': '（已完成）',
         'step1.drop': '拖曳字幕檔到此，或點擊選擇',
@@ -2105,7 +2157,7 @@
         'aria.expand': 'Click to expand details',
         'aria.preview_dl_font': 'Download font {name}',
         'btn.convert': 'Run Subsetter',
-        'btn.converting': 'Processing…',
+        'btn.converting': 'Processing...',
         'btn.discuss': 'Discussion',
         'btn.download': 'Download Output',
         'btn.download_zip': 'Download All (ZIP)',
@@ -2115,7 +2167,7 @@
         'btn.svg': 'SVG to ASS Draw',
         'change': 'Change',
         'discuss.header': 'Discussion',
-        'discuss.loading': 'Loading…',
+        'discuss.loading': 'Loading...',
         'err.format': 'Please upload a valid .ass or .ssa subtitle script',
         'err.invalid': 'Not a valid ASS/SSA script',
         'err.no_events': 'No valid Format/Dialogue lines in [Events]',
@@ -2124,16 +2176,16 @@
         'err.zip_corrupt': 'ZIP file is corrupted or unsupported format',
         'err.file_too_large': 'File exceeds 2 GB — browser limit. Please split before uploading',
         'err.ass_too_large': 'Single ASS/SSA file exceeds 512 MB — too large to process.',
-        'ass.loading': 'Reading subtitle files, please wait…',
+        'ass.loading': 'Reading subtitle files, please wait...',
         'font.chars': '{n} chars',
         'font.local.btn': 'Load System Fonts',
-        'log.sysfont.scanning': '[font] Scanning system fonts…',
+        'log.sysfont.scanning': '[font] Scanning system fonts...',
         'log.sysfont.done': '[font] ✓ Loaded {n} matching font(s) from system.',
         'log.sysfont.none': '[font] ⚠ No system fonts matched the referenced fonts.',
         'log.sysfont.error': '[font] System font access error: {error}',
         'log.sysfont.unsupported': '[font] ⚠ This browser does not support the Local Font Access API.',
         'font.match_fail': '[font] ⚠ {n} font file(s) could not be matched to any referenced font name. Please verify font names.',
-        'font.upload.summary': '[font] {total} font file(s) read — identifying…',
+        'font.upload.summary': '[font] {total} font file(s) read — identifying...',
         'font.upload.done': '[font] ✓ Font identification complete — {matched} matched.',
         'font.upload.expand': '[font] Details for {total} file(s) (click to expand)',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -2141,9 +2193,9 @@
         'font.missing': 'Upload required',
         'font.path.summary': '💡 Common font directories',
         'font.skipped': 'skipped',
-        'font.upload.drop': 'Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC…, multi-select; variable fonts not supported)',
+        'font.upload.drop': 'Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC..., multi-select; variable fonts not supported)',
         'font.upload.title': 'Font Files',
-        'font.loading.label': 'Reading font files, please wait…',
+        'font.loading.label': 'Reading font files, please wait...',
         'font.loading.matching': 'Identifying font {current} / {total}',
         'font.loading.aria': 'Font files are being read, do not close this page',
         'font.uploaded': '✓ {name}',
@@ -2152,6 +2204,20 @@
         'font.weight.boldItalic': 'Bold Italic',
         'font.replace.aria': 'Remove font file {name}',
         'font.weight.normal': 'Regular',
+        'font.weight.thin': 'Thin',
+        'font.weight.extraLight': 'Extra Light',
+        'font.weight.light': 'Light',
+        'font.weight.medium': 'Medium',
+        'font.weight.semiBold': 'Semi Bold',
+        'font.weight.extraBold': 'Extra Bold',
+        'font.weight.black': 'Black',
+        'font.weight.thinItalic': 'Thin Italic',
+        'font.weight.extraLightItalic': 'Extra Light Italic',
+        'font.weight.lightItalic': 'Light Italic',
+        'font.weight.mediumItalic': 'Medium Italic',
+        'font.weight.semiBoldItalic': 'Semi Bold Italic',
+        'font.weight.extraBoldItalic': 'Extra Bold Italic',
+        'font.weight.blackItalic': 'Black Italic',
         'footer.feedback': 'Report Issue',
         'footer.home': 'Home',
         'footer.license_html': 'Open source under <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · Built on <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
@@ -2161,11 +2227,11 @@
         'footer.tool': 'ASS Subsetter (ass-subset)',
         'leave.confirm': 'Subsetting is still running. Leave anyway?',
         'log.convert.done': '[done] Finished. {origKB} KB → {newKB} KB ({delta} KB)',
-        'log.convert.start': '[convert] Starting…',
-        'log.draw.building': '[draw] {unique} unique shapes, {total} references — building font…',
-        'log.draw.building.incremental': '[draw] Incremental update: +{added} new shape(s) (total {total}) — building font…',
-        'log.draw.building.delete': '[draw] Incremental update: all draw shapes removed — rebuilding font…',
-        'log.draw.building.delta': '[draw] Incremental update: +{added} / −{removed} (total {total} shapes) — building font…',
+        'log.convert.start': '[convert] Starting...',
+        'log.draw.building': '[draw] {unique} unique shapes, {total} references — building font...',
+        'log.draw.building.incremental': '[draw] Incremental update: +{added} new shape(s) (total {total}) — building font...',
+        'log.draw.building.delete': '[draw] Incremental update: all draw shapes removed — rebuilding font...',
+        'log.draw.building.delta': '[draw] Incremental update: +{added} / −{removed} (total {total} shapes) — building font...',
         'log.draw.detail.expand': '[draw] {count} glyph mappings (click to expand)',
         'log.draw.done': '[draw] Draw font built: {size} KB',
         'log.draw.item': '  - Char: {char} | Count: {count} | Timeline: [{start} → {end}]',
@@ -2178,11 +2244,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" failed: {error}',
-        'log.font.subsetting': '[font] Subsetting "{name}" ({weight}, {chars} chars)…',
-        'log.rewrite.start': '[ass] Rewriting script…',
+        'log.font.subsetting': '[font] Processing "{name}" ({weight}, {chars} chars)...',
+        'log.rewrite.start': '[ass] Rewriting script...',
         'notice.copyright': '⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.',
         'notice.drawing': '⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.',
-        'opt.draw.desc': 'Extract \\p1…\\p0 vector draws into embedded fonts to reduce redundancy; this option supports intelligent add/delete operations.',
+        'opt.draw.desc': 'Extract \\p1...\\p0 vector draws into embedded fonts to reduce redundancy; this option supports intelligent add/delete operations.',
         'opt.draw.title': 'Subset Draw Commands',
         'opt.font.desc': 'Scan third-party fonts used in the script, subset to used characters only, and embed them into the output.',
         'opt.font.title': 'Embed Third-Party Fonts',
@@ -2213,10 +2279,10 @@
         'stat.extFonts': '3rd-Party Fonts',
         'stat.sysFonts': 'System Fonts',
         'stat.uniqueShapes': 'Unique Shapes',
-        'status.draw': 'Building draw font…',
-        'status.parsing': 'Parsing script…',
-        'status.rewrite': 'Rewriting script…',
-        'status.subset': 'Subsetting…',
+        'status.draw': 'Building draw font...',
+        'status.parsing': 'Parsing script...',
+        'status.rewrite': 'Rewriting script...',
+        'status.subset': 'Subsetting...',
         'step.active': '(in progress)',
         'step.done': '(done)',
         'step1.drop': 'Drop your script here, or click to browse',
@@ -2270,7 +2336,7 @@
         'aria.expand': 'クリックして詳細を展開',
         'aria.preview_dl_font': 'フォント {name} をダウンロード',
         'btn.convert': '変換開始',
-        'btn.converting': '処理中…',
+        'btn.converting': '処理中...',
         'btn.discuss': 'ディスカッション',
         'btn.download': '最適化済み字幕をダウンロード',
         'btn.download_zip': 'すべてダウンロード (ZIP)',
@@ -2280,7 +2346,7 @@
         'btn.svg': 'SVG → ASS描画コマンド',
         'change': 'ファイルを変更',
         'discuss.header': 'ディスカッション · Discussion',
-        'discuss.loading': '読み込み中…',
+        'discuss.loading': '読み込み中...',
         'err.format': '.ass または .ssa 形式の字幕ファイルをアップロードしてください',
         'err.invalid': '有効な ASS/SSA ファイルではありません',
         'err.no_events': '[Events] セクションに Format または Dialogue 行がありません',
@@ -2289,16 +2355,16 @@
         'err.zip_corrupt': 'ZIP ファイルが破損しているか、サポートされていない形式です',
         'err.file_too_large': 'ファイルが 2 GB を超えており、処理できません。分割してください',
         'err.ass_too_large': 'ASS/SSA ファイルが 512 MB を超えており、処理できません',
-        'ass.loading': '字幕ファイルを読み込んでいます。しばらくお待ちください…',
+        'ass.loading': '字幕ファイルを読み込んでいます。しばらくお待ちください...',
         'font.chars': '{n} 文字',
         'font.local.btn': 'システムフォントを自動読み込み',
-        'log.sysfont.scanning': '[font] システムフォントをスキャン中…',
+        'log.sysfont.scanning': '[font] システムフォントをスキャン中...',
         'log.sysfont.done': '[font] ✓ システムから {n} 個のフォントを読み込みました。',
         'log.sysfont.none': '[font] ⚠ 参照フォントに一致するシステムフォントが見つかりませんでした。',
         'log.sysfont.error': '[font] システムフォントアクセスエラー: {error}',
         'log.sysfont.unsupported': '[font] ⚠ このブラウザはローカルフォントアクセス API をサポートしていません。',
         'font.match_fail': '[font] ⚠ {n} 個のフォントファイルが字幕内の参照フォント名と一致しませんでした。フォント名を確認してください。',
-        'font.upload.summary': '[font] {total} 件のフォントファイルを読み込み — 識別中…',
+        'font.upload.summary': '[font] {total} 件のフォントファイルを読み込み — 識別中...',
         'font.upload.done': '[font] ✓ フォント識別完了 — {matched} 件が一致しました。',
         'font.upload.expand': '[font] {total} 件の識別詳細（クリックで展開）',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -2306,9 +2372,9 @@
         'font.missing': 'アップロード待ち',
         'font.path.summary': '💡 よく使われるフォントディレクトリ',
         'font.skipped': 'スキップ',
-        'font.upload.drop': 'フォントまたは .zip ファイルを選択、またはここにファイル/フォルダをドラッグ（TTF / OTF / TTC…対応；可変フォント非対応）',
+        'font.upload.drop': 'フォントまたは .zip ファイルを選択、またはここにファイル/フォルダをドラッグ（TTF / OTF / TTC...対応；可変フォント非対応）',
         'font.upload.title': 'フォントファイル',
-        'font.loading.label': 'フォントファイルを読み込んでいます。しばらくお待ちください…',
+        'font.loading.label': 'フォントファイルを読み込んでいます。しばらくお待ちください...',
         'font.loading.matching': 'フォントを識別中 {current} / {total}',
         'font.loading.aria': 'フォントファイル読み込み中。ページを閉じないでください',
         'font.uploaded': '✓ {name}',
@@ -2317,6 +2383,34 @@
         'font.weight.boldItalic': '太字イタリック',
         'font.replace.aria': 'フォントファイル {name} を削除',
         'font.weight.normal': 'レギュラー',
+        'font.weight.thin': 'رفيع جداً',
+        'font.weight.extraLight': 'خفيف جداً',
+        'font.weight.light': 'خفيف',
+        'font.weight.medium': 'متوسط',
+        'font.weight.semiBold': 'شبه عريض',
+        'font.weight.extraBold': 'عريض جداً',
+        'font.weight.black': 'أسود',
+        'font.weight.thinItalic': 'رفيع جداً مائل',
+        'font.weight.extraLightItalic': 'خفيف جداً مائل',
+        'font.weight.lightItalic': 'خفيف مائل',
+        'font.weight.mediumItalic': 'متوسط مائل',
+        'font.weight.semiBoldItalic': 'شبه عريض مائل',
+        'font.weight.extraBoldItalic': 'عريض جداً مائل',
+        'font.weight.blackItalic': 'أسود مائل',
+        'font.weight.thin': 'シン',
+        'font.weight.extraLight': 'エクストラライト',
+        'font.weight.light': 'ライト',
+        'font.weight.medium': 'ミディアム',
+        'font.weight.semiBold': 'セミボールド',
+        'font.weight.extraBold': 'エクストラボールド',
+        'font.weight.black': 'ブラック',
+        'font.weight.thinItalic': 'シンイタリック',
+        'font.weight.extraLightItalic': 'エクストラライトイタリック',
+        'font.weight.lightItalic': 'ライトイタリック',
+        'font.weight.mediumItalic': 'ミディアムイタリック',
+        'font.weight.semiBoldItalic': 'セミボールドイタリック',
+        'font.weight.extraBoldItalic': 'エクストラボールドイタリック',
+        'font.weight.blackItalic': 'ブラックイタリック',
         'footer.feedback': '問題を報告',
         'footer.home': 'ホーム',
         'footer.license_html': '<a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> のもとオープンソース · <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a> を使用',
@@ -2326,11 +2420,11 @@
         'footer.tool': 'ASS サブセットツール (ass-subset)',
         'leave.confirm': '変換中です。本当に離れますか？',
         'log.convert.done': '[done] 完了。{origKB} KB → {newKB} KB ({delta} KB)',
-        'log.convert.start': '[convert] 変換を開始…',
-        'log.draw.building': '[draw] {unique} 個のユニーク形状、{total} 件の参照を検出 — フォントを構築中…',
-        'log.draw.building.incremental': '[draw] 増分更新：+{added} 個の新規形状（合計 {total} 個）— フォントを構築中…',
-        'log.draw.building.delete': '[draw] 増分更新：全描画形状を削除 — フォントを再構築中…',
-        'log.draw.building.delta': '[draw] 増分更新：+{added} / −{removed}（合計 {total} 個）— フォントを構築中…',
+        'log.convert.start': '[convert] 変換を開始...',
+        'log.draw.building': '[draw] {unique} 個のユニーク形状、{total} 件の参照を検出 — フォントを構築中...',
+        'log.draw.building.incremental': '[draw] 増分更新：+{added} 個の新規形状（合計 {total} 個）— フォントを構築中...',
+        'log.draw.building.delete': '[draw] 増分更新：全描画形状を削除 — フォントを再構築中...',
+        'log.draw.building.delta': '[draw] 増分更新：+{added} / −{removed}（合計 {total} 個）— フォントを構築中...',
         'log.draw.detail.expand': '[draw] {count} 件のグリフマッピング（クリックで展開）',
         'log.draw.done': '[draw] 描画フォントを生成しました：{size} KB',
         'log.draw.item': '  - 文字: {char} | 数: {count} | タイムライン: [{start} → {end}]',
@@ -2343,11 +2437,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] 「{name}」の処理に失敗しました: {error}',
-        'log.font.subsetting': '[font] 「{name}」({weight}、{chars} 文字) をサブセット化中…',
-        'log.rewrite.start': '[ass] スクリプトを書き換え中…',
+        'log.font.subsetting': '[font] 「{name}」({weight}、{chars} 文字) を処理中...',
+        'log.rewrite.start': '[ass] スクリプトを書き換え中...',
         'notice.copyright': '⚠ 著作権注意：未許諾フォントの配布は権利侵害となる場合があります。埋め込むフォントの配布権利をご確認ください。',
         'notice.drawing': '⚠ 注意：描画コマンドの変換後、エフェクトの位置やサイズがわずかにずれることがあります。最終的な表示を必ず確認してください。',
-        'opt.draw.desc': '字幕の \\p1…\\p0 ベクター描画をフォント化して冗長性を削減；このオプションはインテリジェントな追加・削除などの操作に対応。',
+        'opt.draw.desc': '字幕の \\p1...\\p0 ベクター描画をフォント化して冗長性を削減；このオプションはインテリジェントな追加・削除などの操作に対応。',
         'opt.draw.title': '描画コマンドのサブセット化',
         'opt.font.desc': 'スクリプト内で使用されているサードパーティフォントを走査し、使用中の文字のみにサブセット化して出力に埋め込みます。',
         'opt.font.title': 'サードパーティフォントの埋め込み',
@@ -2378,10 +2472,10 @@
         'stat.extFonts': 'サードパーティフォント',
         'stat.sysFonts': 'システムフォント',
         'stat.uniqueShapes': 'ユニーク形状',
-        'status.draw': '描画フォントを構築中…',
-        'status.parsing': 'スクリプトを解析中…',
-        'status.rewrite': 'スクリプトを書き換え中…',
-        'status.subset': 'サブセット化中…',
+        'status.draw': '描画フォントを構築中...',
+        'status.parsing': 'スクリプトを解析中...',
+        'status.rewrite': 'スクリプトを書き換え中...',
+        'status.subset': 'サブセット化中...',
         'step.active': '（進行中）',
         'step.done': '（完了）',
         'step1.drop': 'スクリプトをここにドロップ、またはクリックして選択',
@@ -2435,7 +2529,7 @@
         'aria.expand': '클릭하여 세부 정보 펼치기',
         'aria.preview_dl_font': '폰트 {name} 다운로드',
         'btn.convert': '변환 시작',
-        'btn.converting': '처리 중…',
+        'btn.converting': '처리 중...',
         'btn.discuss': '토론',
         'btn.download': '최적화된 자막 다운로드',
         'btn.download_zip': '전체 다운로드 (ZIP)',
@@ -2445,7 +2539,7 @@
         'btn.svg': 'SVG → ASS 드로우',
         'change': '파일 변경',
         'discuss.header': '토론 · Discussion',
-        'discuss.loading': '로딩 중…',
+        'discuss.loading': '로딩 중...',
         'err.format': '.ass 또는 .ssa 형식의 자막 파일을 업로드해 주세요',
         'err.invalid': '유효한 ASS/SSA 파일이 아닙니다',
         'err.no_events': '[Events] 섹션에 Format 또는 Dialogue 줄이 없습니다',
@@ -2454,16 +2548,16 @@
         'err.zip_corrupt': 'ZIP 파일이 손상되었거나 지원되지 않는 형식입니다',
         'err.file_too_large': '파일이 2 GB를 초과합니다. 분할 후 업로드해 주세요',
         'err.ass_too_large': 'ASS/SSA 파일이 512 MB를 초과합니다',
-        'ass.loading': '자막 파일을 읽는 중입니다. 잠시 기다려 주세요…',
+        'ass.loading': '자막 파일을 읽는 중입니다. 잠시 기다려 주세요...',
         'font.chars': '{n}자',
         'font.local.btn': '시스템 폰트 자동 로드',
-        'log.sysfont.scanning': '[font] 시스템 폰트 스캔 중…',
+        'log.sysfont.scanning': '[font] 시스템 폰트 스캔 중...',
         'log.sysfont.done': '[font] ✓ 시스템에서 {n}개의 폰트를 로드했습니다.',
         'log.sysfont.none': '[font] ⚠ 참조된 폰트와 일치하는 시스템 폰트를 찾을 수 없습니다.',
         'log.sysfont.error': '[font] 시스템 폰트 접근 오류: {error}',
         'log.sysfont.unsupported': '[font] ⚠ 이 브라우저는 로컬 폰트 액세스 API를 지원하지 않습니다.',
         'font.match_fail': '[font] ⚠ {n}개의 폰트 파일이 참조된 폰트 이름과 일치하지 않습니다. 폰트 이름을 확인하세요.',
-        'font.upload.summary': '[font] {total}개 폰트 파일 읽기 완료 — 식별 중…',
+        'font.upload.summary': '[font] {total}개 폰트 파일 읽기 완료 — 식별 중...',
         'font.upload.done': '[font] ✓ 폰트 식별 완료 — {matched}개 일치.',
         'font.upload.expand': '[font] {total}개 파일 식별 세부 정보 (클릭하여 펼치기)',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -2471,9 +2565,9 @@
         'font.missing': '업로드 필요',
         'font.path.summary': '💡 주요 폰트 디렉터리',
         'font.skipped': '건너뜀',
-        'font.upload.drop': '폰트 또는 .zip 파일을 선택하거나 여기에 파일/폴더를 드래그하세요 (TTF / OTF / TTC… 지원; 가변 폰트 미지원)',
+        'font.upload.drop': '폰트 또는 .zip 파일을 선택하거나 여기에 파일/폴더를 드래그하세요 (TTF / OTF / TTC... 지원; 가변 폰트 미지원)',
         'font.upload.title': '폰트 파일',
-        'font.loading.label': '폰트 파일을 읽는 중입니다. 잠시 기다려 주세요…',
+        'font.loading.label': '폰트 파일을 읽는 중입니다. 잠시 기다려 주세요...',
         'font.loading.matching': '폰트 식별 중 {current} / {total}',
         'font.loading.aria': '폰트 파일 읽는 중입니다. 페이지를 닫지 마세요',
         'font.uploaded': '✓ {name}',
@@ -2482,6 +2576,20 @@
         'font.weight.boldItalic': '굵은 이탤릭',
         'font.replace.aria': '폰트 파일 {name} 제거',
         'font.weight.normal': '보통',
+        'font.weight.thin': '씬',
+        'font.weight.extraLight': '엑스트라 라이트',
+        'font.weight.light': '라이트',
+        'font.weight.medium': '미디엄',
+        'font.weight.semiBold': '세미 볼드',
+        'font.weight.extraBold': '엑스트라 볼드',
+        'font.weight.black': '블랙',
+        'font.weight.thinItalic': '씬 이탤릭',
+        'font.weight.extraLightItalic': '엑스트라 라이트 이탤릭',
+        'font.weight.lightItalic': '라이트 이탤릭',
+        'font.weight.mediumItalic': '미디엄 이탤릭',
+        'font.weight.semiBoldItalic': '세미 볼드 이탤릭',
+        'font.weight.extraBoldItalic': '엑스트라 볼드 이탤릭',
+        'font.weight.blackItalic': '블랙 이탤릭',
         'footer.feedback': '이슈 보고',
         'footer.home': '홈',
         'footer.license_html': '<a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> 오픈소스 · <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a> 기반',
@@ -2491,11 +2599,11 @@
         'footer.tool': 'ASS 서브셋 도구 (ass-subset)',
         'leave.confirm': '변환이 진행 중입니다. 정말 떠나시겠습니까?',
         'log.convert.done': '[done] 완료. {origKB} KB → {newKB} KB ({delta} KB)',
-        'log.convert.start': '[convert] 변환 시작…',
-        'log.draw.building': '[draw] {unique}개의 고유 도형, {total}개의 참조 발견 — 폰트 구축 중…',
-        'log.draw.building.incremental': '[draw] 증분 업데이트: +{added}개 신규 도형 (총 {total}개) — 폰트 구축 중…',
-        'log.draw.building.delete': '[draw] 증분 업데이트: 모든 드로우 도형 제거 — 폰트 재구축 중…',
-        'log.draw.building.delta': '[draw] 증분 업데이트: +{added} / −{removed} (총 {total}개) — 폰트 구축 중…',
+        'log.convert.start': '[convert] 변환 시작...',
+        'log.draw.building': '[draw] {unique}개의 고유 도형, {total}개의 참조 발견 — 폰트 구축 중...',
+        'log.draw.building.incremental': '[draw] 증분 업데이트: +{added}개 신규 도형 (총 {total}개) — 폰트 구축 중...',
+        'log.draw.building.delete': '[draw] 증분 업데이트: 모든 드로우 도형 제거 — 폰트 재구축 중...',
+        'log.draw.building.delta': '[draw] 증분 업데이트: +{added} / −{removed} (총 {total}개) — 폰트 구축 중...',
         'log.draw.detail.expand': '[draw] {count}개의 글리프 매핑 (클릭하여 펼치기)',
         'log.draw.done': '[draw] 드로우 폰트 생성 완료: {size} KB',
         'log.draw.item': '  - 문자: {char} | 횟수: {count} | 타임라인: [{start} → {end}]',
@@ -2508,11 +2616,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" 처리 실패: {error}',
-        'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 서브셋화 중…',
-        'log.rewrite.start': '[ass] 자막 스크립트 재작성 중…',
+        'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 수집 중...',
+        'log.rewrite.start': '[ass] 자막 스크립트 재작성 중...',
         'notice.copyright': '⚠ 저작권 주의: 허가 없이 폰트를 배포하면 저작권 침해가 될 수 있습니다. 삽입하는 폰트의 배포 권한이 있는지 확인하세요.',
         'notice.drawing': '⚠ 주의: 드로우 명령어 변환 후 효과의 위치나 크기가 약간 변경될 수 있습니다. 항상 최종 결과를 확인하세요.',
-        'opt.draw.desc': '자막의 \\p1…\\p0 벡터 드로우를 폰트로 변환하여 중복을 제거；이 옵션은 지능형 추가/삭제 등의 작업 지원.',
+        'opt.draw.desc': '자막의 \\p1...\\p0 벡터 드로우를 폰트로 변환하여 중복을 제거；이 옵션은 지능형 추가/삭제 등의 작업 지원.',
         'opt.draw.title': '드로우 명령어 서브셋화',
         'opt.font.desc': '자막 내 사용된 서드파티 폰트를 스캔하여 사용된 문자만 서브셋화하고 출력에 삽입합니다.',
         'opt.font.title': '서드파티 폰트 삽입',
@@ -2543,10 +2651,10 @@
         'stat.extFonts': '서드파티 폰트',
         'stat.sysFonts': '시스템 폰트',
         'stat.uniqueShapes': '고유 도형',
-        'status.draw': '드로우 폰트 구축 중…',
-        'status.parsing': '스크립트 파싱 중…',
-        'status.rewrite': '스크립트 재작성 중…',
-        'status.subset': '서브셋화 중…',
+        'status.draw': '드로우 폰트 구축 중...',
+        'status.parsing': '스크립트 파싱 중...',
+        'status.rewrite': '스크립트 재작성 중...',
+        'status.subset': '서브셋화 중...',
         'step.active': '(진행 중)',
         'step.done': '(완료)',
         'step1.drop': '스크립트를 여기에 드래그하거나 클릭하여 선택',
@@ -2600,7 +2708,7 @@
         'aria.expand': 'Haz clic para expandir los detalles',
         'aria.preview_dl_font': 'Descargar fuente {name}',
         'btn.convert': 'Iniciar conversión',
-        'btn.converting': 'Procesando…',
+        'btn.converting': 'Procesando...',
         'btn.discuss': 'Discusión',
         'btn.download': 'Descargar subtítulo optimizado',
         'btn.download_zip': 'Descargar todo (ZIP)',
@@ -2610,7 +2718,7 @@
         'btn.svg': 'SVG a ASS Draw',
         'change': 'Cambiar archivo',
         'discuss.header': 'Discusión · Discussion',
-        'discuss.loading': 'Cargando…',
+        'discuss.loading': 'Cargando...',
         'err.format': 'Por favor subí un archivo de subtítulos .ass o .ssa',
         'err.invalid': 'No es un archivo ASS/SSA válido',
         'err.no_events': 'Sin líneas Format/Dialogue válidas en [Events]',
@@ -2619,16 +2727,16 @@
         'err.zip_corrupt': 'El archivo ZIP está dañado o en un formato no compatible',
         'err.file_too_large': 'El archivo supera 2 GB — divídalo antes de subir',
         'err.ass_too_large': 'El archivo ASS/SSA supera 512 MB — demasiado grande para procesar.',
-        'ass.loading': 'Leyendo archivos de subtítulos, por favor esperá…',
+        'ass.loading': 'Leyendo archivos de subtítulos, por favor esperá...',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Cargar fuentes del sistema',
-        'log.sysfont.scanning': '[font] Escaneando fuentes del sistema…',
+        'log.sysfont.scanning': '[font] Escaneando fuentes del sistema...',
         'log.sysfont.done': '[font] ✓ Se cargaron {n} fuente(s) del sistema.',
         'log.sysfont.none': '[font] ⚠ No se encontraron fuentes del sistema que coincidan.',
         'log.sysfont.error': '[font] Error al acceder a fuentes del sistema: {error}',
         'log.sysfont.unsupported': '[font] ⚠ Este navegador no soporta la API de acceso a fuentes locales.',
         'font.match_fail': '[font] ⚠ {n} archivo(s) de fuente no pudieron coincidir con ninguna fuente referenciada. Verificá los nombres.',
-        'font.upload.summary': '[font] {total} archivo(s) leído(s) — identificando fuentes…',
+        'font.upload.summary': '[font] {total} archivo(s) leído(s) — identificando fuentes...',
         'font.upload.done': '[font] ✓ Identificación completa — {matched} coincidencias.',
         'font.upload.expand': '[font] Detalles de {total} archivo(s) (clic para expandir)',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -2636,9 +2744,9 @@
         'font.missing': 'Pendiente de subir',
         'font.path.summary': '💡 Directorios de fuentes comunes',
         'font.skipped': 'omitida',
-        'font.upload.drop': 'Haz clic para seleccionar fuentes o un .zip, o arrastra archivos/carpetas aquí (TTF / OTF / TTC…; fuentes variables no compatibles)',
+        'font.upload.drop': 'Haz clic para seleccionar fuentes o un .zip, o arrastra archivos/carpetas aquí (TTF / OTF / TTC...; fuentes variables no compatibles)',
         'font.upload.title': 'Archivos de fuentes',
-        'font.loading.label': 'Leyendo archivos de fuentes, por favor esperá…',
+        'font.loading.label': 'Leyendo archivos de fuentes, por favor esperá...',
         'font.loading.matching': 'Identificando fuente {current} / {total}',
         'font.loading.aria': 'Leyendo archivos de fuentes, no cierres la página',
         'font.uploaded': '✓ {name}',
@@ -2647,6 +2755,20 @@
         'font.weight.boldItalic': 'Negrita Cursiva',
         'font.replace.aria': 'Eliminar archivo de fuente {name}',
         'font.weight.normal': 'Regular',
+        'font.weight.thin': 'Delgado',
+        'font.weight.extraLight': 'Extradelgado',
+        'font.weight.light': 'Ligero',
+        'font.weight.medium': 'Medio',
+        'font.weight.semiBold': 'Seminegrita',
+        'font.weight.extraBold': 'Extranegrita',
+        'font.weight.black': 'Negro',
+        'font.weight.thinItalic': 'Delgado cursiva',
+        'font.weight.extraLightItalic': 'Extradelgado cursiva',
+        'font.weight.lightItalic': 'Ligero cursiva',
+        'font.weight.mediumItalic': 'Medio cursiva',
+        'font.weight.semiBoldItalic': 'Seminegrita cursiva',
+        'font.weight.extraBoldItalic': 'Extranegrita cursiva',
+        'font.weight.blackItalic': 'Negro cursiva',
         'footer.feedback': 'Reportar problema',
         'footer.home': 'Inicio',
         'footer.license_html': 'Código abierto bajo <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · Basado en <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
@@ -2656,11 +2778,11 @@
         'footer.tool': 'Herramienta ASS de subconjunto (ass-subset)',
         'leave.confirm': 'La conversión está en progreso. ¿Seguro que querés salir?',
         'log.convert.done': '[done] Completado. {origKB} KB → {newKB} KB ({delta} KB)',
-        'log.convert.start': '[convert] Iniciando…',
-        'log.draw.building': '[draw] {unique} formas únicas, {total} referencias — construyendo fuente…',
-        'log.draw.building.incremental': '[draw] Actualización incremental: +{added} forma(s) nueva(s) (total {total}) — construyendo fuente…',
-        'log.draw.building.delete': '[draw] Actualización incremental: todas las formas eliminadas — reconstruyendo fuente…',
-        'log.draw.building.delta': '[draw] Actualización incremental: +{added} / −{removed} (total {total} formas) — construyendo fuente…',
+        'log.convert.start': '[convert] Iniciando...',
+        'log.draw.building': '[draw] {unique} formas únicas, {total} referencias — construyendo fuente...',
+        'log.draw.building.incremental': '[draw] Actualización incremental: +{added} forma(s) nueva(s) (total {total}) — construyendo fuente...',
+        'log.draw.building.delete': '[draw] Actualización incremental: todas las formas eliminadas — reconstruyendo fuente...',
+        'log.draw.building.delta': '[draw] Actualización incremental: +{added} / −{removed} (total {total} formas) — construyendo fuente...',
         'log.draw.detail.expand': '[draw] {count} mapeos de glifos (clic para expandir)',
         'log.draw.done': '[draw] Fuente de dibujo generada: {size} KB',
         'log.draw.item': '  - Carácter: {char} | Conteo: {count} | Línea de tiempo: [{start} → {end}]',
@@ -2673,11 +2795,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falló: {error}',
-        'log.font.subsetting': '[font] Creando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
-        'log.rewrite.start': '[ass] Reescribiendo el script…',
+        'log.font.subsetting': '[font] Procesando "{name}" ({weight}, {chars} caracteres)...',
+        'log.rewrite.start': '[ass] Reescribiendo el script...',
         'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegurate de tener permiso para distribuir las fuentes que incrustes.',
         'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores. Siempre verificá el resultado final.',
-        'opt.draw.desc': 'Extrae los vectores \\p1…\\p0 en fuentes incrustadas para reducir redundancia; esta opción admite operaciones inteligentes de adición y eliminación.',
+        'opt.draw.desc': 'Extrae los vectores \\p1...\\p0 en fuentes incrustadas para reducir redundancia; esta opción admite operaciones inteligentes de adición y eliminación.',
         'opt.draw.title': 'Subconjunto de comandos de dibujo',
         'opt.font.desc': 'Escanea las fuentes de terceros usadas en el script, crea un subconjunto solo con los caracteres usados e incrustalas en la salida.',
         'opt.font.title': 'Incrustar fuentes de terceros',
@@ -2708,10 +2830,10 @@
         'stat.extFonts': 'Fuentes de terceros',
         'stat.sysFonts': 'Fuentes del sistema',
         'stat.uniqueShapes': 'Formas únicas',
-        'status.draw': 'Construyendo fuente de dibujo…',
-        'status.parsing': 'Parseando el script…',
-        'status.rewrite': 'Reescribiendo el script…',
-        'status.subset': 'Creando subconjunto…',
+        'status.draw': 'Construyendo fuente de dibujo...',
+        'status.parsing': 'Parseando el script...',
+        'status.rewrite': 'Reescribiendo el script...',
+        'status.subset': 'Creando subconjunto...',
         'step.active': '(en progreso)',
         'step.done': '(completado)',
         'step1.drop': 'Arrastrá tu script aquí, o hacé clic para seleccionar',
@@ -2765,7 +2887,7 @@
         'aria.expand': 'Нажмите для раскрытия деталей',
         'aria.preview_dl_font': 'Скачать шрифт {name}',
         'btn.convert': 'Запустить субсеттер',
-        'btn.converting': 'Обработка…',
+        'btn.converting': 'Обработка...',
         'btn.discuss': 'Обсуждение',
         'btn.download': 'Скачать результат',
         'btn.download_zip': 'Скачать всё (ZIP)',
@@ -2775,7 +2897,7 @@
         'btn.svg': 'SVG → ASS рисование',
         'change': 'Сменить файл',
         'discuss.header': 'Обсуждение · Discussion',
-        'discuss.loading': 'Загрузка…',
+        'discuss.loading': 'Загрузка...',
         'err.format': 'Загрузите файл субтитров в формате .ass или .ssa',
         'err.invalid': 'Не является корректным файлом ASS/SSA',
         'err.no_events': 'В секции [Events] отсутствуют строки Format или Dialogue',
@@ -2784,16 +2906,16 @@
         'err.zip_corrupt': 'ZIP-файл повреждён или имеет неподдерживаемый формат',
         'err.file_too_large': 'Файл превышает 2 ГБ — разделите его перед загрузкой',
         'err.ass_too_large': 'Файл ASS/SSA превышает 512 МБ — слишком велик для обработки.',
-        'ass.loading': 'Чтение файлов субтитров, пожалуйста подождите…',
+        'ass.loading': 'Чтение файлов субтитров, пожалуйста подождите...',
         'font.chars': '{n} симв.',
         'font.local.btn': 'Загрузить системные шрифты',
-        'log.sysfont.scanning': '[font] Сканирование системных шрифтов…',
+        'log.sysfont.scanning': '[font] Сканирование системных шрифтов...',
         'log.sysfont.done': '[font] ✓ Загружено {n} системных шрифтов.',
         'log.sysfont.none': '[font] ⚠ Системные шрифты, соответствующие субтитрам, не найдены.',
         'log.sysfont.error': '[font] Ошибка доступа к системным шрифтам: {error}',
         'log.sysfont.unsupported': '[font] ⚠ Этот браузер не поддерживает API локального доступа к шрифтам.',
         'font.match_fail': '[font] ⚠ {n} файл(ов) шрифтов не удалось сопоставить с именами в скрипте. Проверьте правильность имён.',
-        'font.upload.summary': '[font] Прочитано {total} файл(ов) шрифтов — идентификация…',
+        'font.upload.summary': '[font] Прочитано {total} файл(ов) шрифтов — идентификация...',
         'font.upload.done': '[font] ✓ Идентификация завершена — совпало {matched}.',
         'font.upload.expand': '[font] Подробности по {total} файл(ам) (нажмите для раскрытия)',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -2801,9 +2923,9 @@
         'font.missing': 'Требует загрузки',
         'font.path.summary': '💡 Стандартные папки шрифтов',
         'font.skipped': 'пропущен',
-        'font.upload.drop': 'Нажмите для выбора шрифтов или .zip-архива, или перетащите файлы/папки сюда (TTF / OTF / TTC…; вариативные шрифты не поддерживаются)',
+        'font.upload.drop': 'Нажмите для выбора шрифтов или .zip-архива, или перетащите файлы/папки сюда (TTF / OTF / TTC...; вариативные шрифты не поддерживаются)',
         'font.upload.title': 'Файлы шрифтов',
-        'font.loading.label': 'Чтение файлов шрифтов, пожалуйста подождите…',
+        'font.loading.label': 'Чтение файлов шрифтов, пожалуйста подождите...',
         'font.loading.matching': 'Идентификация шрифта {current} / {total}',
         'font.loading.aria': 'Идёт чтение файлов шрифтов, не закрывайте страницу',
         'font.uploaded': '✓ {name}',
@@ -2812,6 +2934,20 @@
         'font.weight.boldItalic': 'Полужирный курсив',
         'font.replace.aria': 'Удалить файл шрифта {name}',
         'font.weight.normal': 'Обычный',
+        'font.weight.thin': 'Тонкий',
+        'font.weight.extraLight': 'Экстратонкий',
+        'font.weight.light': 'Лёгкий',
+        'font.weight.medium': 'Средний',
+        'font.weight.semiBold': 'Полужирный',
+        'font.weight.extraBold': 'Экстражирный',
+        'font.weight.black': 'Чёрный',
+        'font.weight.thinItalic': 'Тонкий курсив',
+        'font.weight.extraLightItalic': 'Экстратонкий курсив',
+        'font.weight.lightItalic': 'Лёгкий курсив',
+        'font.weight.mediumItalic': 'Средний курсив',
+        'font.weight.semiBoldItalic': 'Полужирный курсив',
+        'font.weight.extraBoldItalic': 'Экстражирный курсив',
+        'font.weight.blackItalic': 'Чёрный курсив',
         'footer.feedback': 'Сообщить о проблеме',
         'footer.home': 'Главная',
         'footer.license_html': 'Открытый код под <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · На основе <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
@@ -2821,11 +2957,11 @@
         'footer.tool': 'ASS субсеттер (ass-subset)',
         'leave.confirm': 'Обработка ещё не завершена. Уйти?',
         'log.convert.done': '[done] Готово. {origKB} КБ → {newKB} КБ ({delta} КБ)',
-        'log.convert.start': '[convert] Запуск обработки…',
-        'log.draw.building': '[draw] {unique} уникальных форм, {total} ссылок — строим шрифт…',
-        'log.draw.building.incremental': '[draw] Инкрементальное обновление: +{added} новых форм (всего {total}) — строим шрифт…',
-        'log.draw.building.delete': '[draw] Инкрементальное обновление: все формы удалены — перестраиваем шрифт…',
-        'log.draw.building.delta': '[draw] Инкрементальное обновление: +{added} / −{removed} (всего {total} форм) — строим шрифт…',
+        'log.convert.start': '[convert] Запуск обработки...',
+        'log.draw.building': '[draw] {unique} уникальных форм, {total} ссылок — строим шрифт...',
+        'log.draw.building.incremental': '[draw] Инкрементальное обновление: +{added} новых форм (всего {total}) — строим шрифт...',
+        'log.draw.building.delete': '[draw] Инкрементальное обновление: все формы удалены — перестраиваем шрифт...',
+        'log.draw.building.delta': '[draw] Инкрементальное обновление: +{added} / −{removed} (всего {total} форм) — строим шрифт...',
         'log.draw.detail.expand': '[draw] {count} глиф-маппингов (нажмите для раскрытия)',
         'log.draw.done': '[draw] Шрифт рисования создан: {size} КБ',
         'log.draw.item': '  - Символ: {char} | Кол-во: {count} | Тайм-код: [{start} → {end}]',
@@ -2838,11 +2974,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] «{name}» ({weight}): {origKB} КБ → {newKB} КБ (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] Ошибка обработки «{name}»: {error}',
-        'log.font.subsetting': '[font] Создание подмножества «{name}» ({weight}, {chars} симв.)…',
-        'log.rewrite.start': '[ass] Перезапись скрипта…',
+        'log.font.subsetting': '[font] Создание подмножества «{name}» ({weight}, {chars} симв.)...',
+        'log.rewrite.start': '[ass] Перезапись скрипта...',
         'notice.copyright': '⚠ Авторские права: распространение шрифтов без лицензии может нарушать авторские права. Убедитесь в наличии прав на распространение встраиваемых шрифтов.',
         'notice.drawing': '⚠ Внимание: после конвертации команд рисования возможны незначительные смещения позиций и размеров эффектов. Обязательно проверьте конечный результат.',
-        'opt.draw.desc': 'Извлекает векторные данные \\p1…\\p0 в встроенные шрифты для уменьшения избыточности; этот параметр поддерживает интеллектуальные операции добавления и удаления.',
+        'opt.draw.desc': 'Извлекает векторные данные \\p1...\\p0 в встроенные шрифты для уменьшения избыточности; этот параметр поддерживает интеллектуальные операции добавления и удаления.',
         'opt.draw.title': 'Подмножество команд рисования',
         'opt.font.desc': 'Сканирует шрифты третьих сторон, используемые в скрипте, создаёт подмножество только из используемых символов и встраивает их в вывод.',
         'opt.font.title': 'Встроить шрифты третьих сторон',
@@ -2873,10 +3009,10 @@
         'stat.extFonts': 'Шрифты третьих сторон',
         'stat.sysFonts': 'Системные шрифты',
         'stat.uniqueShapes': 'Уникальные формы',
-        'status.draw': 'Построение шрифта рисования…',
-        'status.parsing': 'Разбор скрипта…',
-        'status.rewrite': 'Перезапись скрипта…',
-        'status.subset': 'Создание подмножества…',
+        'status.draw': 'Построение шрифта рисования...',
+        'status.parsing': 'Разбор скрипта...',
+        'status.rewrite': 'Перезапись скрипта...',
+        'status.subset': 'Создание подмножества...',
         'step.active': '(в процессе)',
         'step.done': '(завершено)',
         'step1.drop': 'Перетащите скрипт сюда или нажмите для выбора',
@@ -2930,7 +3066,7 @@
         'aria.expand': 'Clique para expandir os detalhes',
         'aria.preview_dl_font': 'Baixar fonte {name}',
         'btn.convert': 'Executar Subsetter',
-        'btn.converting': 'Processando…',
+        'btn.converting': 'Processando...',
         'btn.discuss': 'Discussão',
         'btn.download': 'Baixar legenda otimizada',
         'btn.download_zip': 'Baixar tudo (ZIP)',
@@ -2940,7 +3076,7 @@
         'btn.svg': 'SVG para ASS Draw',
         'change': 'Trocar arquivo',
         'discuss.header': 'Discussão · Discussion',
-        'discuss.loading': 'Carregando…',
+        'discuss.loading': 'Carregando...',
         'err.format': 'Por favor, envie um arquivo de legenda .ass ou .ssa',
         'err.invalid': 'Não é um arquivo ASS/SSA válido',
         'err.no_events': 'Sem linhas Format/Dialogue válidas em [Events]',
@@ -2949,16 +3085,16 @@
         'err.zip_corrupt': 'O arquivo ZIP está corrompido ou em um formato não suportado',
         'err.file_too_large': 'Arquivo supera 2 GB — divida-o antes de enviar',
         'err.ass_too_large': 'O arquivo ASS/SSA supera 512 MB — grande demais para processar.',
-        'ass.loading': 'Lendo arquivos de legenda, aguarde…',
+        'ass.loading': 'Lendo arquivos de legenda, aguarde...',
         'font.chars': '{n} caracteres',
         'font.local.btn': 'Carregar fontes do sistema',
-        'log.sysfont.scanning': '[font] Verificando fontes do sistema…',
+        'log.sysfont.scanning': '[font] Verificando fontes do sistema...',
         'log.sysfont.done': '[font] ✓ {n} fonte(s) carregada(s) do sistema.',
         'log.sysfont.none': '[font] ⚠ Nenhuma fonte do sistema correspondeu às fontes referenciadas.',
         'log.sysfont.error': '[font] Erro ao acessar fontes do sistema: {error}',
         'log.sysfont.unsupported': '[font] ⚠ Este navegador não suporta a API de acesso a fontes locais.',
         'font.match_fail': '[font] ⚠ {n} arquivo(s) de fonte não corresponderam a nenhuma fonte referenciada. Verifique os nomes.',
-        'font.upload.summary': '[font] {total} arquivo(s) lido(s) — identificando fontes…',
+        'font.upload.summary': '[font] {total} arquivo(s) lido(s) — identificando fontes...',
         'font.upload.done': '[font] ✓ Identificação concluída — {matched} correspondência(s).',
         'font.upload.expand': '[font] Detalhes de {total} arquivo(s) (clique para expandir)',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -2966,9 +3102,9 @@
         'font.missing': 'Aguardando envio',
         'font.path.summary': '💡 Diretórios de fontes comuns',
         'font.skipped': 'ignorada',
-        'font.upload.drop': 'Clique para selecionar fontes ou um .zip, ou arraste arquivos/pastas aqui (TTF / OTF / TTC…; fontes variáveis não suportadas)',
+        'font.upload.drop': 'Clique para selecionar fontes ou um .zip, ou arraste arquivos/pastas aqui (TTF / OTF / TTC...; fontes variáveis não suportadas)',
         'font.upload.title': 'Arquivos de fonte',
-        'font.loading.label': 'Lendo arquivos de fonte, aguarde…',
+        'font.loading.label': 'Lendo arquivos de fonte, aguarde...',
         'font.loading.matching': 'Identificando fonte {current} / {total}',
         'font.loading.aria': 'Lendo arquivos de fonte, não feche a página',
         'font.uploaded': '✓ {name}',
@@ -2977,6 +3113,20 @@
         'font.weight.boldItalic': 'Negrito Itálico',
         'font.replace.aria': 'Remover arquivo de fonte {name}',
         'font.weight.normal': 'Regular',
+        'font.weight.thin': 'Fino',
+        'font.weight.extraLight': 'Extrafino',
+        'font.weight.light': 'Leve',
+        'font.weight.medium': 'Médio',
+        'font.weight.semiBold': 'Seminegrito',
+        'font.weight.extraBold': 'Extranegrito',
+        'font.weight.black': 'Preto',
+        'font.weight.thinItalic': 'Fino itálico',
+        'font.weight.extraLightItalic': 'Extrafino itálico',
+        'font.weight.lightItalic': 'Leve itálico',
+        'font.weight.mediumItalic': 'Médio itálico',
+        'font.weight.semiBoldItalic': 'Seminegrito itálico',
+        'font.weight.extraBoldItalic': 'Extranegrito itálico',
+        'font.weight.blackItalic': 'Preto itálico',
         'footer.feedback': 'Reportar problema',
         'footer.home': 'Início',
         'footer.license_html': 'Código aberto sob <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · Baseado em <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
@@ -2986,11 +3136,11 @@
         'footer.tool': 'ASS Subsetter (ass-subset)',
         'leave.confirm': 'O processamento ainda está em andamento. Sair mesmo assim?',
         'log.convert.done': '[done] Concluído. {origKB} KB → {newKB} KB ({delta} KB)',
-        'log.convert.start': '[convert] Iniciando…',
-        'log.draw.building': '[draw] {unique} formas únicas, {total} referências — construindo fonte…',
-        'log.draw.building.incremental': '[draw] Atualização incremental: +{added} nova(s) forma(s) (total {total}) — construindo fonte…',
-        'log.draw.building.delete': '[draw] Atualização incremental: todas as formas removidas — reconstruindo fonte…',
-        'log.draw.building.delta': '[draw] Atualização incremental: +{added} / −{removed} (total {total} formas) — construindo fonte…',
+        'log.convert.start': '[convert] Iniciando...',
+        'log.draw.building': '[draw] {unique} formas únicas, {total} referências — construindo fonte...',
+        'log.draw.building.incremental': '[draw] Atualização incremental: +{added} nova(s) forma(s) (total {total}) — construindo fonte...',
+        'log.draw.building.delete': '[draw] Atualização incremental: todas as formas removidas — reconstruindo fonte...',
+        'log.draw.building.delta': '[draw] Atualização incremental: +{added} / −{removed} (total {total} formas) — construindo fonte...',
         'log.draw.detail.expand': '[draw] {count} mapeamentos de glifos (clique para expandir)',
         'log.draw.done': '[draw] Fonte de desenho criada: {size} KB',
         'log.draw.item': '  - Caractere: {char} | Contagem: {count} | Timeline: [{start} → {end}]',
@@ -3003,11 +3153,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falhou: {error}',
-        'log.font.subsetting': '[font] Criando subconjunto de "{name}" ({weight}, {chars} caracteres)…',
-        'log.rewrite.start': '[ass] Reescrevendo script…',
+        'log.font.subsetting': '[font] Processando "{name}" ({weight}, {chars} caracteres)...',
+        'log.rewrite.start': '[ass] Reescrevendo script...',
         'notice.copyright': '⚠ Direitos autorais: redistribuir fontes sem licença adequada pode constituir infração. Certifique-se de ter permissão para distribuir as fontes que incorporar.',
         'notice.drawing': '⚠ Atenção: a conversão de comandos de desenho pode causar pequenos deslocamentos de posição ou escala. Sempre verifique o resultado final.',
-        'opt.draw.desc': 'Extrai dados vetoriais \\p1…\\p0 para fontes incorporadas para reduzir redundância; esta opção suporta operações inteligentes de adição e exclusão.',
+        'opt.draw.desc': 'Extrai dados vetoriais \\p1...\\p0 para fontes incorporadas para reduzir redundância; esta opção suporta operações inteligentes de adição e exclusão.',
         'opt.draw.title': 'Subconjunto de comandos de desenho',
         'opt.font.desc': 'Escaneia as fontes de terceiros usadas no script, cria um subconjunto apenas com os caracteres usados e as incorpora na saída.',
         'opt.font.title': 'Incorporar fontes de terceiros',
@@ -3038,10 +3188,10 @@
         'stat.extFonts': 'Fontes de terceiros',
         'stat.sysFonts': 'Fontes do sistema',
         'stat.uniqueShapes': 'Formas únicas',
-        'status.draw': 'Construindo fonte de desenho…',
-        'status.parsing': 'Analisando script…',
-        'status.rewrite': 'Reescrevendo script…',
-        'status.subset': 'Criando subconjunto…',
+        'status.draw': 'Construindo fonte de desenho...',
+        'status.parsing': 'Analisando script...',
+        'status.rewrite': 'Reescrevendo script...',
+        'status.subset': 'Criando subconjunto...',
         'step.active': '(em andamento)',
         'step.done': '(concluído)',
         'step1.drop': 'Arraste seu script aqui ou clique para selecionar',
@@ -3095,7 +3245,7 @@
         'aria.expand': 'انقر لتوسيع التفاصيل',
         'aria.preview_dl_font': 'تنزيل خط {name}',
         'btn.convert': 'تشغيل المُقلِّص',
-        'btn.converting': 'جارٍ المعالجة…',
+        'btn.converting': 'جارٍ المعالجة...',
         'btn.discuss': 'نقاش',
         'btn.download': 'تحميل الناتج',
         'btn.download_zip': 'تحميل الكل (ZIP)',
@@ -3105,7 +3255,7 @@
         'btn.svg': 'SVG إلى ASS Draw',
         'change': 'تغيير الملف',
         'discuss.header': 'نقاش · Discussion',
-        'discuss.loading': 'جارٍ التحميل…',
+        'discuss.loading': 'جارٍ التحميل...',
         'err.format': 'يرجى رفع ملف ترجمة بصيغة .ass أو .ssa',
         'err.invalid': 'ليس ملف ASS/SSA صحيحاً',
         'err.no_events': 'لا توجد أسطر Format/Dialogue في قسم [Events]',
@@ -3114,16 +3264,16 @@
         'err.zip_corrupt': 'ملف ZIP تالف أو بتنسيق غير مدعوم',
         'err.file_too_large': 'يتجاوز هذا الملف 2 GB — يرجى تقسيمه قبل الرفع',
         'err.ass_too_large': 'ملف ASS/SSA يتجاوز 512 MB — كبير جداً للمعالجة.',
-        'ass.loading': 'جارٍ قراءة ملفات الترجمة، يرجى الانتظار…',
+        'ass.loading': 'جارٍ قراءة ملفات الترجمة، يرجى الانتظار...',
         'font.chars': '{n} حرف',
         'font.local.btn': 'تحميل خطوط النظام',
-        'log.sysfont.scanning': '[font] جارٍ فحص خطوط النظام…',
+        'log.sysfont.scanning': '[font] جارٍ فحص خطوط النظام...',
         'log.sysfont.done': '[font] ✓ تم تحميل {n} خط(وط) من النظام.',
         'log.sysfont.none': '[font] ⚠ لم يتم العثور على خطوط نظام مطابقة.',
         'log.sysfont.error': '[font] خطأ في الوصول إلى خطوط النظام: {error}',
         'log.sysfont.unsupported': '[font] ⚠ هذا المتصفح لا يدعم واجهة برمجة الوصول إلى الخطوط المحلية.',
         'font.match_fail': '[font] ⚠ تعذّر مطابقة {n} ملف خط مع الخطوط المشار إليها في النص. تحقق من الأسماء.',
-        'font.upload.summary': '[font] تمّت قراءة {total} ملف(ات) خطوط — جارٍ التعرف…',
+        'font.upload.summary': '[font] تمّت قراءة {total} ملف(ات) خطوط — جارٍ التعرف...',
         'font.upload.done': '[font] ✓ اكتمل التعرف — {matched} خط متطابق.',
         'font.upload.expand': '[font] تفاصيل {total} ملف(ات) (انقر للتوسيع)',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -3131,9 +3281,9 @@
         'font.missing': 'في انتظار الرفع',
         'font.path.summary': '💡 مسارات الخطوط الشائعة',
         'font.skipped': 'تم التخطي',
-        'font.upload.drop': 'انقر لاختيار الخطوط أو ملف .zip، أو اسحب الملفات/المجلدات هنا (TTF / OTF / TTC…؛ الخطوط المتغيرة غير مدعومة)',
+        'font.upload.drop': 'انقر لاختيار الخطوط أو ملف .zip، أو اسحب الملفات/المجلدات هنا (TTF / OTF / TTC...؛ الخطوط المتغيرة غير مدعومة)',
         'font.upload.title': 'ملفات الخطوط',
-        'font.loading.label': 'جارٍ قراءة ملفات الخطوط، يرجى الانتظار…',
+        'font.loading.label': 'جارٍ قراءة ملفات الخطوط، يرجى الانتظار...',
         'font.loading.matching': 'جارٍ التعرف على الخط {current} / {total}',
         'font.loading.aria': 'جارٍ قراءة ملفات الخطوط، لا تغلق الصفحة',
         'font.uploaded': '✓ {name}',
@@ -3151,11 +3301,11 @@
         'footer.tool': 'أداة ASS للتقليص (ass-subset)',
         'leave.confirm': 'المعالجة لا تزال جارية. هل تريد المغادرة؟',
         'log.convert.done': '[done] اكتمل. {origKB} كيلوبايت → {newKB} كيلوبايت ({delta} كيلوبايت)',
-        'log.convert.start': '[convert] بدء المعالجة…',
-        'log.draw.building': '[draw] {unique} شكل فريد، {total} إحالة — جارٍ بناء الخط…',
-        'log.draw.building.incremental': '[draw] تحديث تدريجي: +{added} أشكال جديدة (المجموع {total}) — جارٍ بناء الخط…',
-        'log.draw.building.delete': '[draw] تحديث تدريجي: تم حذف جميع الأشكال — جارٍ إعادة بناء الخط…',
-        'log.draw.building.delta': '[draw] تحديث تدريجي: +{added} / −{removed} (المجموع {total} أشكال) — جارٍ بناء الخط…',
+        'log.convert.start': '[convert] بدء المعالجة...',
+        'log.draw.building': '[draw] {unique} شكل فريد، {total} إحالة — جارٍ بناء الخط...',
+        'log.draw.building.incremental': '[draw] تحديث تدريجي: +{added} أشكال جديدة (المجموع {total}) — جارٍ بناء الخط...',
+        'log.draw.building.delete': '[draw] تحديث تدريجي: تم حذف جميع الأشكال — جارٍ إعادة بناء الخط...',
+        'log.draw.building.delta': '[draw] تحديث تدريجي: +{added} / −{removed} (المجموع {total} أشكال) — جارٍ بناء الخط...',
         'log.draw.detail.expand': '[draw] {count} تعيين غليف (انقر للتوسيع)',
         'log.draw.done': '[draw] تم بناء خط الرسم: {size} كيلوبايت',
         'log.draw.item': '  - الحرف: {char} | العدد: {count} | التوقيت: [{start} → {end}]',
@@ -3168,11 +3318,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} كيلوبايت → {newKB} كيلوبايت (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] فشلت معالجة "{name}": {error}',
-        'log.font.subsetting': '[font] جارٍ تقليص "{name}" ({weight}، {chars} حرف)…',
-        'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص…',
+        'log.font.subsetting': '[font] جارٍ تقليص "{name}" ({weight}، {chars} حرف)...',
+        'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص...',
         'notice.copyright': '⚠ حقوق الملكية: قد يُشكّل توزيع الخطوط دون ترخيص انتهاكاً لحقوق النشر. تأكد من امتلاكك حق توزيع الخطوط التي تضمّنها.',
         'notice.drawing': '⚠ ملاحظة: قد يتسبب تحويل أوامر الرسم في انزياحات طفيفة في المواضع والأحجام. تحقق دائماً من النتيجة النهائية.',
-        'opt.draw.desc': 'استخرج بيانات الرسم المتجه \\p1…\\p0 إلى خطوط مضمنة لتقليل التكرار؛ يدعم هذا الخيار عمليات ذكية للإضافة والحذف.',
+        'opt.draw.desc': 'استخرج بيانات الرسم المتجه \\p1...\\p0 إلى خطوط مضمنة لتقليل التكرار؛ يدعم هذا الخيار عمليات ذكية للإضافة والحذف.',
         'opt.draw.title': 'تقليص أوامر الرسم',
         'opt.font.desc': 'يفحص خطوط الطرف الثالث المستخدمة في النص، ينشئ مجموعة فرعية من الأحرف المستخدمة فقط، ثم يضمّنها في الملف الناتج.',
         'opt.font.title': 'تضمين خطوط الطرف الثالث',
@@ -3203,10 +3353,10 @@
         'stat.extFonts': 'خطوط الطرف الثالث',
         'stat.sysFonts': 'خطوط النظام',
         'stat.uniqueShapes': 'أشكال فريدة',
-        'status.draw': 'جارٍ بناء خط الرسم…',
-        'status.parsing': 'جارٍ تحليل النص…',
-        'status.rewrite': 'جارٍ إعادة الكتابة…',
-        'status.subset': 'جارٍ التقليص…',
+        'status.draw': 'جارٍ بناء خط الرسم...',
+        'status.parsing': 'جارٍ تحليل النص...',
+        'status.rewrite': 'جارٍ إعادة الكتابة...',
+        'status.subset': 'جارٍ التقليص...',
         'step.active': '(قيد التنفيذ)',
         'step.done': '(مكتمل)',
         'step1.drop': 'اسحب نصك هنا أو انقر للاختيار',
@@ -3260,7 +3410,7 @@
         'aria.expand': 'Ayrıntıları genişletmek için tıklayın',
         'aria.preview_dl_font': 'Font {name} indir',
         'btn.convert': 'Alt Kümelemeyi Çalıştır',
-        'btn.converting': 'İşleniyor…',
+        'btn.converting': 'İşleniyor...',
         'btn.discuss': 'Tartışma',
         'btn.download': 'Çıktıyı indir',
         'btn.download_zip': 'Tümünü indir (ZIP)',
@@ -3270,7 +3420,7 @@
         'btn.svg': "SVG'den ASS Draw'a",
         'change': 'Dosyayı değiştir',
         'discuss.header': 'Tartışma · Discussion',
-        'discuss.loading': 'Yükleniyor…',
+        'discuss.loading': 'Yükleniyor...',
         'err.format': 'Lütfen .ass veya .ssa formatında bir altyazı dosyası yükleyin',
         'err.invalid': 'Geçerli bir ASS/SSA dosyası değil',
         'err.no_events': '[Events] bölümünde Format veya Dialogue satırı yok',
@@ -3279,16 +3429,16 @@
         'err.zip_corrupt': 'ZIP dosyası bozuk veya desteklenmeyen bir formatta',
         'err.file_too_large': 'Dosya 2 GB\'ı aşıyor — lütfen yüklemeden önce bölün',
         'err.ass_too_large': 'ASS/SSA dosyası 512 MB\'ı aşıyor — işlemek için çok büyük.',
-        'ass.loading': 'Altyazı dosyaları okunuyor, lütfen bekleyin…',
+        'ass.loading': 'Altyazı dosyaları okunuyor, lütfen bekleyin...',
         'font.chars': '{n} karakter',
         'font.local.btn': 'Sistem fontlarını yükle',
-        'log.sysfont.scanning': '[font] Sistem fontları taranıyor…',
+        'log.sysfont.scanning': '[font] Sistem fontları taranıyor...',
         'log.sysfont.done': '[font] ✓ Sistemden {n} font yüklendi.',
         'log.sysfont.none': '[font] ⚠ Referans verilen fontlarla eşleşen sistem fontu bulunamadı.',
         'log.sysfont.error': '[font] Sistem font erişim hatası: {error}',
         'log.sysfont.unsupported': '[font] ⚠ Bu tarayıcı Yerel Font Erişim API\'sini desteklemiyor.',
         'font.match_fail': '[font] ⚠ {n} font dosyası altyazıdaki font adlarıyla eşleştirilemedi. Adları kontrol edin.',
-        'font.upload.summary': '[font] {total} font dosyası okundu — tanımlanıyor…',
+        'font.upload.summary': '[font] {total} font dosyası okundu — tanımlanıyor...',
         'font.upload.done': '[font] ✓ Tanımlama tamamlandı — {matched} eşleşme.',
         'font.upload.expand': '[font] {total} dosyanın ayrıntıları (genişletmek için tıkla)',
         'font.upload.item.ok': '  ✓ {name} → {matched}',
@@ -3296,9 +3446,9 @@
         'font.missing': 'Yükleme bekleniyor',
         'font.path.summary': '💡 Yaygın font dizinleri',
         'font.skipped': 'atlandı',
-        'font.upload.drop': 'Font veya .zip dosyası seçmek için tıklayın ya da dosya/klasör buraya sürükleyin (TTF / OTF / TTC… desteklenir; değişken fontlar desteklenmez)',
+        'font.upload.drop': 'Font veya .zip dosyası seçmek için tıklayın ya da dosya/klasör buraya sürükleyin (TTF / OTF / TTC... desteklenir; değişken fontlar desteklenmez)',
         'font.upload.title': 'Font dosyaları',
-        'font.loading.label': 'Font dosyaları okunuyor, lütfen bekleyin…',
+        'font.loading.label': 'Font dosyaları okunuyor, lütfen bekleyin...',
         'font.loading.matching': 'Font tanımlanıyor {current} / {total}',
         'font.loading.aria': 'Font dosyaları okunuyor, sayfayı kapatmayın',
         'font.uploaded': '✓ {name}',
@@ -3307,6 +3457,20 @@
         'font.weight.boldItalic': 'Kalın İtalik',
         'font.replace.aria': 'Font dosyasını kaldır {name}',
         'font.weight.normal': 'Normal',
+        'font.weight.thin': 'İnce',
+        'font.weight.extraLight': 'Ekstra İnce',
+        'font.weight.light': 'Hafif',
+        'font.weight.medium': 'Orta',
+        'font.weight.semiBold': 'Yarı Kalın',
+        'font.weight.extraBold': 'Ekstra Kalın',
+        'font.weight.black': 'Siyah',
+        'font.weight.thinItalic': 'İnce İtalik',
+        'font.weight.extraLightItalic': 'Ekstra İnce İtalik',
+        'font.weight.lightItalic': 'Hafif İtalik',
+        'font.weight.mediumItalic': 'Orta İtalik',
+        'font.weight.semiBoldItalic': 'Yarı Kalın İtalik',
+        'font.weight.extraBoldItalic': 'Ekstra Kalın İtalik',
+        'font.weight.blackItalic': 'Siyah İtalik',
         'footer.feedback': 'Sorun bildir',
         'footer.home': 'Ana sayfa',
         'footer.license_html': '<a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT Lisansı</a> kapsamında açık kaynak · <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a> üzerine kurulu',
@@ -3316,11 +3480,11 @@
         'footer.tool': 'ASS Alt Kümeleme Aracı (ass-subset)',
         'leave.confirm': 'İşlem hâlâ devam ediyor. Yine de ayrılmak istiyor musunuz?',
         'log.convert.done': '[done] Tamamlandı. {origKB} KB → {newKB} KB ({delta} KB)',
-        'log.convert.start': '[convert] Başlatılıyor…',
-        'log.draw.building': '[draw] {unique} benzersiz şekil, {total} referans — font oluşturuluyor…',
-        'log.draw.building.incremental': '[draw] Artımlı güncelleme: +{added} yeni şekil (toplam {total}) — font oluşturuluyor…',
-        'log.draw.building.delete': '[draw] Artımlı güncelleme: tüm şekiller kaldırıldı — font yeniden oluşturuluyor…',
-        'log.draw.building.delta': '[draw] Artımlı güncelleme: +{added} / −{removed} (toplam {total} şekil) — font oluşturuluyor…',
+        'log.convert.start': '[convert] Başlatılıyor...',
+        'log.draw.building': '[draw] {unique} benzersiz şekil, {total} referans — font oluşturuluyor...',
+        'log.draw.building.incremental': '[draw] Artımlı güncelleme: +{added} yeni şekil (toplam {total}) — font oluşturuluyor...',
+        'log.draw.building.delete': '[draw] Artımlı güncelleme: tüm şekiller kaldırıldı — font yeniden oluşturuluyor...',
+        'log.draw.building.delta': '[draw] Artımlı güncelleme: +{added} / −{removed} (toplam {total} şekil) — font oluşturuluyor...',
         'log.draw.detail.expand': '[draw] {count} glif eşlemesi (genişletmek için tıkla)',
         'log.draw.done': '[draw] Çizim fontu oluşturuldu: {size} KB',
         'log.draw.item': '  - Karakter: {char} | Sayı: {count} | Zaman çizelgesi: [{start} → {end}]',
@@ -3333,11 +3497,11 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" başarısız: {error}',
-        'log.font.subsetting': '[font] "{name}" alt kümeleniyor ({weight}, {chars} karakter)…',
-        'log.rewrite.start': '[ass] Script yeniden yazılıyor…',
+        'log.font.subsetting': '[font] "{name}" işleniyor ({weight}, {chars} karakter)...',
+        'log.rewrite.start': '[ass] Script yeniden yazılıyor...',
         'notice.copyright': '⚠ Telif hakkı: Lisanssız font dağıtımı telif hakkı ihlali sayılabilir. Gömdüğünüz fontları dağıtma hakkınız olduğundan emin olun.',
         'notice.drawing': '⚠ Dikkat: çizim komutlarının dönüştürülmesi efektlerde küçük konum veya boyut farklılıklarına yol açabilir. Sonucu mutlaka kontrol edin.',
-        'opt.draw.desc': '\\p1…\\p0 vektör çizim verilerini gömülü fontlara çıkararak fazlalığı azaltır; bu seçenek akıllı ekleme ve silme işlemlerini destekler.',
+        'opt.draw.desc': '\\p1...\\p0 vektör çizim verilerini gömülü fontlara çıkararak fazlalığı azaltır; bu seçenek akıllı ekleme ve silme işlemlerini destekler.',
         'opt.draw.title': 'Çizim komutlarını alt kümele',
         'opt.font.desc': 'Scriptte kullanılan üçüncü taraf fontlarını tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve çıktıya gömer.',
         'opt.font.title': 'Üçüncü taraf fontları göm',
@@ -3368,10 +3532,10 @@
         'stat.extFonts': 'Üçüncü taraf fontlar',
         'stat.sysFonts': 'Sistem fontları',
         'stat.uniqueShapes': 'Benzersiz şekiller',
-        'status.draw': 'Çizim fontu oluşturuluyor…',
-        'status.parsing': 'Script ayrıştırılıyor…',
-        'status.rewrite': 'Script yeniden yazılıyor…',
-        'status.subset': 'Alt kümeleniyor…',
+        'status.draw': 'Çizim fontu oluşturuluyor...',
+        'status.parsing': 'Script ayrıştırılıyor...',
+        'status.rewrite': 'Script yeniden yazılıyor...',
+        'status.subset': 'Alt kümeleniyor...',
         'step.active': '(devam ediyor)',
         'step.done': '(tamamlandı)',
         'step1.drop': 'Scripti buraya sürükle veya tıkla',
@@ -3617,7 +3781,7 @@
       const stem = ext > 0 ? name.slice(0, ext) : name;
       const suffix = ext > 0 ? name.slice(ext) : '';
       const keep = max - 3 - suffix.length;
-      return keep > 0 ? stem.slice(0, keep) + '…' + suffix : name.slice(0, max - 1) + '…';
+      return keep > 0 ? stem.slice(0, keep) + '...' + suffix : name.slice(0, max - 1) + '...';
     }
 
     function renderAssErrors() {
@@ -3664,19 +3828,23 @@
     let _fontErrState = null;
 
     function renderFontError() {
-      if (!_fontErrState || !_fontErrState.length) return;
       const fontSection = document.getElementById('font-section');
       if (!fontSection) return;
-      let errDiv = fontSection.querySelector('.font-upload-error');
-      if (!errDiv) {
-        errDiv = document.createElement('div');
-        errDiv.className = 'upload-warn font-upload-error';
-        errDiv.style.marginBottom = '0.75rem';
-        const dz = document.getElementById('dz-font');
-        if (dz) dz.insertAdjacentElement('afterend', errDiv);
-        else fontSection.prepend(errDiv);
+      const errDiv = fontSection.querySelector('.font-upload-error');
+      if (!_fontErrState || !_fontErrState.length) {
+        if (errDiv) errDiv.remove();
+        return;
       }
-      errDiv.textContent = _fontErrState.map(e => {
+      let el = errDiv;
+      if (!el) {
+        el = document.createElement('div');
+        el.className = 'upload-warn font-upload-error';
+        el.style.marginBottom = '0.75rem';
+        const dz = document.getElementById('dz-font');
+        if (dz) dz.insertAdjacentElement('afterend', el);
+        else fontSection.prepend(el);
+      }
+      el.textContent = _fontErrState.map(e => {
         if (e.name) {
           const shortName = truncateName(e.name, 50);
           return `⚠ ${shortName}: ${t(e.key, e.params || {})}`;
@@ -3765,7 +3933,14 @@
     }
 
     function handleWorkerLog(msg) {
-      const wMap = { bold: 'font.weight.bold', italic: 'font.weight.italic', boldItalic: 'font.weight.boldItalic', normal: 'font.weight.normal' };
+      const wMap = {
+        bold: 'font.weight.bold', italic: 'font.weight.italic', boldItalic: 'font.weight.boldItalic', normal: 'font.weight.normal',
+        thin: 'font.weight.thin', extraLight: 'font.weight.extraLight', light: 'font.weight.light',
+        medium: 'font.weight.medium', semiBold: 'font.weight.semiBold', extraBold: 'font.weight.extraBold', black: 'font.weight.black',
+        thinItalic: 'font.weight.thinItalic', extraLightItalic: 'font.weight.extraLightItalic', lightItalic: 'font.weight.lightItalic',
+        mediumItalic: 'font.weight.mediumItalic', semiBoldItalic: 'font.weight.semiBoldItalic',
+        extraBoldItalic: 'font.weight.extraBoldItalic', blackItalic: 'font.weight.blackItalic',
+      };
       const text = t(msg.key, {
         ...msg.params,
         skippedText: msg.params.skipped > 0 ? ` [${msg.params.skipped} ${t('font.skipped')}]` : '',
@@ -4265,9 +4440,15 @@
           const srcs = sourcesMap && sourcesMap.has(name) ? Array.from(sourcesMap.get(name)) : [];
           if (srcs.length === 0) return name;
           const stems = srcs.map(baseName);
-          const srcStr = stems.join(', ');
           const safeName = name.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-          return `<span class="ii-detail-row"><span class="ii-font-name" title="${safeName}">${safeName}</span><span class="ii-src-list" title="(${srcStr})">(${srcStr})</span></span>`;
+          const srcTitle = '(' + stems.join(', ') + ')';
+          const nameSpans = stems.map((s, i) => {
+            const safe = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+            const sep = i < stems.length - 1 ? '<span class="ii-src-suffix">,\u00a0</span>' : '';
+            return `<span class="ii-src-name" title="${safe}">${safe}</span>${sep}`;
+          }).join('');
+          const srcHtml = `<span class="ii-src-prefix">(</span><span class="ii-src-names">${nameSpans}</span><span class="ii-src-suffix">)</span>`;
+          return `<span class="ii-detail-row"><span class="ii-font-name" title="${safeName}">${safeName}</span><span class="ii-src-list" title="${srcTitle}">${srcHtml}</span></span>`;
         });
       };
 
@@ -4275,7 +4456,10 @@
         return details.map((d, i) => {
           if (!isMultiFile || !sources || !sources[i]) return d;
           const stem = baseName(sources[i]);
-          return `<span class="ii-draw-row"><span class="ii-draw-status">${d}</span><span class="ii-draw-src">${stem}</span></span>`;
+          const safeStem = stem.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          const safeD = d.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+          const srcHtml = `<span class="ii-src-prefix">(</span><span class="ii-src-names"><span class="ii-src-name" title="${safeStem}">${safeStem}</span></span><span class="ii-src-suffix">)</span>`;
+          return `<span class="ii-draw-row"><span class="ii-draw-status" title="${safeD}">${safeD}</span><span class="ii-draw-src">${srcHtml}</span></span>`;
         });
       };
 
@@ -4291,7 +4475,7 @@
             <span class="ii-label">${label}</span>
             <span class="badge ${badgeCls}">${badgeText}</span>
           </div>
-          <div class="ii-details">${details.join('<br>')}</div>
+          <div class="ii-details">${details.map(d => `<div class="ii-detail-line">${d}</div>`).join('')}</div>
         `;
         const toggle = () => {
           const isOpen = row.classList.toggle('open');
@@ -4356,9 +4540,16 @@
                 return `<span class="fi-fname fi-fname-missing" style="display:inline-flex;margin:1px 0;">${e.displayName}</span>`;
               }
               if (isMultiFile && e.sources && e.sources.length > 0) {
-                const stems = e.sources.map(baseName).join(', ');
+                const stems = e.sources.map(baseName);
                 const safeName = e.displayName.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-                return `<span class="ii-detail-row"><span class="ii-font-name" title="${safeName}">${safeName}</span><span class="ii-src-list" title="(${stems})">(${stems})</span></span>`;
+                const srcTitle = '(' + stems.join(', ') + ')';
+                const nameSpans = stems.map((s, i) => {
+                  const safe = s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+                  const sep = i < stems.length - 1 ? '<span class="ii-src-suffix">,\u00a0</span>' : '';
+                  return `<span class="ii-src-name" title="${safe}">${safe}</span>${sep}`;
+                }).join('');
+                const srcHtml = `<span class="ii-src-prefix">(</span><span class="ii-src-names">${nameSpans}</span><span class="ii-src-suffix">)</span>`;
+                return `<span class="ii-detail-row"><span class="ii-font-name" title="${safeName}">${safeName}</span><span class="ii-src-list" title="${srcTitle}">${srcHtml}</span></span>`;
               }
               return e.displayName;
             }),
@@ -4622,6 +4813,20 @@
               : (subLow === 'bold') ? t('font.weight.bold')
               : (subLow === 'italic' || subLow === 'oblique') ? t('font.weight.italic')
               : (subLow === 'regular' || subLow === 'normal' || subLow === '') ? t('font.weight.normal')
+              : (subLow === 'thin' || subLow === 'hairline' || subLow === 'w1') ? t('font.weight.thin')
+              : (subLow === 'extralight' || subLow === 'extra light' || subLow === 'ultralight' || subLow === 'ultra light' || subLow === 'w2') ? t('font.weight.extraLight')
+              : (subLow === 'light' || subLow === 'w3') ? t('font.weight.light')
+              : (subLow === 'medium' || subLow === 'w5') ? t('font.weight.medium')
+              : (subLow === 'semibold' || subLow === 'semi bold' || subLow === 'demibold' || subLow === 'demi bold' || subLow === 'w6') ? t('font.weight.semiBold')
+              : (subLow === 'extrabold' || subLow === 'extra bold' || subLow === 'ultrabold' || subLow === 'ultra bold' || subLow === 'w8') ? t('font.weight.extraBold')
+              : (subLow === 'black' || subLow === 'heavy' || subLow === 'w9') ? t('font.weight.black')
+              : (subLow === 'thin italic') ? t('font.weight.thinItalic')
+              : (subLow === 'extralight italic' || subLow === 'extra light italic' || subLow === 'ultralight italic') ? t('font.weight.extraLightItalic')
+              : (subLow === 'light italic') ? t('font.weight.lightItalic')
+              : (subLow === 'medium italic') ? t('font.weight.mediumItalic')
+              : (subLow === 'semibold italic' || subLow === 'semi bold italic' || subLow === 'demibold italic') ? t('font.weight.semiBoldItalic')
+              : (subLow === 'extrabold italic' || subLow === 'extra bold italic' || subLow === 'ultrabold italic') ? t('font.weight.extraBoldItalic')
+              : (subLow === 'black italic' || subLow === 'heavy italic') ? t('font.weight.blackItalic')
               : rawSub;
             const sub = i18nSub ? ' [' + i18nSub + ']' : '';
             const prefix = ws.label ? '' : '✓ ';
@@ -4861,6 +5066,8 @@
     }
 
     async function loadLocalFonts() {
+      _fontErrState = null;
+      renderFontError();
       if (!('queryLocalFonts' in window)) {
         log(t('log.sysfont.unsupported'), 'warn');
         return;
@@ -5548,6 +5755,8 @@
           if (rowMW) { rowMW.classList.remove('selected'); }
           const cbRN = document.getElementById('opt-randname');
           if (cbRN) { cbRN.checked = false; document.getElementById('opt-row-randname').classList.remove('selected'); document.getElementById('randname-notice').classList.add('hidden'); }
+          _fontErrState = null;
+          renderFontError();
         }
         
         const asciiRow = document.getElementById('opt-row-ascii');
@@ -5631,7 +5840,7 @@
 
       const dzFont = document.getElementById('dz-font');
       const inpFont = document.getElementById('inp-font');
-      inpFont.addEventListener('change', () => handleFonts(Array.from(inpFont.files)));
+      inpFont.addEventListener('change', () => { _fontErrState = null; renderFontError(); handleFonts(Array.from(inpFont.files)); });
       dzFont.addEventListener('dragover', e => { e.preventDefault(); dzFont.style.borderColor = 'var(--accent)'; });
       dzFont.addEventListener('dragleave', () => dzFont.style.borderColor = '');
       dzFont.addEventListener('drop', async e => {
