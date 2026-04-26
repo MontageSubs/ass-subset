@@ -871,8 +871,8 @@ function extractNamesFromRaw(buffer, records, strOff, allNames, familyNames, onV
     }
     const best = recs.length > 0 ? decodeNameRecord(buffer, strOff, recs[0]) : '';
     if (nameId === NAME_ID_VERSION) onVersion(best);
-    if (nameId === NAME_ID_PREF_SUBFAMILY) onSubfamily(best);
-    if (nameId === NAME_ID_SUBFAMILY) onSubfamily(best);
+    if (nameId === NAME_ID_PREF_SUBFAMILY) onSubfamily(best, true);
+    if (nameId === NAME_ID_SUBFAMILY) onSubfamily(best, false);
     if (nameId === NAME_ID_DESCRIPTION) onDescription(best);
   }
 }
@@ -905,10 +905,9 @@ function extractMetaFromTables(buffer, tables, _unused) {
       let prefSubSet = false;
       extractNamesFromRaw(buffer, raw.records, raw.strOff, allNames, familyNames,
         (v) => { if (!version) version = v; },
-        (v) => {
-          const isPref = raw.records.some(r => r.nameId === NAME_ID_PREF_SUBFAMILY);
-          if (isPref && !prefSubSet) { subfamilyName = v; prefSubSet = true; }
-          else if (!isPref && !subfamilyName) subfamilyName = v;
+        (v, isPref) => {
+          if (isPref) { subfamilyName = v; prefSubSet = true; }
+          else if (!prefSubSet && !subfamilyName) subfamilyName = v;
         },
         (v) => { if (!description) description = v; }
       );
