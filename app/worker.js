@@ -2208,6 +2208,38 @@ self.onmessage = async function (e) {
         try {
           const path = (typeof OPENTYPE_PATH !== 'undefined') ? OPENTYPE_PATH : e.data.opentypePath;
           importScripts(path);
+          const applyCmapPatch = () => {
+            if (!self.opentype?.Font || self.opentype.Font.prototype._isPatched) return;
+            const origToTables = self.opentype.Font.prototype.toTables;
+            self.opentype.Font.prototype.toTables = function() {
+              const origSort = Array.prototype.sort;
+              Array.prototype.sort = function(cmp) {
+                const res = origSort.call(this, cmp);
+                if (this.length > 0 && 'start' in this[0] && 'end' in this[0] && 'delta' in this[0] && 'glyphIndex' in this[0]) {
+                  const comp = [];
+                  for (let i = 0; i < this.length; i++) {
+                    const curr = this[i];
+                    const prev = comp[comp.length - 1];
+                    if (prev && prev.end + 1 === curr.start && prev.delta === curr.delta) {
+                      prev.end = curr.end;
+                    } else {
+                      comp.push(curr);
+                    }
+                  }
+                  this.length = 0;
+                  for (let i = 0; i < comp.length; i++) this.push(comp[i]);
+                }
+                return res;
+              };
+              try {
+                return origToTables.call(this);
+              } finally {
+                Array.prototype.sort = origSort;
+              }
+            };
+            self.opentype.Font.prototype._isPatched = true;
+          };
+          applyCmapPatch();
         } catch (err) {
           self.postMessage({ type: 'error', id, error: 'Failed to load opentype.js: ' + err.message });
           return;
