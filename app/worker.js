@@ -316,18 +316,13 @@ function parseASSText(text, id, forceHasBOM) {
       if (!isRandFontName(baseEmbName) && !randFontMap[baseEmbName]) continue;
       try {
         const buf = assUUDecode(embLines);
-        const fontObj = opentype.parse(buf.buffer);
-        const descField = fontObj.names?.description || fontObj.tables?.name?.description;
-        if (descField) {
-          for (const v of Object.values(descField)) {
-            if (typeof v !== 'string') continue;
-            const m = v.match(fontInternalMapRe);
-            if (m) {
-              const origName = m[1].trim();
-              const subsetName = m[2].trim();
-              if (!discoveredFromId10[subsetName]) discoveredFromId10[subsetName] = origName;
-              break;
-            }
+        const desc = readFontDescriptionRaw(buf.buffer);
+        if (desc) {
+          const m = desc.match(fontInternalMapRe);
+          if (m) {
+            const origName = m[1].trim();
+            const subsetName = m[2].trim();
+            if (!discoveredFromId10[subsetName]) discoveredFromId10[subsetName] = origName;
           }
         }
       } catch (_) { }
@@ -751,138 +746,377 @@ function decodeFontName(v, key) {
   return '';
 }
 
+const NAME_ID_FAMILY         = 1;
+const NAME_ID_SUBFAMILY      = 2;
+const NAME_ID_FULL           = 4;
+const NAME_ID_VERSION        = 5;
+const NAME_ID_POSTSCRIPT     = 6;
+const NAME_ID_DESCRIPTION    = 10;
+const NAME_ID_PREF_FAMILY    = 16;
+const NAME_ID_PREF_SUBFAMILY = 17;
 
-function extractFontNames(fontObj) {
-  const names = new Set();
-  const nameTable = fontObj.tables?.name;
-  if (nameTable) {
-    for (const [prop, val] of Object.entries(nameTable)) {
-      if (val && typeof val === 'object') {
-        for (const [lang, v] of Object.entries(val)) {
-          const res = decodeFontName(v, lang);
-          if (res) names.add(res);
-        }
-      }
-    }
-  }
-  const nObj = fontObj.names || {};
-  for (const [prop, val] of Object.entries(nObj)) {
-    if (val && typeof val === 'object') {
-      for (const [lang, v] of Object.entries(val)) {
-        const res = decodeFontName(v, lang);
-        if (res) names.add(res);
-      }
-    }
-  }
-  return names;
+const MAGIC_TTF   = 0x00010000;
+const MAGIC_OTF   = 0x4F54544F;
+const MAGIC_TTC   = 0x74746366;
+const MAGIC_TRUE  = 0x74727565;
+const MAGIC_WOFF  = 0x774F4646;
+const MAGIC_WOFF2 = 0x774F4632;
+
+function platformPriority(platformId, languageId) {
+  if (platformId === 3 && languageId === 0x0409) return 0;
+  if (platformId === 3) return 1;
+  if (platformId === 1 && languageId === 0x0000) return 2;
+  if (platformId === 1) return 3;
+  return 4;
 }
-function extractFamilyNames(fontObj) {
-  const names = new Set();
-  const nameTable = fontObj.tables?.name;
-  if (nameTable) {
-    ['fontFamily', 'fullName', 'preferredFamily'].forEach(prop => {
-      const val = nameTable[prop];
-      if (val && typeof val === 'object') {
-        for (const [lang, v] of Object.entries(val)) {
-          const res = decodeFontName(v, lang);
-          if (res) names.add(res);
-        }
-      }
+
+function readNameTableRaw(buffer, tableOffset) {
+  const view = new DataView(buffer);
+  if (tableOffset + 6 > buffer.byteLength) return null;
+  const count  = view.getUint16(tableOffset + 2, false);
+  const strOff = tableOffset + view.getUint16(tableOffset + 4, false);
+  const records = [];
+  for (let i = 0; i < count; i++) {
+    const base = tableOffset + 6 + i * 12;
+    if (base + 12 > buffer.byteLength) break;
+    records.push({
+      platformId: view.getUint16(base,      false),
+      encodingId: view.getUint16(base + 2,  false),
+      languageId: view.getUint16(base + 4,  false),
+      nameId:     view.getUint16(base + 6,  false),
+      length:     view.getUint16(base + 8,  false),
+      offset:     view.getUint16(base + 10, false),
     });
   }
-  const nObj = fontObj.names || {};
-  ['fontFamily', 'preferredFamily'].forEach(field => {
-    const val = nObj[field];
-    if (val && typeof val === 'object') {
-      for (const [lang, v] of Object.entries(val)) {
-        const res = decodeFontName(v, lang);
-        if (res) names.add(res);
-      }
+  return { records, strOff };
+}
+
+function decodeNameRecord(buffer, strOff, rec) {
+  const start = strOff + rec.offset;
+  if (start < 0 || start + rec.length > buffer.byteLength) return '';
+  const bytes = new Uint8Array(buffer, start, rec.length);
+  if (rec.platformId === 3 || rec.platformId === 0) {
+    let s = '';
+    for (let i = 0; i + 1 < bytes.length; i += 2) {
+      s += String.fromCharCode((bytes[i] << 8) | bytes[i + 1]);
     }
-  });
-  return names;
+    return s.trim();
+  }
+  let s = '';
+  for (let i = 0; i < bytes.length; i++) s += String.fromCharCode(bytes[i]);
+  return s.trim();
 }
-function getFontItalic(fontObj) {
-  const fs = fontObj.tables?.os2?.fsSelection;
-  if (fs !== undefined) return !!(fs & 1);
-  const sub = (fontObj.names?.fontSubfamily?.en || fontObj.tables?.name?.fontSubfamily?.en || '').toLowerCase();
-  return sub.includes('italic') || sub.includes('oblique');
+
+function bestNameValue(records, strOff, buffer, nameId) {
+  const candidates = records.filter(r => r.nameId === nameId);
+  if (candidates.length === 0) return '';
+  candidates.sort((a, b) => platformPriority(a.platformId, a.languageId) - platformPriority(b.platformId, b.languageId));
+  for (const rec of candidates) {
+    const val = decodeNameRecord(buffer, strOff, rec);
+    if (val) return val;
+  }
+  return '';
 }
-function getFontWeight(fontObj) {
-  const wc = fontObj.tables?.os2?.usWeightClass;
-  if (wc) return wc;
-  const sub = (fontObj.names?.fontSubfamily?.en || '').toLowerCase();
-  if (sub.includes('bold')) return 700;
-  if (sub.includes('light')) return 300;
-  if (sub.includes('thin')) return 100;
-  if (sub.includes('medium')) return 500;
-  if (sub.includes('semibold') || sub.includes('demibold')) return 600;
-  if (sub.includes('black') || sub.includes('heavy')) return 900;
-  return 400;
+
+function locateTableInBuffer(buffer, sfntOffset) {
+  const view = new DataView(buffer);
+  if (sfntOffset + 6 > buffer.byteLength) return {};
+  const numTables = view.getUint16(sfntOffset + 4, false);
+  const result = {};
+  for (let i = 0; i < numTables; i++) {
+    const pos = sfntOffset + 12 + i * 16;
+    if (pos + 16 > buffer.byteLength) break;
+    const tag = String.fromCharCode(
+      view.getUint8(pos), view.getUint8(pos + 1),
+      view.getUint8(pos + 2), view.getUint8(pos + 3)
+    );
+    result[tag] = {
+      offset: view.getUint32(pos + 8,  false),
+      length: view.getUint32(pos + 12, false),
+    };
+  }
+  return result;
 }
+
+function locateWoffTableInBuffer(buffer) {
+  const view = new DataView(buffer);
+  if (buffer.byteLength < 48) return {};
+  const numTables = view.getUint16(12, false);
+  const result = {};
+  for (let i = 0; i < numTables; i++) {
+    const pos = 44 + i * 20;
+    if (pos + 20 > buffer.byteLength) break;
+    const tag = String.fromCharCode(
+      view.getUint8(pos), view.getUint8(pos + 1),
+      view.getUint8(pos + 2), view.getUint8(pos + 3)
+    );
+    const offset      = view.getUint32(pos + 4,  false);
+    const compLength  = view.getUint32(pos + 8,  false);
+    const origLength  = view.getUint32(pos + 12, false);
+    result[tag] = { offset, compLength, origLength };
+  }
+  return result;
+}
+
+function extractWoffTable(buffer, entry) {
+  const { offset, compLength, origLength } = entry;
+  const raw = new Uint8Array(buffer, offset, compLength);
+  if (compLength === origLength) return raw.buffer.slice(offset, offset + origLength);
+  const inflated = new Uint8Array(origLength);
+  let si = 0, di = 0;
+  while (si < raw.length) {
+    const bfinal = raw[si] & 1;
+    const btype  = (raw[si] >> 1) & 3;
+    si++;
+    if (btype === 0) {
+      si = (si + 3) & ~3;
+      if (si + 4 > raw.length) break;
+      const len  = raw[si] | (raw[si + 1] << 8);
+      si += 4;
+      for (let k = 0; k < len && si < raw.length && di < origLength; k++) inflated[di++] = raw[si++];
+    } else {
+      break;
+    }
+    if (bfinal) break;
+  }
+  const tmp = new ArrayBuffer(origLength);
+  new Uint8Array(tmp).set(inflated);
+  return tmp;
+}
+
+function parseFontMetaFromBuffer(buffer, sfntOffset) {
+  const view = new DataView(buffer);
+  const tables = locateTableInBuffer(buffer, sfntOffset);
+  return extractMetaFromTables(buffer, tables, false);
+}
+
+function parseFontMetaFromWoff(buffer) {
+  const woffTables = locateWoffTableInBuffer(buffer);
+  const nameEntry = woffTables['name'];
+  const os2Entry  = woffTables['OS/2'];
+
+  const syntheticBuffer = buffer;
+  const allNames    = new Set();
+  const familyNames = new Set();
+  let weight = 400, isItalic = false, version = '', subfamilyName = '', description = '';
+
+  if (nameEntry) {
+    const nameBuf = extractWoffTable(buffer, nameEntry);
+    const raw = readNameTableRaw(nameBuf, 0);
+    if (raw) {
+      extractNamesFromRaw(nameBuf, raw.records, raw.strOff, allNames, familyNames,
+        (v) => { if (!version) version = v; },
+        (v) => { if (!subfamilyName) subfamilyName = v; },
+        (v) => { if (!description) description = v; }
+      );
+    }
+  }
+
+  if (os2Entry) {
+    const os2Buf = extractWoffTable(buffer, os2Entry);
+    const os2View = new DataView(os2Buf);
+    if (os2Buf.byteLength >= 64) {
+      const wc = os2View.getUint16(4, false);
+      if (wc) weight = wc;
+      const fsSel = os2View.getUint16(62, false);
+      isItalic = !!(fsSel & 1);
+    }
+  }
+
+  applySubfamilyFallbacks(subfamilyName, weight, isItalic,
+    (w) => { weight = w; }, (it) => { isItalic = it; });
+
+  return { allNames, familyNames, weight, isItalic, version, subfamilyName, description };
+}
+
+function extractNamesFromRaw(buffer, records, strOff, allNames, familyNames, onVersion, onSubfamily, onDescription) {
+  const FAMILY_IDS  = new Set([NAME_ID_FAMILY, NAME_ID_FULL, NAME_ID_PREF_FAMILY]);
+  const INCLUDE_IDS = new Set([
+    NAME_ID_FAMILY, NAME_ID_FULL, NAME_ID_PREF_FAMILY,
+    NAME_ID_POSTSCRIPT, NAME_ID_SUBFAMILY, NAME_ID_PREF_SUBFAMILY,
+    NAME_ID_VERSION, NAME_ID_DESCRIPTION,
+  ]);
+
+  const byId = new Map();
+  for (const rec of records) {
+    if (!INCLUDE_IDS.has(rec.nameId)) continue;
+    const existing = byId.get(rec.nameId) || [];
+    existing.push(rec);
+    byId.set(rec.nameId, existing);
+  }
+
+  for (const [nameId, recs] of byId) {
+    recs.sort((a, b) => platformPriority(a.platformId, a.languageId) - platformPriority(b.platformId, b.languageId));
+    const seen = new Set();
+    for (const rec of recs) {
+      const val = decodeNameRecord(buffer, strOff, rec);
+      if (!val || seen.has(val)) continue;
+      seen.add(val);
+      if (nameId !== NAME_ID_VERSION && nameId !== NAME_ID_DESCRIPTION) allNames.add(val);
+      if (FAMILY_IDS.has(nameId)) familyNames.add(val);
+    }
+    const best = recs.length > 0 ? decodeNameRecord(buffer, strOff, recs[0]) : '';
+    if (nameId === NAME_ID_VERSION) onVersion(best);
+    if (nameId === NAME_ID_PREF_SUBFAMILY) onSubfamily(best);
+    if (nameId === NAME_ID_SUBFAMILY) onSubfamily(best);
+    if (nameId === NAME_ID_DESCRIPTION) onDescription(best);
+  }
+}
+
+function applySubfamilyFallbacks(subfamilyName, weight, isItalic, setWeight, setItalic) {
+  if (!isItalic && subfamilyName) {
+    const sub = subfamilyName.toLowerCase();
+    if (sub.includes('italic') || sub.includes('oblique')) setItalic(true);
+  }
+  if (weight === 400 && subfamilyName) {
+    const sub = subfamilyName.toLowerCase();
+    if (sub.includes('bold'))                                      setWeight(700);
+    else if (sub.includes('light'))                                setWeight(300);
+    else if (sub.includes('thin'))                                 setWeight(100);
+    else if (sub.includes('medium'))                               setWeight(500);
+    else if (sub.includes('semibold') || sub.includes('demibold')) setWeight(600);
+    else if (sub.includes('black')    || sub.includes('heavy'))    setWeight(900);
+  }
+}
+
+function extractMetaFromTables(buffer, tables, _unused) {
+  const view = new DataView(buffer);
+  const allNames    = new Set();
+  const familyNames = new Set();
+  let weight = 400, isItalic = false, version = '', subfamilyName = '', description = '';
+
+  if (tables['name']) {
+    const raw = readNameTableRaw(buffer, tables['name'].offset);
+    if (raw) {
+      let prefSubSet = false;
+      extractNamesFromRaw(buffer, raw.records, raw.strOff, allNames, familyNames,
+        (v) => { if (!version) version = v; },
+        (v) => {
+          const isPref = raw.records.some(r => r.nameId === NAME_ID_PREF_SUBFAMILY);
+          if (isPref && !prefSubSet) { subfamilyName = v; prefSubSet = true; }
+          else if (!isPref && !subfamilyName) subfamilyName = v;
+        },
+        (v) => { if (!description) description = v; }
+      );
+    }
+  }
+
+  if (tables['OS/2']) {
+    const os2 = tables['OS/2'].offset;
+    if (os2 + 64 <= buffer.byteLength) {
+      const wc = view.getUint16(os2 + 4, false);
+      if (wc) weight = wc;
+      const fsSel = view.getUint16(os2 + 62, false);
+      isItalic = !!(fsSel & 1);
+    }
+  }
+
+  applySubfamilyFallbacks(subfamilyName, weight, isItalic,
+    (w) => { weight = w; }, (it) => { isItalic = it; });
+
+  return { allNames, familyNames, weight, isItalic, version, subfamilyName, description };
+}
+
+function readFontDescriptionRaw(buffer) {
+  if (buffer.byteLength < 4) return '';
+  const view = new DataView(buffer);
+  const magic = view.getUint32(0, false);
+  if (magic === MAGIC_WOFF2) return '';
+  if (magic === MAGIC_WOFF) {
+    const woffTables = locateWoffTableInBuffer(buffer);
+    if (!woffTables['name']) return '';
+    const nameBuf = extractWoffTable(buffer, woffTables['name']);
+    const raw = readNameTableRaw(nameBuf, 0);
+    if (!raw) return '';
+    return bestNameValue(raw.records, raw.strOff, nameBuf, NAME_ID_DESCRIPTION);
+  }
+  const isTTC = magic === MAGIC_TTC;
+  const sfntOffset = isTTC ? view.getUint32(12, false) : 0;
+  const tables = locateTableInBuffer(buffer, sfntOffset);
+  if (!tables['name']) return '';
+  const raw = readNameTableRaw(buffer, tables['name'].offset);
+  if (!raw) return '';
+  return bestNameValue(raw.records, raw.strOff, buffer, NAME_ID_DESCRIPTION);
+}
+
 function weightScore(weight) {
   const dist = Math.abs(weight - 400);
   if (dist === 0) return 0;
   if (Math.abs(weight - 500) < dist) return Math.abs(weight - 500) + 1;
   return dist + 2;
 }
+
 function matchFontBuffer(buffer, requiredFonts, id) {
+  if (buffer.byteLength < 4) return { results: [], isTTC: false };
   const view = new DataView(buffer);
-  const isTTC = buffer.byteLength >= 4 && view.getUint32(0, false) === 0x74746366;
+  const magic = view.getUint32(0, false);
   const results = [];
-  const processSingleFont = (fontObj, index) => {
-    const allNames = extractFontNames(fontObj);
-    const familyNames = extractFamilyNames(fontObj);
-    const weight = getFontWeight(fontObj);
-    const isItalic = getFontItalic(fontObj);
-    const allNamesLower = new Set([...allNames].map(n => n.toLowerCase()));
+  const reqLowers = requiredFonts.map(r => r.toLowerCase());
+
+  const commitResult = (meta, ttcIndex) => {
+    const { allNames, familyNames, weight, isItalic, version, subfamilyName } = meta;
+    const allNamesLower    = new Set([...allNames].map(n => n.toLowerCase()));
     const familyNamesLower = new Set([...familyNames].map(n => n.toLowerCase()));
-    for (const req of requiredFonts) {
-      const reqLower = req.toLowerCase();
-      if (allNamesLower.has(reqLower)) {
-        const isFamilyMatch = familyNamesLower.has(reqLower);
-        const versionField = fontObj.names?.version || fontObj.tables?.name?.version;
-        let version = '';
-        if (versionField) {
-          const v = versionField['en'] || Object.values(versionField).find(v => typeof v === 'string' && v.trim()) || '';
-          version = typeof v === 'string' ? v.trim() : '';
-        }
-        const subfamilyName = (
-          fontObj.names?.preferredSubfamily?.en ||
-          fontObj.tables?.name?.preferredSubfamily?.en ||
-          fontObj.names?.fontSubfamily?.en ||
-          fontObj.tables?.name?.fontSubfamily?.en ||
-          ''
-        ).trim();
+    for (let ri = 0; ri < requiredFonts.length; ri++) {
+      if (allNamesLower.has(reqLowers[ri])) {
         results.push({
-          matchedFor: req,
-          weight,
-          isItalic,
-          isFamilyMatch,
-          subfamilyName,
-          version,
-          allNames: Array.from(allNames),
+          matchedFor:    requiredFonts[ri],
+          weight, isItalic,
+          isFamilyMatch: familyNamesLower.has(reqLowers[ri]),
+          subfamilyName, version,
+          allNames:   Array.from(allNames),
           familyNames: Array.from(familyNames),
-          ttcIndex: index
+          ttcIndex,
         });
       }
     }
   };
+
   try {
-    if (isTTC) {
+    if (magic === MAGIC_WOFF2) {
+      const fontObj = opentype.parse(buffer);
+      const allNames    = new Set();
+      const familyNames = new Set();
+      for (const [prop, val] of Object.entries(fontObj.tables?.name || {})) {
+        if (val && typeof val === 'object') {
+          for (const v of Object.values(val)) {
+            const s = decodeFontName(v, '');
+            if (s) allNames.add(s);
+          }
+        }
+      }
+      ['fontFamily', 'fullName', 'preferredFamily'].forEach(f => {
+        const val = fontObj.tables?.name?.[f];
+        if (val && typeof val === 'object') {
+          for (const v of Object.values(val)) {
+            const s = decodeFontName(v, '');
+            if (s) familyNames.add(s);
+          }
+        }
+      });
+      const wc = fontObj.tables?.os2?.usWeightClass;
+      const weight = wc || 400;
+      const fsSel = fontObj.tables?.os2?.fsSelection;
+      const isItalic = fsSel !== undefined ? !!(fsSel & 1) : false;
+      const sub = (fontObj.names?.preferredSubfamily?.en || fontObj.names?.fontSubfamily?.en || '').trim();
+      const ver = (fontObj.names?.version?.en || '').trim();
+      commitResult({ allNames, familyNames, weight, isItalic, version: ver, subfamilyName: sub }, -1);
+    } else if (magic === MAGIC_WOFF) {
+      commitResult(parseFontMetaFromWoff(buffer), -1);
+    } else if (magic === MAGIC_TTC) {
       const numFonts = view.getUint32(8, false);
       for (let i = 0; i < numFonts; i++) {
-        try {
-          const subBuffer = extractTTFFromTTC(buffer, i);
-          processSingleFont(opentype.parse(subBuffer), i);
-        } catch (_) { }
+        const sfntOffset = view.getUint32(12 + i * 4, false);
+        try { commitResult(parseFontMetaFromBuffer(buffer, sfntOffset), i); } catch (_) { }
       }
     } else {
-      processSingleFont(opentype.parse(buffer), -1);
+      commitResult(parseFontMetaFromBuffer(buffer, 0), -1);
     }
   } catch (e) {
     emitLog(id, 'log.font.parse_fail', 'err', { error: e.message });
   }
+
+  const isTTC = magic === MAGIC_TTC;
   return { results, isTTC };
 }
 function extractOrigNameLangKeys(origFont, fieldName, targetValue) {
