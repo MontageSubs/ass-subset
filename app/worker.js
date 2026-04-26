@@ -1904,7 +1904,7 @@ async function doConvert(data, id) {
       emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: 'normal', chars: allChars.length });
       try {
         const result = await subsetFont(best.buffer, allChars, fontNameStr, best.isTTC, 'normal', best.ttcIndex, id, options.wantAscii, options.wantFullFont);
-        embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars, weight: best.weight, weightSlot: 'normal' });
+        embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars, weight: best.weight, weightSlot: 'normal', subfamilyName: best.subfamilyName || '' });
         emitLog(id, 'log.font.subset_done', 'ok', { name: fontNameStr, weight: 'normal', origKB: (result.origSize / 1024).toFixed(0), newKB: (result.ttf.length / 1024).toFixed(0), pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0), skipped: result.skipped });
       } catch (e) {
         emitLog(id, 'log.font.subset_fail', 'err', { name: fontNameStr, error: e.message });
@@ -1970,7 +1970,7 @@ async function doConvert(data, id) {
       emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: wLabel, chars: mergedChars.length });
       try {
         const result = await subsetFont(candidate.buffer, mergedChars, fontNameStr, candidate.isTTC, primarySlot.key, candidate.ttcIndex, id, options.wantAscii, options.wantFullFont);
-        embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars, weight: candidate.weight, weightSlot: primarySlot.key });
+        embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars, weight: candidate.weight, weightSlot: primarySlot.key, subfamilyName: candidate.subfamilyName || '' });
         emitLog(id, 'log.font.subset_done', 'ok', { name: fontNameStr, weight: wLabel, origKB: (result.origSize / 1024).toFixed(0), newKB: (result.ttf.length / 1024).toFixed(0), pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0), skipped: result.skipped });
       } catch (e) {
         emitLog(id, 'log.font.subset_fail', 'err', { name: fontNameStr, error: e.message });
@@ -2179,7 +2179,7 @@ async function doConvert(data, id) {
   const fontBuffers = [];
   if (drawTTF) fontBuffers.push({ name: drawFontFamily, buffer: drawTTF.buffer, isDrawing: true });
   for (const ef of finalEmbeddedFonts) {
-    fontBuffers.push({ name: ef.name, buffer: ef.ttf.buffer, isDrawing: false, weight: ef.weight, weightSlot: ef.weightSlot || 'normal', usedChars: ef.usedChars || null });
+    fontBuffers.push({ name: ef.name, buffer: ef.ttf.buffer, isDrawing: false, weight: ef.weight, weightSlot: ef.weightSlot || 'normal', subfamilyName: ef.subfamilyName || '', usedChars: ef.usedChars || null });
   }
   const drawMap = new Map((drawingDataToChar || []).map(e => [e.data, e.char]));
   return {

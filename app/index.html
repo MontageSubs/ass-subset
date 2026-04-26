@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.16">
+  <meta name="version" content="2.6.17">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -2388,20 +2388,6 @@
         'font.weight.boldItalic': '太字イタリック',
         'font.replace.aria': 'フォントファイル {name} を削除',
         'font.weight.normal': 'レギュラー',
-        'font.weight.thin': 'رفيع جداً',
-        'font.weight.extraLight': 'خفيف جداً',
-        'font.weight.light': 'خفيف',
-        'font.weight.medium': 'متوسط',
-        'font.weight.semiBold': 'شبه عريض',
-        'font.weight.extraBold': 'عريض جداً',
-        'font.weight.black': 'أسود',
-        'font.weight.thinItalic': 'رفيع جداً مائل',
-        'font.weight.extraLightItalic': 'خفيف جداً مائل',
-        'font.weight.lightItalic': 'خفيف مائل',
-        'font.weight.mediumItalic': 'متوسط مائل',
-        'font.weight.semiBoldItalic': 'شبه عريض مائل',
-        'font.weight.extraBoldItalic': 'عريض جداً مائل',
-        'font.weight.blackItalic': 'أسود مائل',
         'font.weight.thin': 'シン',
         'font.weight.extraLight': 'エクストラライト',
         'font.weight.light': 'ライト',
@@ -3297,6 +3283,20 @@
         'font.weight.boldItalic': 'غامق مائل',
         'font.replace.aria': 'إزالة ملف الخط {name}',
         'font.weight.normal': 'عادي',
+        'font.weight.thin': 'رفيع جداً',
+        'font.weight.extraLight': 'خفيف جداً',
+        'font.weight.light': 'خفيف',
+        'font.weight.medium': 'متوسط',
+        'font.weight.semiBold': 'شبه عريض',
+        'font.weight.extraBold': 'عريض جداً',
+        'font.weight.black': 'أسود',
+        'font.weight.thinItalic': 'رفيع جداً مائل',
+        'font.weight.extraLightItalic': 'خفيف جداً مائل',
+        'font.weight.lightItalic': 'خفيف مائل',
+        'font.weight.mediumItalic': 'متوسط مائل',
+        'font.weight.semiBoldItalic': 'شبه عريض مائل',
+        'font.weight.extraBoldItalic': 'عريض جداً مائل',
+        'font.weight.blackItalic': 'أسود مائل',
         'footer.feedback': 'الإبلاغ عن مشكلة',
         'footer.home': 'الرئيسية',
         'footer.license_html': 'مفتوح المصدر تحت <a href="https://github.com/MontageSubs/ass-subset/blob/main/LICENSE" target="_blank" rel="noopener">MIT License</a> · مبني على <a href="https://opentype.js.org/" target="_blank" rel="noopener">opentype.js</a>',
@@ -5569,10 +5569,31 @@
             limitMsg = t('preview.total', { total: allGlyphs.length });
           }
 
-          const _wSlot = fb.weightSlot || (fb.weight >= 600 && fb.isItalic ? 'boldItalic' : fb.weight >= 600 ? 'bold' : fb.isItalic ? 'italic' : 'normal');
-          const _wLabel = _wSlot === 'boldItalic' ? t('font.weight.boldItalic') : _wSlot === 'bold' ? t('font.weight.bold') : _wSlot === 'italic' ? t('font.weight.italic') : null;
-          const _hasSibling = buffers.some(b => b.name === fb.name && b !== fb);
-          const _finalLabel = _wLabel || (_hasSibling ? t('font.weight.normal') : null);
+          const _multiWeightOn = !!(document.getElementById('opt-multiweight')?.checked);
+          let _finalLabel = null;
+          if (_multiWeightOn) {
+            const _rawSub = fb.subfamilyName || '';
+            const _subLow = _rawSub.toLowerCase();
+            _finalLabel = (_subLow === 'bold italic' || _subLow === 'bolditalic') ? t('font.weight.boldItalic')
+              : (_subLow === 'bold') ? t('font.weight.bold')
+              : (_subLow === 'italic' || _subLow === 'oblique') ? t('font.weight.italic')
+              : (_subLow === 'regular' || _subLow === 'normal' || _subLow === '') ? t('font.weight.normal')
+              : (_subLow === 'thin' || _subLow === 'hairline' || _subLow === 'w1') ? t('font.weight.thin')
+              : (_subLow === 'extralight' || _subLow === 'extra light' || _subLow === 'ultralight' || _subLow === 'ultra light' || _subLow === 'w2') ? t('font.weight.extraLight')
+              : (_subLow === 'light' || _subLow === 'w3') ? t('font.weight.light')
+              : (_subLow === 'medium' || _subLow === 'w5') ? t('font.weight.medium')
+              : (_subLow === 'semibold' || _subLow === 'semi bold' || _subLow === 'demibold' || _subLow === 'demi bold' || _subLow === 'w6') ? t('font.weight.semiBold')
+              : (_subLow === 'extrabold' || _subLow === 'extra bold' || _subLow === 'ultrabold' || _subLow === 'ultra bold' || _subLow === 'w8') ? t('font.weight.extraBold')
+              : (_subLow === 'black' || _subLow === 'heavy' || _subLow === 'w9') ? t('font.weight.black')
+              : (_subLow === 'thin italic') ? t('font.weight.thinItalic')
+              : (_subLow === 'extralight italic' || _subLow === 'extra light italic' || _subLow === 'ultralight italic') ? t('font.weight.extraLightItalic')
+              : (_subLow === 'light italic') ? t('font.weight.lightItalic')
+              : (_subLow === 'medium italic') ? t('font.weight.mediumItalic')
+              : (_subLow === 'semibold italic' || _subLow === 'semi bold italic' || _subLow === 'demibold italic') ? t('font.weight.semiBoldItalic')
+              : (_subLow === 'extrabold italic' || _subLow === 'extra bold italic' || _subLow === 'ultrabold italic') ? t('font.weight.extraBoldItalic')
+              : (_subLow === 'black italic' || _subLow === 'heavy italic') ? t('font.weight.blackItalic')
+              : _rawSub || t('font.weight.normal');
+          }
           title.textContent = fb.name + (_finalLabel ? ' [' + _finalLabel + ']' : '') + limitMsg;
 
           ctx.clearRect(0, 0, logicalW, logicalH);
