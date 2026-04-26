@@ -838,95 +838,10 @@ function locateTableInBuffer(buffer, sfntOffset) {
   return result;
 }
 
-function locateWoffTableInBuffer(buffer) {
-  const view = new DataView(buffer);
-  if (buffer.byteLength < 48) return {};
-  const numTables = view.getUint16(12, false);
-  const result = {};
-  for (let i = 0; i < numTables; i++) {
-    const pos = 44 + i * 20;
-    if (pos + 20 > buffer.byteLength) break;
-    const tag = String.fromCharCode(
-      view.getUint8(pos), view.getUint8(pos + 1),
-      view.getUint8(pos + 2), view.getUint8(pos + 3)
-    );
-    const offset      = view.getUint32(pos + 4,  false);
-    const compLength  = view.getUint32(pos + 8,  false);
-    const origLength  = view.getUint32(pos + 12, false);
-    result[tag] = { offset, compLength, origLength };
-  }
-  return result;
-}
-
-function extractWoffTable(buffer, entry) {
-  const { offset, compLength, origLength } = entry;
-  const raw = new Uint8Array(buffer, offset, compLength);
-  if (compLength === origLength) return raw.buffer.slice(offset, offset + origLength);
-  const inflated = new Uint8Array(origLength);
-  let si = 0, di = 0;
-  while (si < raw.length) {
-    const bfinal = raw[si] & 1;
-    const btype  = (raw[si] >> 1) & 3;
-    si++;
-    if (btype === 0) {
-      si = (si + 3) & ~3;
-      if (si + 4 > raw.length) break;
-      const len  = raw[si] | (raw[si + 1] << 8);
-      si += 4;
-      for (let k = 0; k < len && si < raw.length && di < origLength; k++) inflated[di++] = raw[si++];
-    } else {
-      break;
-    }
-    if (bfinal) break;
-  }
-  const tmp = new ArrayBuffer(origLength);
-  new Uint8Array(tmp).set(inflated);
-  return tmp;
-}
-
 function parseFontMetaFromBuffer(buffer, sfntOffset) {
   const view = new DataView(buffer);
   const tables = locateTableInBuffer(buffer, sfntOffset);
   return extractMetaFromTables(buffer, tables, false);
-}
-
-function parseFontMetaFromWoff(buffer) {
-  const woffTables = locateWoffTableInBuffer(buffer);
-  const nameEntry = woffTables['name'];
-  const os2Entry  = woffTables['OS/2'];
-
-  const syntheticBuffer = buffer;
-  const allNames    = new Set();
-  const familyNames = new Set();
-  let weight = 400, isItalic = false, version = '', subfamilyName = '', description = '';
-
-  if (nameEntry) {
-    const nameBuf = extractWoffTable(buffer, nameEntry);
-    const raw = readNameTableRaw(nameBuf, 0);
-    if (raw) {
-      extractNamesFromRaw(nameBuf, raw.records, raw.strOff, allNames, familyNames,
-        (v) => { if (!version) version = v; },
-        (v) => { if (!subfamilyName) subfamilyName = v; },
-        (v) => { if (!description) description = v; }
-      );
-    }
-  }
-
-  if (os2Entry) {
-    const os2Buf = extractWoffTable(buffer, os2Entry);
-    const os2View = new DataView(os2Buf);
-    if (os2Buf.byteLength >= 64) {
-      const wc = os2View.getUint16(4, false);
-      if (wc) weight = wc;
-      const fsSel = os2View.getUint16(62, false);
-      isItalic = !!(fsSel & 1);
-    }
-  }
-
-  applySubfamilyFallbacks(subfamilyName, weight, isItalic,
-    (w) => { weight = w; }, (it) => { isItalic = it; });
-
-  return { allNames, familyNames, weight, isItalic, version, subfamilyName, description };
 }
 
 function extractNamesFromRaw(buffer, records, strOff, allNames, familyNames, onVersion, onSubfamily, onDescription) {
@@ -1021,14 +936,14 @@ function readFontDescriptionRaw(buffer) {
   if (buffer.byteLength < 4) return '';
   const view = new DataView(buffer);
   const magic = view.getUint32(0, false);
-  if (magic === MAGIC_WOFF2) return '';
-  if (magic === MAGIC_WOFF) {
-    const woffTables = locateWoffTableInBuffer(buffer);
-    if (!woffTables['name']) return '';
-    const nameBuf = extractWoffTable(buffer, woffTables['name']);
-    const raw = readNameTableRaw(nameBuf, 0);
-    if (!raw) return '';
-    return bestNameValue(raw.records, raw.strOff, nameBuf, NAME_ID_DESCRIPTION);
+  if (magic === MAGIC_WOFF2 || magic === MAGIC_WOFF) {
+    try {
+      const fontObj = opentype.parse(buffer);
+      const desc = fontObj.names?.description?.en || Object.values(fontObj.names?.description || {})[0];
+      return typeof desc === 'string' ? desc : '';
+    } catch (e) {
+      return '';
+    }
   }
   const isTTC = magic === MAGIC_TTC;
   const sfntOffset = isTTC ? view.getUint32(12, false) : 0;
@@ -1073,7 +988,7 @@ function matchFontBuffer(buffer, requiredFonts, id) {
   };
 
   try {
-    if (magic === MAGIC_WOFF2) {
+    if (magic === MAGIC_WOFF2 || magic === MAGIC_WOFF) {
       const fontObj = opentype.parse(buffer);
       const allNames    = new Set();
       const familyNames = new Set();
@@ -1101,8 +1016,6 @@ function matchFontBuffer(buffer, requiredFonts, id) {
       const sub = (fontObj.names?.preferredSubfamily?.en || fontObj.names?.fontSubfamily?.en || '').trim();
       const ver = (fontObj.names?.version?.en || '').trim();
       commitResult({ allNames, familyNames, weight, isItalic, version: ver, subfamilyName: sub }, -1);
-    } else if (magic === MAGIC_WOFF) {
-      commitResult(parseFontMetaFromWoff(buffer), -1);
     } else if (magic === MAGIC_TTC) {
       const numFonts = view.getUint32(8, false);
       for (let i = 0; i < numFonts; i++) {
