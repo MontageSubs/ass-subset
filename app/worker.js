@@ -170,8 +170,7 @@ function normFont(name) { return name.replace(/^@/, '').trim(); }
 function genRandFontName() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   let r = '';
-  const len = 7 + Math.floor(Math.random() * 2);
-  for (let i = 0; i < len; i++) r += chars[Math.floor(Math.random() * 26)];
+  for (let i = 0; i < 8; i++) r += chars[Math.floor(Math.random() * 26)];
   return r;
 }
 function parseASSText(text, id, forceHasBOM) {
