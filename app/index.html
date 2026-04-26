@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.11">
+  <meta name="version" content="2.6.12">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -1549,16 +1549,16 @@
     <div class="step active" id="step1">
       <div class="step-head">
         <span class="step-num">1</span>
-        <h2 class="step-title" data-i18n="step1.title">Upload Script</h2>
+        <h2 class="step-title" data-i18n="step1.title">Upload Subtitle</h2>
         <span class="step-subtitle">.ass / .ssa</span>
       </div>
       <div class="step-body">
-        <label class="drop-zone" id="dz-ass" for="inp-ass" data-i18n-aria="aria.dz_ass" aria-label="Upload script — drag and drop or click to browse">
-          <div class="dz-main" data-i18n="step1.drop">Drop your script here, or click to browse</div>
+        <label class="drop-zone" id="dz-ass" for="inp-ass" data-i18n-aria="aria.dz_ass" aria-label="Upload subtitle — drag and drop or click to browse">
+          <div class="dz-main" data-i18n="step1.drop">Drop your subtitle here, or click to browse</div>
           <div class="dz-hint" data-i18n="step1.hint">.ass and .ssa files, ZIP archives, and folder drag-and-drop supported — multi-select for batch conversion</div>
         </label>
         <input type="file" id="inp-ass" accept=".ass,.ssa,.zip" multiple class="file-input-hidden"
-          data-i18n-aria="aria.dz_ass" aria-label="Upload script — drag and drop or click to browse">
+          data-i18n-aria="aria.dz_ass" aria-label="Upload subtitle — drag and drop or click to browse">
         <div id="ass-badge" class="hidden mt2"></div>
         <div class="upload-error hidden"></div>
       </div>
@@ -1594,7 +1594,7 @@
           <input type="checkbox" id="opt-font" aria-describedby="opt-font-desc">
           <div class="opt-label">
             <strong data-i18n="opt.font.title">Embed Third-Party Fonts</strong>
-            <span id="opt-font-desc" data-i18n="opt.font.desc">Scan third-party fonts used in the script, subset to used characters only, and embed them into the output.</span>
+            <span id="opt-font-desc" data-i18n="opt.font.desc">Scan third-party fonts used in the subtitle, subset to used characters only, and embed them into the output.</span>
           </div>
           <span class="opt-tag">TTF / OTF / TTC / OTC / WOFF / WOFF2</span>
         </label>
@@ -1602,7 +1602,7 @@
           <input type="checkbox" id="opt-sysfont" aria-describedby="opt-sysfont-desc">
           <div class="opt-label">
             <strong data-i18n="opt.sysfont.title">Embed System Fonts</strong>
-            <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">Scan system fonts used in the script, subset and embed them for consistent font rendering on all platforms.</span>
+            <span id="opt-sysfont-desc" data-i18n="opt.sysfont.desc">Scan system fonts used in the subtitle, subset and embed them for consistent font rendering on all platforms.</span>
           </div>
           <span class="opt-tag">TTF / OTF / TTC / OTC / WOFF / WOFF2</span>
         </label>
@@ -1638,12 +1638,12 @@
           <input type="checkbox" id="opt-strip" disabled aria-describedby="opt-strip-desc">
           <div class="opt-label">
             <strong data-i18n="opt.strip.title">Remove Embedded Fonts</strong>
-            <span id="opt-strip-desc" data-i18n="opt.strip.desc">Remove existing embedded fonts from the script while keeping the subsetted draw fonts</span>
+            <span id="opt-strip-desc" data-i18n="opt.strip.desc">Remove existing embedded fonts from the subtitle while keeping the subsetted draw fonts</span>
           </div>
         </label>
         <div id="drawing-notice" class="notice notice-warn hidden" data-i18n="notice.drawing">⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.</div>
         <div id="copyright-notice" class="notice notice-warn hidden" data-i18n="notice.copyright">⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.</div>
-        <div id="fullfont-notice" class="notice notice-warn hidden" data-i18n="notice.fullfont">⚠ Size Warning: Embedding full fonts will drastically inflate the subtitle file size, potentially causing player performance issues.</div>
+        <div id="fullfont-notice" class="notice notice-warn hidden" data-i18n="notice.fullfont">⚠ Full Font Warning: Embedding full fonts will significantly bloat the subtitle file size, potentially causing performance issues in media players.</div>
         <div id="randname-notice" class="notice notice-rand hidden" data-i18n="notice.randname">⚠ Non-standard: This is a non-standard implementation. If the font mapping table is lost, embedded fonts cannot be restored to their original names.</div>
         <div id="font-section" class="hidden">
           <hr class="divider">
@@ -1927,7 +1927,7 @@
         'status.draw': '正在生成绘图字体...',
         'status.parsing': '正在解析字幕...',
         'status.rewrite': '正在重写字幕...',
-        'status.subset': '正在子集化...',
+        'status.subset': '正在处理字体...',
         'step.active': '（正在进行）',
         'step.done': '（已完成）',
         'step1.drop': '拖拽字幕文件到此，或点击选择',
@@ -1943,7 +1943,7 @@
         'log.font.rand_missing': '[font] ⚠ 检测到随机化字体名称，映射表丢失，无法处理该字体。',
         'log.font.rand_applied': '[font] ✓ 已为 {count} 个字体应用随机化名称，并写入映射表。',
         'analysis.font.rand_missing_warn': '检测到映射表缺失的随机化字体，该字体无法处理。',
-        'err.unsupported_archive': '不支持该格式的压缩档，请使用 ZIP 格式',
+        'err.unsupported_archive': '不支持此压缩格式，请改用 ZIP',
         'step4.title': '转换 & 下载',
       },
       'zh-TW': {
@@ -2106,7 +2106,7 @@
         'status.draw': '正在生成繪圖字型...',
         'status.parsing': '正在解析字幕...',
         'status.rewrite': '正在重寫字幕...',
-        'status.subset': '正在子集化...',
+        'status.subset': '正在处理字体...',
         'step.active': '（進行中）',
         'step.done': '（已完成）',
         'step1.drop': '拖曳字幕檔到此，或點擊選擇',
@@ -2122,7 +2122,7 @@
         'log.font.rand_applied': '[font] ✓ 已為 {count} 個字型套用隨機化名稱，並寫入對照表。',
         'analysis.font.rand_missing_warn': '偵測到對照表遺失的隨機化字型，無法處理。',
         'log.font.rand_missing': '[font] ⚠ 偵測到隨機化字型名稱，對照表遺失，無法處理該字型。',
-        'err.unsupported_archive': '不支援該格式的壓縮檔，請使用 ZIP 格式',
+        'err.unsupported_archive': '不支援此壓縮格式，請改用 ZIP',
         'step4.title': '轉換 & 下載',
       },
       en: {
@@ -2152,7 +2152,7 @@
         'analysis.font.sys.none': 'No system fonts referenced',
         'app.subtitle': 'Subtitle Drawing Optimization · Font Embedding and Management',
         'app.title': 'ASS Subsetter',
-        'aria.dz_ass': 'Upload script — drag and drop or click to browse',
+        'aria.dz_ass': 'Upload subtitle — drag and drop or click to browse',
         'aria.dz_font': 'Upload font files',
         'aria.lang_toggle': 'Switch language',
         'aria.log_box': 'Processing log',
@@ -2171,7 +2171,7 @@
         'change': 'Change',
         'discuss.header': 'Discussion',
         'discuss.loading': 'Loading...',
-        'err.format': 'Please upload a valid .ass or .ssa subtitle script',
+        'err.format': 'Please upload a valid .ass or .ssa subtitle file',
         'err.invalid': 'Not a valid ASS/SSA script',
         'err.no_events': 'No valid Format/Dialogue lines in [Events]',
         'err.zip_depth': 'ZIP nesting exceeds {limit} levels — extraction stopped.',
@@ -2228,7 +2228,7 @@
         'footer.slogan': 'Powered by Love ❤️ 用爱发电',
         'footer.source': 'Source Code',
         'footer.tool': 'ASS Subsetter (ass-subset)',
-        'leave.confirm': 'Subsetting is still running. Leave anyway?',
+        'leave.confirm': 'Conversion is still running. Leave anyway?',
         'log.convert.done': '[done] Finished. {origKB} KB → {newKB} KB ({delta} KB)',
         'log.convert.start': '[convert] Starting...',
         'log.draw.building': '[draw] {unique} unique shapes, {total} references — building font...',
@@ -2253,16 +2253,16 @@
         'notice.drawing': '⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.',
         'opt.draw.desc': 'Extract \\p1...\\p0 vector draws into embedded fonts to reduce redundancy; this option supports intelligent add/delete operations.',
         'opt.draw.title': 'Subset Draw Commands',
-        'opt.font.desc': 'Scan third-party fonts used in the script, subset to used characters only, and embed them into the output.',
+        'opt.font.desc': 'Scan third-party fonts used in the subtitle, subset to used characters only, and embed them into the output.',
         'opt.font.title': 'Embed Third-Party Fonts',
-        'opt.sysfont.desc': 'Scan system fonts used in the script, subset and embed them for consistent font rendering on all platforms.',
+        'opt.sysfont.desc': 'Scan system fonts used in the subtitle, subset and embed them for consistent font rendering on all platforms.',
         'opt.sysfont.title': 'Embed System Fonts',
         'opt.ascii.title': 'Include ASCII Characters',
         'opt.ascii.desc': 'Retain all available ASCII characters from the original font in the subset, improving compatibility across media players.',
         'opt.fullfont.title': 'Embed Full Fonts',
         'opt.fullfont.desc': 'Embed the complete font without subsetting. Subtitle text changes require no reprocessing, but result in larger file size and longer conversion time.',
         'notice.fullfont': '⚠ Full Font Warning: Embedding full fonts will significantly bloat the subtitle file size, potentially causing performance issues in media players.',
-        'opt.strip.desc': 'Remove existing embedded fonts from the script while keeping the subsetted draw fonts.',
+        'opt.strip.desc': 'Remove existing embedded fonts from the subtitle while keeping the subsetted draw fonts.',
         'opt.strip.title': 'Remove Embedded Fonts',
         'opt.append_optimize': 'Add _optimized suffix',
         'path.linux': 'Linux: ~/.fonts or /usr/share/fonts',
@@ -2275,7 +2275,7 @@
         'preview.total': ' ({total} chars)',
         'result.detail': '{count} font(s) embedded · {origKB} KB → {newKB} KB',
         'result.detail.strip': '{count} embedded font(s) removed · {origKB} KB → {newKB} KB',
-        'result.done': 'Subsetting Complete',
+        'result.done': 'Conversion Complete',
         'stat.drawBlocks': 'Draw Blocks (uniq/total)',
         'stat.totalDrawings': 'Total Draw Blocks',
         'stat.embeddedFonts': 'Embedded Fonts',
@@ -2283,14 +2283,14 @@
         'stat.sysFonts': 'System Fonts',
         'stat.uniqueShapes': 'Unique Shapes',
         'status.draw': 'Building draw font...',
-        'status.parsing': 'Parsing script...',
+        'status.parsing': 'Parsing subtitle...',
         'status.rewrite': 'Rewriting script...',
-        'status.subset': 'Subsetting...',
+        'status.subset': 'Processing...',
         'step.active': '(in progress)',
         'step.done': '(done)',
-        'step1.drop': 'Drop your script here, or click to browse',
+        'step1.drop': 'Drop your subtitle here, or click to browse',
         'step1.hint': '.ass and .ssa files, ZIP archives, and folder drag-and-drop supported — multi-select for batch conversion',
-        'step1.title': 'Upload Script',
+        'step1.title': 'Upload Subtitle',
         'step2.title': 'Analysis',
         'step3.title': 'Options',
         'opt.multiweight.title': 'Generate Separate Fonts by Weight',
@@ -2301,7 +2301,7 @@
         'log.font.rand_applied': '[font] ✓ Applied randomized names to {count} font(s) and wrote mapping table.',
         'analysis.font.rand_missing_warn': 'Randomized font(s) detected with missing mapping table. Cannot be processed.',
         'log.font.rand_missing': '[font] ⚠ Randomized font detected. Mapping table missing — cannot process this font.',
-        'err.unsupported_archive': 'Unsupported archive format. Please use ZIP instead',
+        'err.unsupported_archive': 'Unsupported format. Please use a ZIP archive',
         'step4.title': 'Run & Download',
       },
       ja: {
@@ -2478,7 +2478,7 @@
         'status.draw': '描画フォントを構築中...',
         'status.parsing': 'スクリプトを解析中...',
         'status.rewrite': 'スクリプトを書き換え中...',
-        'status.subset': 'サブセット化中...',
+        'status.subset': 'フォント処理中...',
         'step.active': '（進行中）',
         'step.done': '（完了）',
         'step1.drop': 'スクリプトをここにドロップ、またはクリックして選択',
@@ -2494,7 +2494,7 @@
         'log.font.rand_applied': '[font] ✓ {count} 個のフォントにランダム名を適用し、マッピングテーブルを書き込みました。',
         'analysis.font.rand_missing_warn': 'マッピングテーブルのないランダム化フォントが検出されました。処理不可。',
         'log.font.rand_missing': '[font] ⚠ ランダム化フォントを検出。マッピングテーブルがなく、処理できません。',
-        'err.unsupported_archive': 'このアーカイブ形式はサポートされていません。ZIP をご使用ください',
+        'err.unsupported_archive': '未対応の形式です。ZIP を使用してください',
         'step4.title': '変換 & ダウンロード',
       },
       ko: {
@@ -2619,7 +2619,7 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" 처리 실패: {error}',
-        'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 수집 중...',
+        'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 처리 중...',
         'log.rewrite.start': '[ass] 자막 스크립트 재작성 중...',
         'notice.copyright': '⚠ 저작권 주의: 허가 없이 폰트를 배포하면 저작권 침해가 될 수 있습니다. 삽입하는 폰트의 배포 권한이 있는지 확인하세요.',
         'notice.drawing': '⚠ 주의: 드로우 명령어 변환 후 효과의 위치나 크기가 약간 변경될 수 있습니다. 항상 최종 결과를 확인하세요.',
@@ -2657,7 +2657,7 @@
         'status.draw': '드로우 폰트 구축 중...',
         'status.parsing': '스크립트 파싱 중...',
         'status.rewrite': '스크립트 재작성 중...',
-        'status.subset': '서브셋화 중...',
+        'status.subset': '폰트 처리 중...',
         'step.active': '(진행 중)',
         'step.done': '(완료)',
         'step1.drop': '스크립트를 여기에 드래그하거나 클릭하여 선택',
@@ -2673,7 +2673,7 @@
         'log.font.rand_applied': '[font] ✓ {count}개 폰트에 무작위 이름을 적용하고 매핑 테이블을 기록했습니다.',
         'analysis.font.rand_missing_warn': '매핑 테이블이 누락된 랜덤화 폰트 발견. 처리 불가.',
         'log.font.rand_missing': '[font] ⚠ 랜덤화된 폰트 발견. 매핑 테이블 누락 — 해당 폰트를 처리할 수 없습니다.',
-        'err.unsupported_archive': '지원되지 않는 압축 형식입니다. ZIP을 사용해 주세요',
+        'err.unsupported_archive': '지원하지 않는 형식입니다. ZIP 파일을 사용하세요',
         'step4.title': '변환 & 다운로드',
       },
       es: {
@@ -2799,14 +2799,14 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falló: {error}',
         'log.font.subsetting': '[font] Procesando "{name}" ({weight}, {chars} caracteres)...',
-        'log.rewrite.start': '[ass] Reescribiendo el script...',
+        'log.rewrite.start': '[ass] Reescribiendo subtítulo...',
         'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegurate de tener permiso para distribuir las fuentes que incrustes.',
         'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores. Siempre verificá el resultado final.',
         'opt.draw.desc': 'Extrae los vectores \\p1...\\p0 en fuentes incrustadas para reducir redundancia; esta opción admite operaciones inteligentes de adición y eliminación.',
         'opt.draw.title': 'Subconjunto de comandos de dibujo',
-        'opt.font.desc': 'Escanea las fuentes de terceros usadas en el script, crea un subconjunto solo con los caracteres usados e incrustalas en la salida.',
+        'opt.font.desc': 'Escanea las fuentes de terceros usadas en el subtítulo, crea un subconjunto solo con los caracteres usados e incrustalas en la salida.',
         'opt.font.title': 'Incrustar fuentes de terceros',
-        'opt.sysfont.desc': 'Escanea las fuentes del sistema usadas en el script, crealas en subconjunto e incrustalas para garantizar una renderización consistente en todas las plataformas.',
+        'opt.sysfont.desc': 'Escanea las fuentes del sistema usadas en el subtítulo, crealas en subconjunto e incrustalas para garantizar una renderización consistente en todas las plataformas.',
         'opt.sysfont.title': 'Incrustar fuentes del sistema',
         'opt.ascii.title': 'Incluir caracteres ASCII',
         'opt.ascii.desc': 'Conserva todos los caracteres ASCII disponibles de la fuente original en el subconjunto, mejorando la compatibilidad con reproductores.',
@@ -2834,14 +2834,14 @@
         'stat.sysFonts': 'Fuentes del sistema',
         'stat.uniqueShapes': 'Formas únicas',
         'status.draw': 'Construyendo fuente de dibujo...',
-        'status.parsing': 'Parseando el script...',
-        'status.rewrite': 'Reescribiendo el script...',
-        'status.subset': 'Creando subconjunto...',
+        'status.parsing': 'Procesando subtítulo...',
+        'status.rewrite': 'Reescribiendo subtítulo...',
+        'status.subset': 'Procesando...',
         'step.active': '(en progreso)',
         'step.done': '(completado)',
-        'step1.drop': 'Arrastrá tu script aquí, o hacé clic para seleccionar',
+        'step1.drop': 'Soltá tu subtítulo aquí, o hacé clic para seleccionar',
         'step1.hint': 'Archivos .ass, .ssa, .zip y carpetas con arrastrar y soltar — múltiple selección para lotes',
-        'step1.title': 'Subir script de subtítulos',
+        'step1.title': 'Subir subtítulo',
         'step2.title': 'Análisis',
         'step3.title': 'Opciones',
         'opt.multiweight.title': 'Generar Fuentes por Peso',
@@ -2852,7 +2852,7 @@
         'log.font.rand_applied': '[font] ✓ Nombres aleatorios aplicados a {count} fuente(s) y tabla de mapeo escrita.',
         'analysis.font.rand_missing_warn': 'Fuente(s) aleatorizada(s) con tabla de mapeo ausente. No se puede procesar.',
         'log.font.rand_missing': '[font] ⚠ Fuente aleatorizada detectada. Tabla de mapeo ausente — no se puede procesar.',
-        'err.unsupported_archive': 'Formato de archivo comprimido no compatible. Use ZIP',
+        'err.unsupported_archive': 'Formato no compatible. Use un archivo ZIP',
         'step4.title': 'Convertir y descargar',
       },
       ru: {
@@ -2977,7 +2977,7 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] «{name}» ({weight}): {origKB} КБ → {newKB} КБ (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] Ошибка обработки «{name}»: {error}',
-        'log.font.subsetting': '[font] Создание подмножества «{name}» ({weight}, {chars} симв.)...',
+        'log.font.subsetting': '[font] Обработка «{name}» ({weight}, {chars} симв.)...',
         'log.rewrite.start': '[ass] Перезапись скрипта...',
         'notice.copyright': '⚠ Авторские права: распространение шрифтов без лицензии может нарушать авторские права. Убедитесь в наличии прав на распространение встраиваемых шрифтов.',
         'notice.drawing': '⚠ Внимание: после конвертации команд рисования возможны незначительные смещения позиций и размеров эффектов. Обязательно проверьте конечный результат.',
@@ -3015,7 +3015,7 @@
         'status.draw': 'Построение шрифта рисования...',
         'status.parsing': 'Разбор скрипта...',
         'status.rewrite': 'Перезапись скрипта...',
-        'status.subset': 'Создание подмножества...',
+        'status.subset': 'Обработка...',
         'step.active': '(в процессе)',
         'step.done': '(завершено)',
         'step1.drop': 'Перетащите скрипт сюда или нажмите для выбора',
@@ -3031,7 +3031,7 @@
         'log.font.rand_applied': '[font] ✓ Случайные имена применены к {count} шрифту(ам), таблица соответствий записана.',
         'analysis.font.rand_missing_warn': 'Обнаружены рандомизированные шрифты без таблицы соответствия. Обработка невозможна.',
         'log.font.rand_missing': '[font] ⚠ Обнаружен рандомизированный шрифт. Таблица соответствия отсутствует — обработка невозможна.',
-        'err.unsupported_archive': 'Формат архива не поддерживается. Используйте ZIP',
+        'err.unsupported_archive': 'Неподдерживаемый формат. Используйте ZIP',
         'step4.title': 'Обработка и скачивание',
       },
       'pt-BR': {
@@ -3157,14 +3157,14 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falhou: {error}',
         'log.font.subsetting': '[font] Processando "{name}" ({weight}, {chars} caracteres)...',
-        'log.rewrite.start': '[ass] Reescrevendo script...',
+        'log.rewrite.start': '[ass] Reescrevendo legenda...',
         'notice.copyright': '⚠ Direitos autorais: redistribuir fontes sem licença adequada pode constituir infração. Certifique-se de ter permissão para distribuir as fontes que incorporar.',
         'notice.drawing': '⚠ Atenção: a conversão de comandos de desenho pode causar pequenos deslocamentos de posição ou escala. Sempre verifique o resultado final.',
         'opt.draw.desc': 'Extrai dados vetoriais \\p1...\\p0 para fontes incorporadas para reduzir redundância; esta opção suporta operações inteligentes de adição e exclusão.',
         'opt.draw.title': 'Subconjunto de comandos de desenho',
-        'opt.font.desc': 'Escaneia as fontes de terceiros usadas no script, cria um subconjunto apenas com os caracteres usados e as incorpora na saída.',
+        'opt.font.desc': 'Escaneia as fontes de terceiros usadas na legenda, cria um subconjunto apenas com os caracteres usados e as incorpora na saída.',
         'opt.font.title': 'Incorporar fontes de terceiros',
-        'opt.sysfont.desc': 'Escaneia as fontes do sistema usadas no script, cria subconjunto e as incorpora para garantir uma renderização consistente em todas as plataformas.',
+        'opt.sysfont.desc': 'Escaneia as fontes do sistema usadas na legenda, cria subconjunto e as incorpora para garantir uma renderização consistente em todas as plataformas.',
         'opt.sysfont.title': 'Incorporar fontes do sistema',
         'opt.ascii.title': 'Incluir caracteres ASCII',
         'opt.ascii.desc': 'Preserva todos os caracteres ASCII disponíveis da fonte original no subconjunto, melhorando a compatibilidade com players de mídia.',
@@ -3192,14 +3192,14 @@
         'stat.sysFonts': 'Fontes do sistema',
         'stat.uniqueShapes': 'Formas únicas',
         'status.draw': 'Construindo fonte de desenho...',
-        'status.parsing': 'Analisando script...',
-        'status.rewrite': 'Reescrevendo script...',
-        'status.subset': 'Criando subconjunto...',
+        'status.parsing': 'Analisando legenda...',
+        'status.rewrite': 'Reescrevendo legenda...',
+        'status.subset': 'Processando...',
         'step.active': '(em andamento)',
         'step.done': '(concluído)',
-        'step1.drop': 'Arraste seu script aqui ou clique para selecionar',
+        'step1.drop': 'Arraste sua legenda aqui ou clique para selecionar',
         'step1.hint': 'Arquivos .ass, .ssa, .zip e arrastar pastas — seleção múltipla para lote',
-        'step1.title': 'Enviar script',
+        'step1.title': 'Enviar legenda',
         'step2.title': 'Análise',
         'step3.title': 'Opções',
         'opt.multiweight.title': 'Gerar Fontes por Peso',
@@ -3210,7 +3210,7 @@
         'log.font.rand_applied': '[font] ✓ Nomes aleatórios aplicados a {count} fonte(s) e tabela de mapeamento gravada.',
         'analysis.font.rand_missing_warn': 'Fonte(s) aleatorizada(s) com tabela de mapeamento ausente. Não é possível processar.',
         'log.font.rand_missing': '[font] ⚠ Fonte aleatorizada detectada. Tabela de mapeamento ausente — não é possível processar.',
-        'err.unsupported_archive': 'Formato de arquivo compactado não suportado. Use ZIP',
+        'err.unsupported_archive': 'Formato não suportado. Use um arquivo ZIP',
         'step4.title': 'Executar e baixar',
       },
       ar: {
@@ -3321,7 +3321,7 @@
         'log.font.strip.item': '  - {name}',
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} كيلوبايت → {newKB} كيلوبايت (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] فشلت معالجة "{name}": {error}',
-        'log.font.subsetting': '[font] جارٍ تقليص "{name}" ({weight}، {chars} حرف)...',
+        'log.font.subsetting': '[font] جارٍ معالجة "{name}" ({weight}، {chars} حرف)...',
         'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص...',
         'notice.copyright': '⚠ حقوق الملكية: قد يُشكّل توزيع الخطوط دون ترخيص انتهاكاً لحقوق النشر. تأكد من امتلاكك حق توزيع الخطوط التي تضمّنها.',
         'notice.drawing': '⚠ ملاحظة: قد يتسبب تحويل أوامر الرسم في انزياحات طفيفة في المواضع والأحجام. تحقق دائماً من النتيجة النهائية.',
@@ -3359,7 +3359,7 @@
         'status.draw': 'جارٍ بناء خط الرسم...',
         'status.parsing': 'جارٍ تحليل النص...',
         'status.rewrite': 'جارٍ إعادة الكتابة...',
-        'status.subset': 'جارٍ التقليص...',
+        'status.subset': 'جارٍالمعالجة...',
         'step.active': '(قيد التنفيذ)',
         'step.done': '(مكتمل)',
         'step1.drop': 'اسحب نصك هنا أو انقر للاختيار',
@@ -3375,7 +3375,7 @@
         'log.font.rand_applied': '[font] ✓ تم تطبيق أسماء عشوائية على {count} خط وكتابة جدول التعيين.',
         'analysis.font.rand_missing_warn': 'تم اكتشاف خطوط عشوائية بدون جدول تعيين. المعالجة مستحيلة.',
         'log.font.rand_missing': '[font] ⚠ تم اكتشاف خط عشوائي. جدول التعيين مفقود — لا يمكن المعالجة.',
-        'err.unsupported_archive': 'تنسيق الأرشيف غير مدعوم. يُرجى استخدام ZIP',
+        'err.unsupported_archive': 'صيغة غير مدعومة. استخدم ملف ZIP',
         'step4.title': 'تشغيل وتحميل',
       },
       tr: {
@@ -3501,14 +3501,14 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" başarısız: {error}',
         'log.font.subsetting': '[font] "{name}" işleniyor ({weight}, {chars} karakter)...',
-        'log.rewrite.start': '[ass] Script yeniden yazılıyor...',
+        'log.rewrite.start': '[ass] Altyazı yeniden yazılıyor...',
         'notice.copyright': '⚠ Telif hakkı: Lisanssız font dağıtımı telif hakkı ihlali sayılabilir. Gömdüğünüz fontları dağıtma hakkınız olduğundan emin olun.',
         'notice.drawing': '⚠ Dikkat: çizim komutlarının dönüştürülmesi efektlerde küçük konum veya boyut farklılıklarına yol açabilir. Sonucu mutlaka kontrol edin.',
         'opt.draw.desc': '\\p1...\\p0 vektör çizim verilerini gömülü fontlara çıkararak fazlalığı azaltır; bu seçenek akıllı ekleme ve silme işlemlerini destekler.',
         'opt.draw.title': 'Çizim komutlarını alt kümele',
-        'opt.font.desc': 'Scriptte kullanılan üçüncü taraf fontlarını tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve çıktıya gömer.',
+        'opt.font.desc': 'Altyazıda kullanılan üçüncü taraf fontlarını tarar, yalnızca kullanılan karakterlerle alt küme oluşturur ve çıktıya gömer.',
         'opt.font.title': 'Üçüncü taraf fontları göm',
-        'opt.sysfont.desc': 'Scriptte kullanılan sistem fontlarını tarar, alt küme oluşturur ve gömerek tüm platformlarda tutarlı yazı tipi görüntülemesini sağlar.',
+        'opt.sysfont.desc': 'Altyazıda kullanılan sistem fontlarını tarar, alt küme oluşturur ve gömerek tüm platformlarda tutarlı yazı tipi görüntülemesini sağlar.',
         'opt.sysfont.title': 'Sistem fontlarını göm',
         'opt.ascii.title': 'ASCII karakterleri dahil et',
         'opt.ascii.desc': 'Orijinal fontun mevcut tüm ASCII karakterlerini alt kümede saklayarak medya oynatıcı uyumluluğunu artırır.',
@@ -3536,14 +3536,14 @@
         'stat.sysFonts': 'Sistem fontları',
         'stat.uniqueShapes': 'Benzersiz şekiller',
         'status.draw': 'Çizim fontu oluşturuluyor...',
-        'status.parsing': 'Script ayrıştırılıyor...',
-        'status.rewrite': 'Script yeniden yazılıyor...',
-        'status.subset': 'Alt kümeleniyor...',
+        'status.parsing': 'Altyazı işleniyor...',
+        'status.rewrite': 'Altyazı yeniden yazılıyor...',
+        'status.subset': 'İşleniyor...',
         'step.active': '(devam ediyor)',
         'step.done': '(tamamlandı)',
-        'step1.drop': 'Scripti buraya sürükle veya tıkla',
+        'step1.drop': 'Altyazıyı buraya sürükle veya tıkla',
         'step1.hint': '.ass, .ssa, .zip dosyaları ve klasör sürükle-bırak desteklenir — toplu dönüşüm için çoklu seçim',
-        'step1.title': 'Script yükle',
+        'step1.title': 'Altyazı yükle',
         'step2.title': 'Analiz',
         'step3.title': 'Seçenekler',
         'opt.multiweight.title': 'Ağırlığa Göre Yazı Tipi Oluştur',
@@ -3554,7 +3554,7 @@
         'log.font.rand_applied': '[font] ✓ {count} fonta rastgele ad uygulandı ve eşleme tablosu yazıldı.',
         'analysis.font.rand_missing_warn': 'Eşleme tablosu eksik rastgeleştirilmiş font(lar) tespit edildi. İşleme yapılamıyor.',
         'log.font.rand_missing': '[font] ⚠ Rastgeleştirilmiş font tespit edildi. Eşleme tablosu eksik — işlenemiyor.',
-        'err.unsupported_archive': 'Bu arşiv biçimi desteklenmiyor. Lütfen ZIP kullanın',
+        'err.unsupported_archive': 'Desteklenmeyen format. Lütfen ZIP kullanın',
         'step4.title': 'Çalıştır ve indir',
       },
     };
