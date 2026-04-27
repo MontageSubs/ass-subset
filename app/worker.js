@@ -1940,9 +1940,7 @@ async function doConvert(data, id) {
       if (!fileKeyToGroup.has(fileKey)) fileKeyToGroup.set(fileKey, { fonts: [], names: new Set() });
       const group = fileKeyToGroup.get(fileKey);
       group.fonts.push(f);
-      for (const n of (f.allNames || [f.matchedFor]).map(n => n.toLowerCase())) {
-        group.names.add(n);
-      }
+      group.names.add(f.matchedFor.toLowerCase());
     }
     return fileKeyToGroup;
   })();
