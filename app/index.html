@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.18">
+  <meta name="version" content="2.6.19">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -833,6 +833,24 @@
     }
     .font-item:last-child { margin-bottom: 0; }
     .font-item:hover { border-color: var(--rule); }
+    .fi-alias-secondary { opacity: 0.6; }
+    .fi-alias-badge {
+      font-family: var(--mono);
+      font-size: 0.65rem;
+      color: var(--ink2);
+      background: var(--rule2);
+      border-radius: 3px;
+      padding: 1px 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 0 1 auto;
+      min-width: 0;
+    }
+    .fi-alias-merged {
+      color: var(--ok);
+      background: rgba(30,122,70,0.08);
+    }
     .fi-header {
       display: flex;
       align-items: baseline;
@@ -899,7 +917,6 @@
       border-radius: 4px;
       padding: 3px 7px;
       flex: 0 1 auto;
-      margin-right: auto;
       min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -1885,6 +1902,7 @@
         'log.draw.none': '[draw] 未发现 \\p1 绘图指令，跳过。',
         'log.draw.summary': '[draw] 绘图指令关系分析完成，共计 {count} 个独立字形映射：',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上传，跳过。',
+        'log.font.alias_merged': '[font] 「{name}」与 {count} 个别名 [{aliases}] 共享同一字体文件，合并为单次嵌入。',
         'log.font.none_external': '[font] 未发现需嵌入的外部字体。',
         'log.font.parse_fail': '[font] 字体解析失败: {error}',
         'log.font.strip.expand': '[font] 已移除 {count} 个内嵌字体（点击展开）',
@@ -2064,7 +2082,7 @@
         'log.draw.none': '[draw] 未發現 \\p1 繪圖指令，跳過。',
         'log.draw.summary': '[draw] 繪圖指令關係分析完成，共計 {count} 個獨立字形映射：',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) 未上傳，跳過。',
-        'log.font.none_external': '[font] 未發現需嵌入的外部字型。',
+        'log.font.alias_merged': '[font] 「{name}」與 {count} 個別名 [{aliases}] 共用同一字體檔案，合併為單次嵌入。',
         'log.font.parse_fail': '[font] 字型解析失敗: {error}',
         'log.font.strip.expand': '[font] 已移除 {count} 個內嵌字型（點擊展開）',
         'log.font.strip.item': '  - {name}',
@@ -2243,6 +2261,7 @@
         'log.draw.none': '[draw] No \\p1 draw commands found, skipping.',
         'log.draw.summary': '[draw] Draw analysis complete — {count} unique glyph mappings:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) not provided, skipping.',
+        'log.font.alias_merged': '[font] "{name}" and {count} alias(es) [{aliases}] share one physical font; merged into a single embed.',
         'log.font.none_external': '[font] No non-system fonts to embed.',
         'log.font.parse_fail': '[font] Failed to parse font: {error}',
         'log.font.strip.expand': '[font] {count} embedded font(s) removed (click to expand)',
@@ -2422,6 +2441,7 @@
         'log.draw.none': '[draw] \\p1 描画コマンドが見つかりません。スキップします。',
         'log.draw.summary': '[draw] 描画分析完了 — {count} 件のユニークグリフマッピング：',
         'log.font.missing': '[font] ⚠ 「{name}」({weight}) がアップロードされていません。スキップします。',
+        'log.font.alias_merged': '[font] "{name}" と {count} 件の別名 [{aliases}] が同一フォントファイルを共有しています。単一の埋め込みにまとめます。',
         'log.font.none_external': '[font] 埋め込む外部フォントがありません。',
         'log.font.parse_fail': '[font] フォントのパースに失敗しました: {error}',
         'log.font.strip.expand': '[font] {count} 個の埋め込みフォントを削除しました（クリックで展開）',
@@ -2601,6 +2621,7 @@
         'log.draw.none': '[draw] \\p1 드로우 명령어가 없습니다. 건너뜁니다.',
         'log.draw.summary': '[draw] 드로우 분석 완료 — {count}개의 고유 글리프 매핑:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) 업로드되지 않음, 건너뜁니다.',
+        'log.font.alias_merged': '[font] "{name}" 외 {count}개의 별칭 [{aliases}]이 동일한 폰트 파일을 공유합니다. 단일 임베드로 병합합니다.',
         'log.font.none_external': '[font] 삽입할 외부 폰트가 없습니다.',
         'log.font.parse_fail': '[font] 폰트 파싱 실패: {error}',
         'log.font.strip.expand': '[font] {count}개 내장 폰트 제거됨 (클릭하여 펼치기)',
@@ -2780,6 +2801,7 @@
         'log.draw.none': '[draw] No se encontraron comandos de dibujo \\p1, omitiendo.',
         'log.draw.summary': '[draw] Análisis completo — {count} mapeos de glifos únicos:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) no fue subida, omitiendo.',
+        'log.font.alias_merged': '[font] "{name}" y {count} alias(es) [{aliases}] comparten el mismo archivo de fuente; se fusionan en una sola inserción.',
         'log.font.none_external': '[font] No hay fuentes externas para incrustar.',
         'log.font.parse_fail': '[font] Error al parsear fuente: {error}',
         'log.font.strip.expand': '[font] {count} fuentes incrustadas eliminadas (clic para expandir)',
@@ -2959,6 +2981,7 @@
         'log.draw.none': '[draw] Команды рисования \\p1 не найдены, пропуск.',
         'log.draw.summary': '[draw] Анализ рисования завершён — {count} уникальных глиф-маппингов:',
         'log.font.missing': '[font] ⚠ «{name}» ({weight}) не загружен, пропуск.',
+        'log.font.alias_merged': '[font] "{name}" и {count} псевдоним(ов) [{aliases}] используют один файл шрифта; объединены в одно встраивание.',
         'log.font.none_external': '[font] Внешние шрифты для встраивания не найдены.',
         'log.font.parse_fail': '[font] Ошибка разбора шрифта: {error}',
         'log.font.strip.expand': '[font] Удалено {count} встроенных шрифтов (нажмите, чтобы развернуть)',
@@ -3138,6 +3161,7 @@
         'log.draw.none': '[draw] Nenhum comando de desenho \\p1 encontrado, pulando.',
         'log.draw.summary': '[draw] Análise de desenho concluída — {count} mapeamentos de glifos únicos:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) não foi enviado, pulando.',
+        'log.font.alias_merged': '[font] "{name}" e {count} alias(es) [{aliases}] compartilham o mesmo arquivo de fonte; mesclados em uma única incorporação.',
         'log.font.none_external': '[font] Nenhuma fonte externa para incorporar.',
         'log.font.parse_fail': '[font] Falha ao analisar fonte: {error}',
         'log.font.strip.expand': '[font] {count} fontes incorporadas removidas (clique para expandir)',
@@ -3317,6 +3341,7 @@
         'log.draw.none': '[draw] لم يتم العثور على أوامر رسم \\p1، جارٍ التخطي.',
         'log.draw.summary': '[draw] اكتمل تحليل الرسم — {count} تعيين غليف فريد:',
         'log.font.missing': '[font] ⚠ لم يتم رفع "{name}" ({weight})، جارٍ التخطي.',
+        'log.font.alias_merged': '[font] "{name}" و{count} اسم(اء) بديل [{aliases}] يشتركون في ملف خط واحد؛ تم دمجها في تضمين واحد.',
         'log.font.none_external': '[font] لا توجد خطوط خارجية للتضمين.',
         'log.font.parse_fail': '[font] فشل تحليل الخط: {error}',
         'log.font.strip.expand': '[font] تم إزالة {count} خط مضمن (انقر للتوسيع)',
@@ -3496,6 +3521,7 @@
         'log.draw.none': '[draw] \\p1 çizim komutu bulunamadı, atlanıyor.',
         'log.draw.summary': '[draw] Çizim analizi tamamlandı — {count} benzersiz glif eşlemesi:',
         'log.font.missing': '[font] ⚠ "{name}" ({weight}) yüklenmedi, atlanıyor.',
+        'log.font.alias_merged': '[font] "{name}" ve {count} takma ad [{aliases}] aynı yazı tipi dosyasını paylaşıyor; tek bir gömmeye birleştirildi.',
         'log.font.none_external': '[font] Gömülecek harici font yok.',
         'log.font.parse_fail': '[font] Font ayrıştırma hatası: {error}',
         'log.font.strip.expand': '[font] {count} gömülü font kaldırıldı (genişletmek için tıklayın)',
@@ -4760,10 +4786,59 @@
           (info.boldItalic || []).forEach(c => allFonts[name].boldItalic.add(c));
         }
       }
+
+      const aliasGroupMap = (() => {
+        const fileToNames = new Map();
+        for (const [vk, record] of S.uploadedFonts) {
+          const fileName = record.file ? record.file.name : '';
+          const ttcIndex = record.ttcIndex !== undefined ? record.ttcIndex : -1;
+          const fileKey = fileName + '::' + ttcIndex;
+          if (!fileToNames.has(fileKey)) fileToNames.set(fileKey, new Set());
+          const allN = (record.allNames || [record.matchedFor]).map(n => n.toLowerCase());
+          for (const n of allN) fileToNames.get(fileKey).add(n);
+        }
+        const nameToFileKey = new Map();
+        for (const [fileKey, names] of fileToNames) {
+          for (const n of names) {
+            if (!nameToFileKey.has(n)) nameToFileKey.set(n, fileKey);
+          }
+        }
+        const subtitleNames = Object.keys(allFonts).map(n => n.toLowerCase());
+        const result = new Map();
+        const visited = new Set();
+        const slotSuffixes = wantMultiWeight ? ['normal', 'bold', 'italic', 'boldItalic'] : ['default'];
+        const isExplicitlyUnlinked = (name) => slotSuffixes.every(sk => S.pendingReplaceKeys.has(name + '::' + sk));
+        for (const name of subtitleNames) {
+          if (visited.has(name)) continue;
+          if (isExplicitlyUnlinked(name)) {
+            result.set(name, { primary: name, aliases: [name] });
+            visited.add(name);
+            continue;
+          }
+          const fileKey = nameToFileKey.get(name);
+          if (!fileKey) continue;
+          const fileNames = fileToNames.get(fileKey);
+          const aliasesInSub = subtitleNames.filter(n => !isExplicitlyUnlinked(n) && nameToFileKey.get(n) === fileKey && fileNames.has(n));
+          if (aliasesInSub.length <= 1) {
+            result.set(name, { primary: name, aliases: [name] });
+            visited.add(name);
+            continue;
+          }
+          const primary = aliasesInSub[0];
+          for (const a of aliasesInSub) {
+            result.set(a, { primary, aliases: aliasesInSub });
+            visited.add(a);
+          }
+        }
+        return result;
+      })();
       const list = document.getElementById('font-list');
       list.innerHTML = '';
       for (const [name, info] of Object.entries(allFonts)) {
         const key = name.toLowerCase();
+        const mergeInfo = aliasGroupMap.get(key);
+        const isPrimaryAlias = mergeInfo && mergeInfo.primary === key && mergeInfo.aliases.length > 1;
+        const isSecondaryAlias = mergeInfo && mergeInfo.primary !== key;
         const totalChars = new Set([...info.normal, ...info.bold, ...info.italic, ...info.boldItalic]).size;
         const variants = [];
         if (info.normal.size > 0) variants.push(t('font.weight.normal'));
@@ -4781,7 +4856,7 @@
           : [{ slot: 'default', vk: key + '::default', label: null, active: true }];
 
         const div = document.createElement('div');
-        div.className = 'font-item';
+        div.className = 'font-item' + (isSecondaryAlias ? ' fi-alias-secondary' : '');
 
         const hdr = document.createElement('div');
         hdr.className = 'fi-header';
@@ -4790,6 +4865,22 @@
         nameEl.title = name;
         nameEl.textContent = name;
         hdr.appendChild(nameEl);
+        if (isPrimaryAlias) {
+          const primaryAliases = mergeInfo.aliases
+            .filter(a => a !== key)
+            .map(a => Object.keys(allFonts).find(n => n.toLowerCase() === a) || a);
+          const badge = document.createElement('span');
+          badge.className = 'fi-alias-badge';
+          badge.title = primaryAliases.join(', ');
+          badge.textContent = primaryAliases.join(', ');
+          hdr.appendChild(badge);
+        } else if (isSecondaryAlias) {
+          const badge = document.createElement('span');
+          badge.className = 'fi-alias-badge fi-alias-merged';
+          const primaryName = Object.keys(allFonts).find(n => n.toLowerCase() === mergeInfo.primary) || mergeInfo.primary;
+          badge.textContent = '→ ' + primaryName;
+          hdr.appendChild(badge);
+        }
         const charsEl = document.createElement('span');
         charsEl.className = 'fi-chars';
         charsEl.textContent = t('font.chars', { n: totalChars }) + (variants.length ? ' [' + variants.join('+') + ']' : '');
@@ -5011,7 +5102,8 @@
                 isFamilyMatch: match.isFamilyMatch,
                 subfamilyName: match.subfamilyName || '',
                 version: match.version || '', lastModified: entry.file.lastModified || 0,
-                size: entry.file.size || entry.buffer.byteLength
+                size: entry.file.size || entry.buffer.byteLength,
+                allNames: match.allNames || [match.matchedFor],
               };
               if (wantMultiWeight) {
                 const slotKey = match.isItalic && match.weight >= 600 ? 'boldItalic' : match.weight >= 600 ? 'bold' : match.isItalic ? 'italic' : 'normal';
@@ -5186,6 +5278,7 @@
         weight: info.weight,
         isItalic: info.isItalic || false,
         subfamilyName: info.subfamilyName || '',
+        allNames: info.allNames || [info.matchedFor],
       }));
 
       batchFileIdx = 0;

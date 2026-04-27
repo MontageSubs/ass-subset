@@ -341,9 +341,17 @@ function parseASSText(text, id, forceHasBOM) {
       }
     }
   }
+  const isSystemFont = (name) => {
+    const lower = name.toLowerCase();
+    if (SYSTEM_FONTS.has(lower)) return true;
+    for (const sf of SYSTEM_FONTS) {
+      if (lower.startsWith(sf + ' ') || lower.startsWith(sf + '-')) return true;
+    }
+    return false;
+  };
   const externalFonts = {};
   for (const [name, weights] of Object.entries(fontChars)) {
-    if (!SYSTEM_FONTS.has(name.toLowerCase()) && !isAnyDrawFont(name)) {
+    if (!isSystemFont(name) && !isAnyDrawFont(name)) {
       externalFonts[name] = {
         normal: Array.from(weights.normal || []),
         bold: Array.from(weights.bold || []),
@@ -354,7 +362,7 @@ function parseASSText(text, id, forceHasBOM) {
   }
   const systemFontsReferenced = {};
   for (const [name, weights] of Object.entries(fontChars)) {
-    if (SYSTEM_FONTS.has(name.toLowerCase()) && !isAnyDrawFont(name)) {
+    if (isSystemFont(name) && !isAnyDrawFont(name)) {
       const totalChars = (weights.normal?.size || 0) + (weights.bold?.size || 0) + (weights.italic?.size || 0) + (weights.boldItalic?.size || 0);
       if (totalChars > 0) {
         systemFontsReferenced[name] = {
@@ -970,18 +978,24 @@ function matchFontBuffer(buffer, requiredFonts, id) {
     const { allNames, familyNames, weight, isItalic, version, subfamilyName } = meta;
     const allNamesLower    = new Set([...allNames].map(n => n.toLowerCase()));
     const familyNamesLower = new Set([...familyNames].map(n => n.toLowerCase()));
+    const matched = [];
     for (let ri = 0; ri < requiredFonts.length; ri++) {
-      if (allNamesLower.has(reqLowers[ri])) {
-        results.push({
-          matchedFor:    requiredFonts[ri],
-          weight, isItalic,
-          isFamilyMatch: familyNamesLower.has(reqLowers[ri]),
-          subfamilyName, version,
-          allNames:   Array.from(allNames),
-          familyNames: Array.from(familyNames),
-          ttcIndex,
-        });
-      }
+      if (allNamesLower.has(reqLowers[ri])) matched.push(ri);
+    }
+    if (matched.length === 0) return;
+    const allNamesArr    = Array.from(allNames);
+    const familyNamesArr = Array.from(familyNames);
+    for (const ri of matched) {
+      results.push({
+        matchedFor:    requiredFonts[ri],
+        weight, isItalic,
+        isFamilyMatch: familyNamesLower.has(reqLowers[ri]),
+        subfamilyName, version,
+        allNames:    allNamesArr,
+        familyNames: familyNamesArr,
+        ttcIndex,
+        coveredRequiredIndices: matched.map(i => requiredFonts[i]),
+      });
     }
   };
 
@@ -1244,6 +1258,7 @@ function modifyNameTable(buffer, newNames) {
   }
 
   for (const [field, entries] of Object.entries(newNames)) {
+    if (field === '_aliasNames') continue;
     const nameID = NAME_ID_MAP[field];
     if (nameID === undefined) continue;
     const alreadyHas3 = newRecords.some(r => r.nameID === nameID && r.platformID === 3);
@@ -1255,6 +1270,31 @@ function modifyNameTable(buffer, newNames) {
       newRecords.push({ platformID, encodingID: platformID === 3 ? 1 : 0, languageID: platformID === 3 ? 0x0409 : 0, nameID, length: bytes.length, strOff: strPos });
       stringChunks.push(bytes);
       strPos += bytes.length;
+    }
+  }
+
+  const aliasNamesArr = newNames._aliasNames || [];
+  for (const aliasName of aliasNamesArr) {
+    for (const nameID of [NAME_ID_MAP.fontFamily, NAME_ID_MAP.preferredFamily]) {
+      for (const platformID of [3, 1]) {
+        const str = aliasName;
+        let bytes;
+        if (platformID === 3 || platformID === 0) {
+          bytes = new Uint8Array(str.length * 2);
+          const dv = new DataView(bytes.buffer);
+          for (let i = 0; i < str.length; i++) dv.setUint16(i * 2, str.charCodeAt(i), false);
+        } else {
+          const arr = [];
+          for (let i = 0; i < str.length; i++) {
+            const cp = str.charCodeAt(i);
+            arr.push(cp <= 0xFF ? cp : 0x3F);
+          }
+          bytes = new Uint8Array(arr);
+        }
+        newRecords.push({ platformID, encodingID: platformID === 3 ? 1 : 0, languageID: platformID === 3 ? 0x0409 : 0, nameID, length: bytes.length, strOff: strPos });
+        stringChunks.push(bytes);
+        strPos += bytes.length;
+      }
     }
   }
 
@@ -1309,7 +1349,8 @@ function modifyNameTable(buffer, newNames) {
   outView.setUint32(nameDirOffset + 12, newNameTableSize, false);
   return out.buffer;
 }
-async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcIndex, id, wantAscii, wantFullFont) {
+async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, ttcIndex, id, wantAscii, wantFullFont, aliasNames) {
+  aliasNames = aliasNames || [];
   let orig;
   const isTargetBold = (targetWeight === 'bold' || targetWeight === 'boldItalic');
   const isTargetItalic = (targetWeight === 'italic' || targetWeight === 'boldItalic');
@@ -1519,6 +1560,7 @@ async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, 
     description: descriptionEntry,
     manufacturerURL: urlEntry,
     designerURL: urlEntry,
+    _aliasNames: aliasNames,
   };
   if (origLicense) {
     newNames.license = {};
@@ -1536,13 +1578,17 @@ async function subsetFont(fontBuffer, charArray, fontName, isTTC, targetWeight, 
     }
     if (Object.keys(newNames.licenseURL).length === 0) delete newNames.licenseURL;
   }
-  newFont.names = newNames;
+  const newNamesForOpentype = Object.fromEntries(Object.entries(newNames).filter(([k]) => k !== '_aliasNames'));
+  newFont.names = newNamesForOpentype;
   let rawTTF;
   if (wantFullFont) {
     const baseBuffer = isTTC && ttcIndex !== undefined && ttcIndex !== -1 ? extractTTFFromTTC(fontBuffer, ttcIndex) : fontBuffer;
     rawTTF = repairFontBuffer(new Uint8Array(modifyNameTable(baseBuffer, newNames)));
   } else {
-    rawTTF = repairFontBuffer(new Uint8Array(newFont.toArrayBuffer()));
+    const baseTTF = new Uint8Array(newFont.toArrayBuffer());
+    rawTTF = aliasNames.length > 0
+      ? repairFontBuffer(new Uint8Array(modifyNameTable(baseTTF.buffer, newNames)))
+      : repairFontBuffer(baseTTF);
   }
 
   return {
@@ -1885,25 +1931,115 @@ async function doConvert(data, id) {
     }
     return best;
   }
+  const fileToFontGroup = (() => {
+    const fileKeyToGroup = new Map();
+    for (const f of fonts) {
+      const fileName = f.file ? f.file.name : (f.name || '');
+      const ttcIndex = f.ttcIndex !== undefined ? f.ttcIndex : -1;
+      const fileKey = fileName + '::' + ttcIndex;
+      if (!fileKeyToGroup.has(fileKey)) fileKeyToGroup.set(fileKey, { fonts: [], names: new Set() });
+      const group = fileKeyToGroup.get(fileKey);
+      group.fonts.push(f);
+      for (const n of (f.allNames || [f.matchedFor]).map(n => n.toLowerCase())) {
+        group.names.add(n);
+      }
+    }
+    return fileKeyToGroup;
+  })();
+
+  const nameToFileKey = new Map();
+  for (const [fileKey, group] of fileToFontGroup) {
+    for (const n of group.names) {
+      if (!nameToFileKey.has(n)) nameToFileKey.set(n, fileKey);
+    }
+  }
+
+
+  const allSubtitleFontNames = [
+    ...Object.keys(parsed.externalFonts || {}),
+    ...Object.keys(parsed.systemFontsReferenced || {}),
+  ];
+
+  const resolvedFontGroups = (() => {
+    const result = new Map();
+    const allSubtitleLower = allSubtitleFontNames.map(n => n.toLowerCase());
+    const visited = new Set();
+    for (const subtitleName of allSubtitleFontNames) {
+      const lower = subtitleName.toLowerCase();
+      if (visited.has(lower)) continue;
+      const fileKey = nameToFileKey.get(lower);
+      if (!fileKey) continue;
+      const groupNames = fileToFontGroup.get(fileKey)?.names;
+      const aliasesInSubtitle = allSubtitleLower.filter(n => nameToFileKey.get(n) === fileKey && groupNames?.has(n));
+      if (aliasesInSubtitle.length <= 1) {
+        result.set(lower, { primary: lower, aliases: [lower] });
+        visited.add(lower);
+        continue;
+      }
+      const primary = aliasesInSubtitle[0];
+      for (const alias of aliasesInSubtitle) {
+        result.set(alias, { primary, aliases: aliasesInSubtitle });
+        visited.add(alias);
+      }
+    }
+    return result;
+  })();
+
   const subsetFontGroup = async (charInfo, fontNameStr) => {
-    const candidates = fonts.filter(f => f.matchedFor.toLowerCase() === fontNameStr.toLowerCase());
+    const fontNameLower = fontNameStr.toLowerCase();
+    const mergeInfo = resolvedFontGroups.get(fontNameLower);
+    if (mergeInfo && mergeInfo.primary !== fontNameLower) return;
+
+    const aliasNames = mergeInfo
+      ? mergeInfo.aliases
+          .filter(a => a !== fontNameLower)
+          .map(a => allSubtitleFontNames.find(n => n.toLowerCase() === a) || a)
+      : [];
+
+    const mergedCharInfo = mergeInfo && mergeInfo.aliases.length > 1 ? (() => {
+      const merged = {
+        normal:     [...(charInfo.normal     || [])],
+        bold:       [...(charInfo.bold       || [])],
+        italic:     [...(charInfo.italic     || [])],
+        boldItalic: [...(charInfo.boldItalic || [])],
+      };
+      for (const alias of mergeInfo.aliases) {
+        if (alias === fontNameLower) continue;
+        const allFontNames = { ...parsed.externalFonts, ...parsed.systemFontsReferenced };
+        const origName = Object.keys(allFontNames).find(n => n.toLowerCase() === alias);
+        if (!origName) continue;
+        const ac = allFontNames[origName];
+        for (const slot of ['normal', 'bold', 'italic', 'boldItalic']) {
+          merged[slot] = Array.from(new Set([...merged[slot], ...(ac[slot] || [])]));
+        }
+      }
+      return merged;
+    })() : charInfo;
+
+    const candidates = fonts.filter(f =>
+      f.matchedFor.toLowerCase() === fontNameLower ||
+      (mergeInfo && mergeInfo.aliases.includes(f.matchedFor.toLowerCase()))
+    );
     if (candidates.length === 0) {
       emitLog(id, 'log.font.missing', 'warn', { name: fontNameStr, weight: 'normal' });
       return;
     }
+    if (aliasNames.length > 0) {
+      emitLog(id, 'log.font.alias_merged', 'info', { name: fontNameStr, aliases: aliasNames.join(', '), count: aliasNames.length });
+    }
     if (!options.wantMultiWeight) {
       const allChars = Array.from(new Set([
-        ...(charInfo.normal || []),
-        ...(charInfo.bold || []),
-        ...(charInfo.italic || []),
-        ...(charInfo.boldItalic || [])
+        ...(mergedCharInfo.normal || []),
+        ...(mergedCharInfo.bold || []),
+        ...(mergedCharInfo.italic || []),
+        ...(mergedCharInfo.boldItalic || [])
       ]));
       if (allChars.length === 0) return;
       const best = selectBestFont(candidates, 400, false);
       if (!best) return;
       emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: 'normal', chars: allChars.length });
       try {
-        const result = await subsetFont(best.buffer, allChars, fontNameStr, best.isTTC, 'normal', best.ttcIndex, id, options.wantAscii, options.wantFullFont);
+        const result = await subsetFont(best.buffer, allChars, fontNameStr, best.isTTC, 'normal', best.ttcIndex, id, options.wantAscii, options.wantFullFont, aliasNames);
         embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars, weight: best.weight, weightSlot: 'normal', subfamilyName: best.subfamilyName || '' });
         emitLog(id, 'log.font.subset_done', 'ok', { name: fontNameStr, weight: 'normal', origKB: (result.origSize / 1024).toFixed(0), newKB: (result.ttf.length / 1024).toFixed(0), pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0), skipped: result.skipped });
       } catch (e) {
@@ -1912,10 +2048,10 @@ async function doConvert(data, id) {
       return;
     }
     const weightSlots = [
-      { key: 'normal', chars: charInfo.normal || [], reqW: 400, reqI: false },
-      { key: 'bold', chars: charInfo.bold || [], reqW: 700, reqI: false },
-      { key: 'italic', chars: charInfo.italic || [], reqW: 400, reqI: true },
-      { key: 'boldItalic', chars: charInfo.boldItalic || [], reqW: 700, reqI: true },
+      { key: 'normal',     chars: mergedCharInfo.normal     || [], reqW: 400, reqI: false },
+      { key: 'bold',       chars: mergedCharInfo.bold       || [], reqW: 700, reqI: false },
+      { key: 'italic',     chars: mergedCharInfo.italic     || [], reqW: 400, reqI: true  },
+      { key: 'boldItalic', chars: mergedCharInfo.boldItalic || [], reqW: 700, reqI: true  },
     ];
     const fileKeyFor = (c) => (c.file?.name || c.name || '') + '::' + (c.ttcIndex ?? -1);
     const libassScore = (c, reqW, reqI) => Math.abs((c.weight || 400) - reqW) + (!!c.isItalic === !!reqI ? 0 : 10000);
@@ -1969,7 +2105,7 @@ async function doConvert(data, id) {
       const wLabel = primarySlot.key;
       emitLog(id, 'log.font.subsetting', 'info', { name: fontNameStr, weight: wLabel, chars: mergedChars.length });
       try {
-        const result = await subsetFont(candidate.buffer, mergedChars, fontNameStr, candidate.isTTC, primarySlot.key, candidate.ttcIndex, id, options.wantAscii, options.wantFullFont);
+        const result = await subsetFont(candidate.buffer, mergedChars, fontNameStr, candidate.isTTC, primarySlot.key, candidate.ttcIndex, id, options.wantAscii, options.wantFullFont, aliasNames);
         embeddedFonts.push({ name: fontNameStr, ttf: result.ttf, usedChars: result.usedChars, weight: candidate.weight, weightSlot: primarySlot.key, subfamilyName: candidate.subfamilyName || '' });
         emitLog(id, 'log.font.subset_done', 'ok', { name: fontNameStr, weight: wLabel, origKB: (result.origSize / 1024).toFixed(0), newKB: (result.ttf.length / 1024).toFixed(0), pct: ((1 - result.ttf.length / result.origSize) * 100).toFixed(0), skipped: result.skipped });
       } catch (e) {
