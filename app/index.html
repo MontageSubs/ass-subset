@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.22">
+  <meta name="version" content="2.6.23">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -4956,6 +4956,47 @@
       }
     }
 
+    const WEIGHT_KW = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'medium', 'normal', 'regular', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
+    const ITALIC_KW = ['italic', 'oblique', 'slanted'];
+
+    function parseVersion(s) {
+      const m = (s || '').match(/(\d+)\.(\d+)/);
+      return m ? [parseInt(m[1], 10), parseInt(m[2], 10)] : [0, 0];
+    }
+    function cmpVersion(a, b) {
+      if (a[0] !== b[0]) return a[0] - b[0];
+      return a[1] - b[1];
+    }
+
+    function isBetterCandidate(newCand, oldCand, fontNameStr) {
+      const fLow = fontNameStr.toLowerCase();
+      const needsW = WEIGHT_KW.some(kw => fLow.includes(kw));
+      const needsI = ITALIC_KW.some(kw => fLow.includes(kw));
+      const getScore = (c) => {
+        let score = 0;
+        if (needsW || needsI) {
+          const sLow = (c.subfamilyName || '').toLowerCase();
+          const wOk = !needsW || WEIGHT_KW.some(kw => fLow.includes(kw) && sLow.includes(kw));
+          const iOk = !needsI || ITALIC_KW.some(kw => fLow.includes(kw) && sLow.includes(kw));
+          if (wOk && iOk) score -= 10000;
+        }
+        score += Math.abs((c.weight || 400) - 400);
+        if (c.isItalic && !needsI) score += 5000;
+        return score;
+      };
+      const sNew = getScore(newCand);
+      const sOld = getScore(oldCand);
+      if (sNew !== sOld) return sNew < sOld;
+      const vNew = parseVersion(newCand.version || '');
+      const vOld = parseVersion(oldCand.version || '');
+      const cmp = cmpVersion(vNew, vOld);
+      if (cmp !== 0) return cmp > 0;
+      const dNew = newCand.file?.lastModified || newCand.lastModified || 0;
+      const dOld = oldCand.file?.lastModified || oldCand.lastModified || 0;
+      if (dNew !== dOld) return dNew > dOld;
+      return (newCand.size || 0) > (oldCand.size || 0);
+    }
+
     async function handleFonts(files) {
       const dz = document.getElementById('dz-font');
       const notice = document.getElementById('font-loading-notice');
@@ -5067,12 +5108,14 @@
                 const vk = nameKey + '::' + slotKey;
                 const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
                 if (isPendingReplace) { S.pendingReplaceKeys.delete(vk); S.uploadedFonts.set(vk, fontRecord); continue; }
-                if (!S.uploadedFonts.has(vk)) S.uploadedFonts.set(vk, fontRecord);
+                const existing = S.uploadedFonts.get(vk);
+                if (!existing || isBetterCandidate(fontRecord, existing, match.matchedFor)) S.uploadedFonts.set(vk, fontRecord);
               } else {
                 const vk = nameKey + '::default';
                 const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
                 if (isPendingReplace) { S.pendingReplaceKeys.delete(vk); S.uploadedFonts.set(vk, fontRecord); continue; }
-                if (!S.uploadedFonts.has(vk)) S.uploadedFonts.set(vk, fontRecord);
+                const existing = S.uploadedFonts.get(vk);
+                if (!existing || isBetterCandidate(fontRecord, existing, match.matchedFor)) S.uploadedFonts.set(vk, fontRecord);
               }
             }
             itemLines.push(t('font.upload.item.ok', { name: entry.file.name, matched: matchNames }));
@@ -5171,12 +5214,24 @@
           for (const matchName of matched) {
             const vk = wantMultiWeight ? matchName + '::' + slotKey : matchName + '::default';
             const isPendingReplace = S.pendingReplaceKeys && S.pendingReplaceKeys.has(vk);
-            if (isPendingReplace) {
-              S.pendingReplaceKeys.delete(vk);
-            } else if (S.uploadedFonts.has(vk)) {
+            const existing = S.uploadedFonts.get(vk);
+            if (!isPendingReplace && existing) {
+              if (!buffer) { const blob = await font.blob(); buffer = await blob.arrayBuffer(); }
+              const dataView = new DataView(buffer);
+              const isTTC = buffer.byteLength > 12 && dataView.getUint32(0, false) === 0x74746366;
+              const candidate = {
+                file: { name: font.fullName + ' (system)' },
+                buffer, matchedFor: matchName,
+                isTTC, ttcIndex: isTTC ? 0 : -1,
+                weight, isItalic,
+                subfamilyName: font.style || '',
+                isFamilyMatch: true, isSystem: true
+              };
+              if (isBetterCandidate(candidate, existing, matchName)) S.uploadedFonts.set(vk, candidate);
               matchedCount++;
               continue;
             }
+            if (isPendingReplace) S.pendingReplaceKeys.delete(vk);
             if (!buffer) { const blob = await font.blob(); buffer = await blob.arrayBuffer(); }
             const dataView = new DataView(buffer);
             const isTTC = buffer.byteLength > 12 && dataView.getUint32(0, false) === 0x74746366;
