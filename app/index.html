@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.26">
+  <meta name="version" content="2.6.27">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -781,11 +781,17 @@
     }
 
     .font-loading-notice {
+      position: absolute;
+      inset: 0;
       border: 1.5px dashed var(--rule);
       border-radius: var(--r);
       padding: 1.25rem;
       background: var(--paper);
-      margin-bottom: 1rem;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
     }
 
     .font-loading-notice .fln-text {
@@ -1671,7 +1677,8 @@
             <p style="font-size:0.95rem;font-weight:600;margin:0;" data-i18n="font.upload.title">Font Files</p>
             <button class="btn btn-outline hidden" id="btn-local-font" data-i18n="font.local.btn" style="font-size:0.8rem;padding:0.45rem 1rem;">Load System Fonts</button>
           </div>
-          <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="Upload font files">
+          <div style="position:relative;margin-bottom:1rem;">
+          <label class="font-upload-zone" id="dz-font" for="inp-font" data-i18n-aria="aria.dz_font" aria-label="Upload font files" style="margin-bottom:0;">
             <span data-i18n="font.upload.drop">Click to select fonts or a .zip archive, or drag files/folders here (TTF / OTF / TTC..., multi-select; variable fonts not supported)</span>
           </label>
           <div id="font-loading-notice" class="font-loading-notice hidden" role="status" aria-live="polite">
@@ -1681,6 +1688,7 @@
                 aria-valuemax="100" aria-labelledby="fln-text"></div>
               <div class="progress-text" id="fln-progress-text" aria-live="off"></div>
             </div>
+          </div>
           </div>
           <input type="file" id="inp-font" accept=".ttf,.otf,.ttc,.otc,.woff,.woff2,.zip" multiple class="file-input-hidden"
             data-i18n-aria="aria.dz_font" aria-label="Upload font files">
@@ -4374,7 +4382,7 @@
             const slotSuffix = slotMatch ? slotMatch[2].toUpperCase() : '_0';
             if (!base.toLowerCase().startsWith('assdrawsubset')) {
               totalEmbedded.add(k);
-              const isRandFont = /^[A-Z]{7,8}$/.test(base);
+              const isRandFont = /^[A-Z0-9]{7,8}$/.test(base);
               const hasMappedName = isRandFont && (p.randFontMap?.[base]);
               const hasOrigToRand = !isRandFont && origToRand[base.toLowerCase()];
               const isMissingMap = isRandFont && !hasMappedName;
@@ -4615,7 +4623,7 @@
             const baseName = efName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
             if (baseName.toLowerCase().startsWith('assdrawsubset')) continue;
             strippableCount++;
-            const isUnknownRand = /^[A-Z]{7,8}$/.test(baseName) && !entry.parsed.randFontMap?.[baseName];
+            const isUnknownRand = /^[A-Z0-9]{7,8}$/.test(baseName) && !entry.parsed.randFontMap?.[baseName];
             if (isUnknownRand) unknownRandCount++;
           }
           if (strippableCount > 0 && unknownRandCount < strippableCount) hasStripFonts = true;
@@ -4781,11 +4789,12 @@
         if (wantSys && entry.parsed.systemFontsReferenced)
           sources.push(...Object.entries(entry.parsed.systemFontsReferenced).map(([n,i]) => [n,i,true]));
         for (const [name, info, isSys] of sources) {
-          if (!allFonts[name]) allFonts[name] = { normal: new Set(), bold: new Set(), italic: new Set(), boldItalic: new Set(), isSystem: isSys };
+          if (!allFonts[name]) allFonts[name] = { normal: new Set(), bold: new Set(), italic: new Set(), boldItalic: new Set(), isSystem: isSys, totalChars: 0 };
           info.normal.forEach(c => allFonts[name].normal.add(c));
           info.bold.forEach(c => allFonts[name].bold.add(c));
           (info.italic || []).forEach(c => allFonts[name].italic.add(c));
           (info.boldItalic || []).forEach(c => allFonts[name].boldItalic.add(c));
+          allFonts[name].totalChars += new Set([...info.normal, ...info.bold, ...(info.italic||[]), ...(info.boldItalic||[])]).size;
         }
       }
 
@@ -4840,7 +4849,7 @@
         const mergeInfo = aliasGroupMap.get(key);
         const isPrimaryAlias = mergeInfo && mergeInfo.primary === key && mergeInfo.aliases.length > 1;
         const isSecondaryAlias = mergeInfo && mergeInfo.primary !== key;
-        const totalChars = new Set([...info.normal, ...info.bold, ...info.italic, ...info.boldItalic]).size;
+        const totalChars = info.totalChars;
         const variants = [];
         if (info.normal.size > 0) variants.push(t('font.weight.normal'));
         if (info.bold.size > 0) variants.push(t('font.weight.bold'));
