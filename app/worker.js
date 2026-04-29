@@ -168,9 +168,9 @@ function assTimeToMs(s) {
 }
 function normFont(name) { return name.replace(/^@/, '').trim(); }
 function genRandFontName() {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let r = '';
-  for (let i = 0; i < 8; i++) r += chars[Math.floor(Math.random() * 26)];
+  for (let i = 0; i < 8; i++) r += chars[Math.floor(Math.random() * 36)];
   return r;
 }
 function parseASSText(text, id, forceHasBOM) {
@@ -217,7 +217,7 @@ function parseASSText(text, id, forceHasBOM) {
       if (resXM) playResX = parseInt(resXM[1]);
       const resYM = t.match(/^PlayResY\s*:\s*(\d+)/i);
       if (resYM) playResY = parseInt(resYM[1]);
-      const randM = t.match(/^;\s*Font Subset:\s*([A-Z]{7,8})\s*-\s*(.+)$/);
+      const randM = t.match(/^;\s*Font Subset:\s*([A-Z0-9]{8})\s*-\s*(.+)$/);
       if (randM) { randFontMap[randM[1].trim()] = randM[2].trim(); }
     }
     if (section.includes('styles')) {
@@ -298,8 +298,8 @@ function parseASSText(text, id, forceHasBOM) {
 
   applyRandResolution(randFontMap);
 
-  const isRandFontName = (n) => /^[A-Z]{7,8}$/.test(n);
-  const fontInternalMapRe = /FontSubsetMap:\s*\{original:\s*(.+?),\s*subset:\s*([A-Z]{7,8}),\s*ass-subset:\s*([\d.]+)\}/;
+  const isRandFontName = (n) => /^[A-Z0-9]{8}$/.test(n);
+  const fontInternalMapRe = /FontSubsetMap:\s*\{original:\s*(.+?),\s*subset:\s*([A-Z0-9]{8}),\s*ass-subset:\s*([\d.]+)\}/;
 
   const potentialRandEmbedded = Object.keys(embeddedFonts).some(embName => {
     const baseEmbName = embName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
@@ -2114,7 +2114,7 @@ async function doConvert(data, id) {
 
   const unresolvableRandBases = new Set();
   if (parsed.randMapMissing && parsed.embeddedFonts) {
-    const isRandFontNameLocal = (n) => /^[A-Z]{7,8}$/.test(n);
+    const isRandFontNameLocal = (n) => /^[A-Z0-9]{8}$/.test(n);
     for (const embName of Object.keys(parsed.embeddedFonts)) {
       const baseEmbName = embName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
       if (isAnyDrawFont(baseEmbName)) continue;
