@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # ============================================================================
 # Name: DrawInspector.py
-# Version: 1.0
+# Version: 1.1
 # Organization: MontageSubs (蒙太奇字幕组)
 # Contributors: Meow P (小p)
 # License: MIT License
@@ -49,6 +49,15 @@ def extract_version():
 
 VERSION = extract_version()
 
+DRAW_TABLE_SCHEMA = [
+    {'name': 'data', 'length_type': 'uint16', 'data_type': 'utf8'},
+    {'name': 'char', 'length_type': 'uint8', 'data_type': 'utf8'},
+    {'name': 'flags', 'length_type': None, 'data_type': 'bitfield', 'size': 1, 'fields': [
+        {'name': 'pLevel', 'mask': 0x0F, 'shift': 0},
+        {'name': 'hasExplicitClose', 'mask': 0x10, 'shift': 4},
+    ]},
+]
+
 def print_help():
     print(f"DrawInspector v{VERSION} - Drawing Commands Font Inspector")
     print("\nUsage: python DrawInspector.py [options] [font_file]")
@@ -74,6 +83,59 @@ def check_dependencies():
         print("\nPlease install it with:")
         print("  pip install fontTools")
         sys.exit(1)
+
+def read_length_value(data, offset, length_type):
+    if length_type == 'uint16':
+        if offset + 2 > len(data):
+            return None, None, None
+        length = struct.unpack('>H', data[offset:offset+2])[0]
+        return length, 2, offset + 2
+    elif length_type == 'uint8':
+        if offset + 1 > len(data):
+            return None, None, None
+        length = struct.unpack('B', data[offset:offset+1])[0]
+        return length, 1, offset + 1
+    return None, None, None
+
+def parse_field(data, offset, field_def):
+    field_name = field_def['name']
+    length_type = field_def['length_type']
+    data_type = field_def['data_type']
+    
+    if data_type == 'bitfield':
+        field_size = field_def['size']
+        if offset + field_size > len(data):
+            return None, None
+        byte_val = struct.unpack('B', data[offset:offset+field_size])[0]
+        field_values = {}
+        for subfield in field_def['fields']:
+            mask = subfield['mask']
+            shift = subfield['shift']
+            value = (byte_val & mask) >> shift
+            if mask == 0x0F:
+                field_values[subfield['name']] = value
+            else:
+                field_values[subfield['name']] = bool(value)
+        return field_values, offset + field_size
+    
+    length, len_header_size, data_offset = read_length_value(data, offset, length_type)
+    if length is None:
+        return None, None
+    
+    if data_offset + length > len(data):
+        return None, None
+    
+    field_data = data[data_offset:data_offset+length]
+    
+    if data_type == 'utf8':
+        try:
+            field_value = field_data.decode('utf-8')
+        except UnicodeDecodeError:
+            field_value = field_data.decode('utf-8', errors='replace')
+    else:
+        field_value = field_data
+    
+    return field_value, data_offset + length
 
 def main():
     if len(sys.argv) > 1:
@@ -131,49 +193,36 @@ def main():
             offset += 4
             
             for i in range(entry_count):
-                if offset + 2 > len(data):
-                    print(f"Error: Unexpected end of data at entry {i}")
+                entry_data = {}
+                entry_offset = offset
+                parse_error = False
+                
+                for field_def in DRAW_TABLE_SCHEMA:
+                    field_value, new_offset = parse_field(data, entry_offset, field_def)
+                    
+                    if field_value is None:
+                        print(f"Error: Failed to parse field '{field_def['name']}' at entry {i}, offset {entry_offset}")
+                        parse_error = True
+                        break
+                    
+                    entry_data[field_def['name']] = field_value
+                    entry_offset = new_offset
+                
+                if parse_error:
                     break
                 
-                data_length = struct.unpack('>H', data[offset:offset+2])[0]
-                offset += 2
-                
-                if offset + data_length > len(data):
-                    print(f"Error: Insufficient data for entry {i}")
-                    break
-                
-                data_bytes = data[offset:offset+data_length]
-                offset += data_length
-                
-                if offset + 1 > len(data):
-                    print(f"Error: Missing char_length at entry {i}")
-                    break
-                
-                char_length = struct.unpack('B', data[offset:offset+1])[0]
-                offset += 1
-                
-                if offset + char_length > len(data):
-                    print(f"Error: Insufficient data for char at entry {i}")
-                    break
-                
-                char_bytes = data[offset:offset+char_length]
-                offset += char_length
-                
-                if offset + 1 > len(data):
-                    print(f"Error: Missing flags at entry {i}")
-                    break
-                
-                flags = struct.unpack('B', data[offset:offset+1])[0]
-                offset += 1
-                
-                pLevel = flags & 0x0F
-                hasExplicitClose = (flags >> 4) & 1
+                offset = entry_offset
                 
                 print(f"Entry {i}:")
-                print(f"  Data: {data_bytes.decode('utf-8', errors='replace')}")
-                print(f"  Char: {char_bytes.decode('utf-8', errors='replace')}")
-                print(f"  pLevel: {pLevel}")
-                print(f"  hasExplicitClose: {hasExplicitClose}\n")
+                for field_def in DRAW_TABLE_SCHEMA:
+                    field_name = field_def['name']
+                    if field_def['data_type'] == 'bitfield':
+                        field_value = entry_data[field_name]
+                        for subfield in field_def['fields']:
+                            print(f"  {subfield['name']}: {field_value[subfield['name']]}")
+                    else:
+                        print(f"  {field_name}: {entry_data[field_name]}")
+                print()
         
         except Exception as e:
             print(f"Error: Failed to parse draw table")
