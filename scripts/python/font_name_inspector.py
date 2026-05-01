@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ============================================================================
-# Name: font_inspector.py
-# Version: 1.0.1
+# Name: font_name_inspector.py
+# Version: 1.1
 # Organization: MontageSubs (蒙太奇字幕组)
 # Contributors: Meow P (小p)
 # License: MIT License
@@ -18,8 +18,8 @@
 #    - fontTools (pip install fonttools)
 #
 # Usage / 用法:
-#    python font_inspector.py [font_file]
-#    python font_inspector.py font.ttf
+#    python font_name_inspector.py [font_file]
+#    python font_name_inspector.py font.ttf
 #
 # Output / 输出:
 #    Displays all font tables and detailed name table entries including
@@ -40,14 +40,59 @@ PLATFORM = {
 }
 
 LANGUAGE = {
-    0x0: "Neutral", 0x409: "English (US)", 0x809: "English (UK)", 0xC09: "English (AU)",
-    0x404: "Chinese (Trad)", 0x804: "Chinese (Simp)", 0xC04: "Chinese (HK)",
-    0x1004: "Chinese (SG)", 0x1404: "Chinese (Macau)", 0x7C04: "Chinese (TW)",
-    0x411: "Japanese", 0x412: "Korean", 0x40E: "Hungarian", 0x415: "Polish",
-    0x419: "Russian", 0x407: "German", 0xC07: "German (AT)", 0x40C: "French",
-    0x80C: "French (BE)", 0xC0C: "French (CA)", 0x100C: "French (CH)",
-    0x410: "Italian", 0x810: "Italian (CH)", 0x4009: "English (IN)", 0x1009: "English (CA)",
+    0x0000: "Neutral",
+    0x0401: "Arabic (Saudi Arabia)", 0x0801: "Arabic (Iraq)", 0x0C01: "Arabic (Egypt)", 
+    0x1001: "Arabic (Libya)", 0x1401: "Arabic (Algeria)", 0x1801: "Arabic (Morocco)", 
+    0x1C01: "Arabic (Tunisia)", 0x2001: "Arabic (Oman)", 0x2401: "Arabic (Yemen)", 
+    0x2801: "Arabic (Syria)", 0x2C01: "Arabic (Jordan)", 0x3001: "Arabic (Lebanon)", 
+    0x3401: "Arabic (Kuwait)", 0x3801: "Arabic (UAE)", 0x3C01: "Arabic (Bahrain)", 
+    0x4001: "Arabic (Qatar)", 0x4401: "Arabic (Palestine)",
+    0x0402: "Bulgarian", 0x0403: "Catalan", 0x0404: "Chinese (Traditional)",
+    0x0405: "Czech", 0x0406: "Danish", 0x0407: "German", 0x0408: "Greek", 
+    0x0409: "English (US)", 0x040A: "Spanish", 0x040B: "Finnish", 0x040C: "French", 
+    0x040D: "Hebrew", 0x040E: "Hungarian", 0x040F: "Icelandic", 0x0410: "Italian", 
+    0x0411: "Japanese", 0x0412: "Korean", 0x0413: "Dutch", 0x0414: "Norwegian (Bokmål)", 
+    0x0415: "Polish", 0x0416: "Portuguese (Brazil)", 0x0417: "Romansh", 0x0418: "Romanian", 
+    0x0419: "Russian", 0x041A: "Croatian", 0x041B: "Slovak", 0x041C: "Albanian",
+    0x041D: "Swedish", 0x041E: "Thai", 0x041F: "Turkish", 0x0420: "Urdu",
+    0x0421: "Indonesian", 0x0422: "Ukrainian", 0x0423: "Belarusian", 0x0424: "Slovenian",
+    0x0425: "Estonian", 0x0426: "Latvian", 0x0427: "Lithuanian", 0x0428: "Tajik",
+    0x0429: "Persian", 0x042A: "Vietnamese", 0x042B: "Armenian", 0x042C: "Azeri (Cyrillic)",
+    0x042D: "Basque", 0x042E: "Sorbian", 0x042F: "Macedonian", 0x0430: "Sutu",
+    0x0431: "Tsonga", 0x0432: "Tswana", 0x0433: "Venda", 0x0434: "Xhosa",
+    0x0435: "Zulu", 0x0436: "Afrikaans", 0x0437: "Georgian", 0x0438: "Faroese",
+    0x0439: "Farsi", 0x043A: "Sindhi", 0x043B: "Kashmiri (Perso-Arabic)", 0x043C: "Kashmiri (Devanagari)",
+    0x043D: "Nepali (India)", 0x043E: "Nepali", 0x043F: "Punjabi", 0x0440: "Gujarati",
+    0x0441: "Oriya", 0x0442: "Tamil", 0x0443: "Telugu", 0x0444: "Kannada",
+    0x0445: "Malayalam", 0x0446: "Assamese", 0x0447: "Marathi", 0x0448: "Sanskrit",
+    0x0449: "Mongolian (Cyrillic)", 0x044A: "Tibetan", 0x044B: "Welsh", 0x044C: "Khmer",
+    0x044D: "Lao", 0x044E: "Burmese", 0x044F: "Galician", 0x0450: "Konkani",
+    0x0451: "Manipuri", 0x0453: "Syriac", 0x0454: "Sinhalese", 0x0455: "Cherokee",
+    0x0456: "Inuktitut", 0x0457: "Amharic", 0x0458: "Tamazight (Latin)", 0x045B: "Divehi",
+    0x045C: "Bashkir", 0x045D: "Luxembourgish", 0x045E: "Uzbek (Cyrillic)", 0x045F: "Uzbek (Latin)",
+    0x0460: "Kazakh", 0x0461: "Kyrgyz (Cyrillic)", 0x0462: "Turkmen", 0x0463: "Mongolian (Mongolia)",
+    0x0464: "Pashto", 0x0465: "Filipino", 0x0466: "Dhivehi", 0x0467: "Edo",
+    0x0468: "Fulah", 0x0469: "Hausa", 0x046A: "Ilocano", 0x046B: "Igbo",
+    0x046C: "Kanuri", 0x046D: "Guarani", 0x046E: "Haitian Creole", 0x046F: "Latin",
+    0x0470: "Songhai", 0x0471: "Tigrinya", 0x0472: "Tigre", 0x0473: "Geez",
+    0x0474: "Sami (Northern)", 0x0475: "Sami (Lule)", 0x0476: "Sami (Southern)", 0x0477: "Sami (Inari)",
+    0x0478: "Sami (Skolt)", 0x047C: "Maori", 0x047D: "Mapudungun", 0x047E: "Mohawk",
+    0x047F: "Yakut", 0x0480: "Qiche", 0x0481: "Kinyarwanda", 0x0482: "Wolof",
+    0x0483: "Dari", 0x0484: "Scottish Gaelic", 0x0485: "Irish Gaelic", 0x0486: "Breton",
+    0x0487: "Uyghur", 0x0488: "Mi'kmaq", 0x0489: "Occitan",
+    0x0804: "Chinese (Simplified)", 0x0816: "Portuguese (Portugal)", 0x080A: "Spanish (Mexico)",
+    0x0C0A: "Spanish (Spain)", 0x0C0C: "French (Canada)", 0x0C51: "Quechua (Peru)",
+    0x1004: "Chinese (Singapore)", 0x1009: "English (Canada)", 0x100C: "French (Switzerland)",
+    0x1401: "Arabic (Algeria)", 0x1407: "German (Switzerland)", 0x1409: "English (New Zealand)",
+    0x140C: "French (Belgium)", 0x1809: "English (Ireland)", 0x180A: "Spanish (Argentina)",
+    0x1C09: "English (South Africa)", 0x1C0A: "Spanish (Colombia)", 0x2009: "English (Jamaica)",
+    0x200A: "Spanish (Peru)", 0x2409: "English (Caribbean)", 0x240A: "Spanish (Venezuela)",
+    0x2809: "English (Belize)", 0x280A: "Spanish (Chile)", 0x2C0A: "Spanish (Ecuador)",
+    0x2C09: "English (Trinidad)", 0x3009: "English (Zimbabwe)", 0x300A: "Spanish (Bolivia)",
+    0x3409: "English (Philippines)", 0x340A: "Spanish (Paraguay)", 0x3C0A: "Spanish (Uruguay)",
+    0x4009: "English (India)", 0x4409: "English (Malaysia)", 0x4809: "English (Singapore)",
 }
+
 
 MAX_COLUMN_WIDTH = 80
 SEPARATOR_WIDTH = 100
@@ -119,7 +164,7 @@ class FontAnalyzer:
         except Exception as e:
             raise RuntimeError(f"Failed to load TTC: {str(e)}")
         
-        print(f"Font Inspector v{VERSION} - Font Metadata Inspector")
+        print(f"Font Name Inspector v{VERSION}")
         print("=" * SEPARATOR_WIDTH)
         print(f"Font file: {self.font_path}")
         print(f"Type: TTC Collection ({len(ttc)} fonts)\n")
@@ -138,7 +183,7 @@ class FontAnalyzer:
         except Exception as e:
             raise RuntimeError(f"Failed to load TTF: {str(e)}")
         
-        print(f"Font Inspector v{VERSION} - Font Metadata Inspector")
+        print(f"Font Name Inspector v{VERSION}")
         print("=" * SEPARATOR_WIDTH)
         print(f"Font file: {self.font_path}")
         print(f"Type: TTF")
@@ -252,18 +297,18 @@ class FontAnalyzer:
 def main():
     if len(sys.argv) < 2:
         print("Error: Font file not specified.")
-        print("Usage: python FontInspector.py <font_file>")
+        print("Usage: python font_name_inspector.py <font_file>")
         sys.exit(1)
     
     arg = sys.argv[1]
     
     if arg in ['-h', '--help']:
-        print(f"Font Inspector v{VERSION} - Font Metadata Inspector")
-        print("Usage: python font_inspector.py <font_file>")
+        print(f"Font Name Inspector v{VERSION} - Font Metadata Inspector")
+        print("Usage: python font_name_inspector.py <font_file>")
         sys.exit(0)
     
     if arg in ['-v', '--version']:
-        print(f"Font Inspector v{VERSION}")
+        print(f"Font Name Inspector v{VERSION}")
         sys.exit(0)
     
     analyzer = FontAnalyzer(arg)
