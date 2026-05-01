@@ -2,9 +2,8 @@
 # -*- coding: utf-8 -*-
 # ============================================================================
 # Name: font_inspector.py
-# Version: 1.0
+# Version: 1.0.1
 # Organization: MontageSubs (蒙太奇字幕组)
-# License: MIT License
 # Contributors: Meow P (小p)
 # License: MIT License
 # Source: https://github.com/MontageSubs/ass-subset/scripts/python/
