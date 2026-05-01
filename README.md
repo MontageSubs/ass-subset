@@ -78,18 +78,22 @@ opentype.js is used for font file parsing and binary construction. JSZip is used
 
 ```
 ass-subset/
-├── app/                           # Tool
-│   ├── index.html                 # Tool main file
-│   ├── worker.js                  # Web Worker (main processing logic)
+├── app/                           # Web Application (PWA)
+│   ├── index.html                 # Main entry point
+│   ├── worker.js                  # Web Worker (core processing logic)
 │   ├── sw.js                      # Service Worker (caching strategy)
 │   ├── manifests/                 # PWA manifests (10 languages)
-│   ├── sitemap.xml                # Sitemap for search engines
+│   ├── sitemap.xml                # SEO sitemap
 │   ├── vendor/                    # Third-party dependencies
-│   │   ├── opentype.min.js        # Local copy of opentype.js
-│   │   └── jszip.min.js           # Local copy of JSZip
-│   └── icons/                     # App icons
+│   │   ├── opentype.min.js        # Font parsing library
+│   │   └── jszip.min.js           # ZIP compression library
+│   └── icons/                     # App icons (PWA assets)
+├── scripts/                       # Utility scripts
+│   └── python/                    # Python diagnostic tools
+│       ├── draw_font_inspector.py # Diagnoses the drawing command font
+│       └── font_name_inspector.py # Analyzes the 'name' table in fonts
 ├── LICENSE                        # MIT License
-├── README.md                      # English documentation (this file)
+├── README.md                      # English documentation
 └── README.zh-hans.md              # Chinese documentation
 ```
 
