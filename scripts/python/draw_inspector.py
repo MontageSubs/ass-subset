@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # ============================================================================
-# Name: DrawInspector.py
-# Version: 1.1
+# Name: draw_inspector.py
+# Version: 1.2
 # Organization: MontageSubs (蒙太奇字幕组)
 # Contributors: Meow P (小p)
 # License: MIT License
@@ -21,8 +21,8 @@
 #    - fontTools (pip install fonttools)
 #
 # Usage / 用法:
-#    python DrawInspector.py [font_file]
-#    python DrawInspector.py ASSDrawSubset_0.ttf
+#    python draw_inspector.py [font_file]
+#    python draw_inspector.py ASSDrawSubset_0.ttf
 #
 # Output / 输出:
 #    Displays all font tables and detailed draw table entries including 
@@ -59,8 +59,8 @@ DRAW_TABLE_SCHEMA = [
 ]
 
 def print_help():
-    print(f"DrawInspector v{VERSION} - Drawing Commands Font Inspector")
-    print("\nUsage: python DrawInspector.py [options] [font_file]")
+    print(f"Draw Inspector v{VERSION} - Drawing Commands Font Inspector")
+    print("\nUsage: python draw_inspector.py [options] [font_file]")
     print("\nOptions:")
     print("  -h, --help     Show this help message and exit")
     print("  -v, --version  Show version and exit")
@@ -68,12 +68,12 @@ def print_help():
     print("  font_file      Path to TTF font file")
     print("                 Default: ASSDrawSubset_0.ttf")
     print("\nExamples:")
-    print("  python DrawInspector.py")
-    print("  python DrawInspector.py custom_font.ttf")
-    print("  python DrawInspector.py -h")
+    print("  python draw_inspector.py")
+    print("  python draw_inspector.py custom_font.ttf")
+    print("  python draw_inspector.py -h")
 
 def print_version():
-    print(f"DrawInspector v{VERSION}")
+    print(f"Draw Inspector v{VERSION}")
 
 def check_dependencies():
     try:
@@ -152,8 +152,8 @@ def main():
     
     if not os.path.exists(font_file):
         print(f"Error: Font file '{font_file}' not found.")
-        print("\nUsage: python DrawInspector.py [font_file]")
-        print(f"       python DrawInspector.py -h")
+        print("\nUsage: python draw_inspector.py [font_file]")
+        print(f"       python draw_inspector.py -h")
         sys.exit(1)
     
     from fontTools.ttLib import TTFont
@@ -165,7 +165,7 @@ def main():
         print(f"Details: {str(e)}")
         sys.exit(1)
     
-    print(f"DrawInspector v{VERSION} - Drawing Commands Font Inspector")
+    print(f"Draw Inspector v{VERSION} - Drawing Commands Font Inspector")
     print("=" * 50)
     print(f"Font file: {font_file}")
     print(f"Total tables: {len(font)}\n")
