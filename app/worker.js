@@ -408,6 +408,10 @@ function parseASSText(text, id, forceHasBOM) {
       subsetNeedsUpdate = true;
     }
   }
+  let hasDrawTable = false;
+  if (existingSubsetFontBuffer) {
+    try { hasDrawTable = extractDrawTable(existingSubsetFontBuffer) !== null; } catch (_) {}
+  }
   return {
     styles,
     externalFonts,
@@ -417,6 +421,7 @@ function parseASSText(text, id, forceHasBOM) {
     playResX, playResY,
     lineCount: totalLines,
     hasExistingDrawSubset,
+    hasDrawTable,
     subsetNeedsUpdate,
     existingGlyphCount,
     orphanGlyphCount,
@@ -2165,7 +2170,7 @@ async function doConvert(data, id) {
     } else {
       emitLog(id, 'log.draw.none', 'info', {});
     }
-  } else if (parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
+  } else if (!options.wantStrip && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
 
@@ -2461,7 +2466,7 @@ async function doConvert(data, id) {
     }
   }
 
-  if (!options.wantDraw && !drawTTF && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
+  if (!options.wantDraw && !options.wantStrip && !drawTTF && parsed.hasExistingDrawSubset && parsed.existingSubsetFontBuffer) {
     drawTTF = new Uint8Array(parsed.existingSubsetFontBuffer);
   }
   const pureOriginalText = text.startsWith('\uFEFF') ? text.slice(1) : text;
@@ -2600,6 +2605,37 @@ async function doConvert(data, id) {
   const newSize = new Blob([finalOutput]).size;
   const delta = newSize - origSize;
 
+  let drawRestoreLog = null;
+  if (options.wantStrip && !options.wantDraw && drawStripResult) {
+    if (!drawStripResult.hasTable) {
+      drawRestoreLog = { type: 'no_table', name: drawStripResult.name };
+    } else {
+      const { drawTable, buf } = drawStripResult;
+      const refCharsSet = new Set(parsed.subsetReferencedChars.map(r => r.char));
+      const tableCharSet = new Set(drawTable.map(e => e.char));
+      const restoredCount = drawTable.filter(e => refCharsSet.has(e.char)).length;
+      const retainedChars = [];
+      try {
+        const ef = opentype.parse(buf.buffer);
+        for (let i = 1; i < ef.glyphs.length; i++) {
+          const g = ef.glyphs.get(i);
+          if (!g || !g.unicode || g.unicode === 0) continue;
+          const ch = String.fromCodePoint(g.unicode);
+          if (refCharsSet.has(ch) && !tableCharSet.has(ch)) retainedChars.push(ch);
+        }
+      } catch (_) {}
+      if (restoredCount === 0 && retainedChars.length === 0 && refCharsSet.size === 0) {
+        drawRestoreLog = { type: 'orphan_purge', name: drawStripResult.name };
+      } else if (restoredCount > 0 && retainedChars.length === 0) {
+        drawRestoreLog = { type: 'full', name: drawStripResult.name, restoredCount };
+      } else if (restoredCount > 0 && retainedChars.length > 0) {
+        drawRestoreLog = { type: 'partial', name: drawStripResult.name, restoredCount, retainedCount: retainedChars.length, retainedChars };
+      } else if (restoredCount === 0 && retainedChars.length > 0) {
+        drawRestoreLog = { type: 'unrestorable', name: drawStripResult.name, retainedCount: retainedChars.length, retainedChars };
+      }
+    }
+  }
+
   emitLog(id, 'log.convert.done', 'ok', {
     origKB: (origSize / 1024).toFixed(0),
     newKB: (newSize / 1024).toFixed(0),
@@ -2621,6 +2657,7 @@ async function doConvert(data, id) {
       drawingCount: parsed.drawings,
       uniqueDrawings: parsed.uniqueDrawings.length,
       strippedNames,
+      drawRestoreLog,
     },
     detailedDrawings: options.wantDraw ? Array.from(parsed.uniqueDrawings.values()).map(d => ({
       char: drawMap.get(d.data) || d.char,

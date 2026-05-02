@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.6.28">
+  <meta name="version" content="2.7-beta3">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -1701,7 +1701,7 @@
       </div>
       <div class="step-body">
         <div class="flex-gap" style="align-items: center; flex-wrap: wrap;">
-          <button class="btn btn-primary" id="btn-convert" data-i18n="btn.convert">Start Conversion</button>
+          <button class="btn btn-primary" id="btn-convert" data-i18n="btn.convert">Run Subsetter</button>
           <button class="btn btn-success hidden" id="btn-download" data-i18n="btn.download">Download Output</button>
           <label class="btn btn-outline hidden" id="opt-optimize-wrap"
             style="gap: 0.4rem; cursor: pointer; user-select: none; display: inline-flex; align-items: center; padding: 0.78rem 1.25rem; line-height: 1; height: auto;">
@@ -1911,6 +1911,12 @@
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（缩减 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」处理失败: {error}',
         'log.font.subsetting': '[font] 正在处理「{name}」({weight}，{chars} 字符)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} 不含 draw 表（旧版字体），跳过还原，保留字体。',
+        'log.draw.strip.full': '[draw] ✓ 绘图指令已完整还原：{name} 中 {count} 个字形全部恢复为 \\p 指令，字体已移除。',
+        'log.draw.strip.partial': '[draw] ⚠ 绘图指令部分还原：{name} — {restored} 个字形已还原，{retained} 个字形无法还原（点击展开）',
+        'log.draw.strip.partial.item': '  - 字符 {char} 无法还原（draw 表缺失该条目）',
+        'log.draw.strip.unrestorable': '[draw] ✗ 绘图指令无法还原：{name} — {retained} 个字形均不在 draw 表中，字体已保留（点击展开）',
+        'log.draw.strip.orphan_purge': '[draw] ✓ 字幕中已无绘图指令引用，{name} 中所有孤立字形已清除，字体已移除。',
         'log.rewrite.start': '[ass] 重写字幕文件...',
         'notice.copyright': '⚠ 版权提示：分发未经授权的字体文件可能构成侵权。请确保你拥有所嵌入字体的分发权利。',
         'notice.drawing': '⚠ 注意：绘图指令转换后，特效的大小和位置可能发生轻微偏移，请手动检查最终效果。',
@@ -2091,6 +2097,12 @@
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB（縮減 {pct}%）{skippedText}',
         'log.font.subset_fail': '[font] 「{name}」處理失敗: {error}',
         'log.font.subsetting': '[font] 正在處理「{name}」({weight}，{chars} 字元)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} 不含 draw 表（舊版字型），跳過還原，保留字型。',
+        'log.draw.strip.full': '[draw] ✓ 繪圖指令已完整還原：{name} 中 {count} 個字形全部恢復為 \\p 指令，字型已移除。',
+        'log.draw.strip.partial': '[draw] ⚠ 繪圖指令部分還原：{name} — {restored} 個字形已還原，{retained} 個字形無法還原（點擊展開）',
+        'log.draw.strip.partial.item': '  - 字符 {char} 無法還原（draw 表缺少該條目）',
+        'log.draw.strip.unrestorable': '[draw] ✗ 繪圖指令無法還原：{name} — {retained} 個字形均不在 draw 表中，字型已保留（點擊展開）',
+        'log.draw.strip.orphan_purge': '[draw] ✓ 字幕中已無繪圖指令引用，{name} 中所有孤立字形已清除，字型已移除。',
         'log.rewrite.start': '[ass] 重寫字幕檔...',
         'notice.copyright': '⚠ 版權提示：分發未授權的字型檔可能構成侵權。請確保你擁有所嵌入字型的分發權利。',
         'notice.drawing': '⚠ 注意：繪圖指令轉換後，特效的大小和位置可能發生輕微偏移，請手動確認最終效果。',
@@ -2181,7 +2193,7 @@
         'aria.modal_close': 'Close preview',
         'aria.expand': 'Click to expand details',
         'aria.preview_dl_font': 'Download font {name}',
-        'btn.convert': 'Start Conversion',
+        'btn.convert': 'Run Subsetter',
         'btn.converting': 'Processing...',
         'btn.discuss': 'Discussion',
         'btn.download': 'Download Output',
@@ -2271,6 +2283,12 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" failed: {error}',
         'log.font.subsetting': '[font] Processing "{name}" ({weight}, {chars} chars)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} has no draw table (legacy font) — font retained as-is.',
+        'log.draw.strip.full': '[draw] ✓ Draw commands fully restored: all {count} glyph(s) in {name} recovered as \\p instructions. Font removed.',
+        'log.draw.strip.partial': '[draw] ⚠ Draw commands partially restored: {name} — {restored} glyph(s) recovered, {retained} unrestorable (click to expand)',
+        'log.draw.strip.partial.item': '  - Glyph {char} could not be restored (missing from draw table)',
+        'log.draw.strip.unrestorable': '[draw] ✗ Draw commands cannot be restored: {name} — {retained} glyph(s) not in draw table, font retained (click to expand)',
+        'log.draw.strip.orphan_purge': '[draw] ✓ No draw references remain in script. All orphaned glyphs in {name} cleared. Font removed.',
         'log.rewrite.start': '[ass] Rewriting script...',
         'notice.copyright': '⚠ Font copyright: redistributing fonts without a valid license may constitute infringement. Ensure you have distribution rights for any fonts you embed.',
         'notice.drawing': '⚠ Note: converting draw commands may cause minor position or scale shifts. Always verify the final render.',
@@ -2451,6 +2469,12 @@
         'log.font.subset_done': '[font] 「{name}」({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] 「{name}」の処理に失敗しました: {error}',
         'log.font.subsetting': '[font] 「{name}」({weight}、{chars} 文字) を処理中...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} に draw テーブルがありません（旧フォント）—フォントを保持します。',
+        'log.draw.strip.full': '[draw] ✓ 描画コマンドが完全に復元されました：{name} の {count} グリフすべてを \\p 命令に戻しました。フォントを削除しました。',
+        'log.draw.strip.partial': '[draw] ⚠ 描画コマンドが部分的に復元されました：{name} — {restored} グリフ復元済み、{retained} 個は復元不可（クリックで展開）',
+        'log.draw.strip.partial.item': '  - グリフ {char} は復元できません（draw テーブルに未登録）',
+        'log.draw.strip.unrestorable': '[draw] ✗ 描画コマンドを復元できません：{name} — {retained} グリフが draw テーブルにありません、フォントを保持します（クリックで展開）',
+        'log.draw.strip.orphan_purge': '[draw] ✓ スクリプト内に描画参照がありません。{name} の孤立グリフをすべて削除し、フォントを削除しました。',
         'log.rewrite.start': '[ass] スクリプトを書き換え中...',
         'notice.copyright': '⚠ 著作権注意：未許諾フォントの配布は権利侵害となる場合があります。埋め込むフォントの配布権利をご確認ください。',
         'notice.drawing': '⚠ 注意：描画コマンドの変換後、エフェクトの位置やサイズがわずかにずれることがあります。最終的な表示を必ず確認してください。',
@@ -2631,6 +2655,12 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" 처리 실패: {error}',
         'log.font.subsetting': '[font] "{name}" ({weight}, {chars}자) 처리 중...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} 에 draw 테이블이 없습니다 (구버전 폰트) — 폰트를 유지합니다.',
+        'log.draw.strip.full': '[draw] ✓ 드로우 명령이 완전히 복원되었습니다: {name} 의 {count} 개 글리프가 \\p 명령으로 복원되었습니다. 폰트가 제거되었습니다.',
+        'log.draw.strip.partial': '[draw] ⚠ 드로우 명령이 부분적으로 복원되었습니다: {name} — {restored} 개 복원됨, {retained} 개 복원 불가 (클릭하여 펼치기)',
+        'log.draw.strip.partial.item': '  - 글리프 {char} 복원 불가 (draw 테이블에 없음)',
+        'log.draw.strip.unrestorable': '[draw] ✗ 드로우 명령을 복원할 수 없습니다: {name} — {retained} 개 글리프가 draw 테이블에 없습니다, 폰트를 유지합니다 (클릭하여 펼치기)',
+        'log.draw.strip.orphan_purge': '[draw] ✓ 스크립트에 드로우 참조가 없습니다. {name} 의 모든 고아 글리프를 지우고 폰트를 제거했습니다.',
         'log.rewrite.start': '[ass] 자막 스크립트 재작성 중...',
         'notice.copyright': '⚠ 저작권 주의: 허가 없이 폰트를 배포하면 저작권 침해가 될 수 있습니다. 삽입하는 폰트의 배포 권한이 있는지 확인하세요.',
         'notice.drawing': '⚠ 주의: 드로우 명령어 변환 후 효과의 위치나 크기가 약간 변경될 수 있습니다. 항상 최종 결과를 확인하세요.',
@@ -2811,6 +2841,12 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falló: {error}',
         'log.font.subsetting': '[font] Procesando "{name}" ({weight}, {chars} caracteres)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} no tiene tabla draw (fuente antigua) — se conserva la fuente.',
+        'log.draw.strip.full': '[draw] ✓ Comandos de dibujo restaurados completamente: {count} glifo(s) de {name} recuperados como instrucciones \\p. Fuente eliminada.',
+        'log.draw.strip.partial': '[draw] ⚠ Restauración parcial de comandos de dibujo: {name} — {restored} glifo(s) restaurados, {retained} no restaurables (clic para expandir)',
+        'log.draw.strip.partial.item': '  - Glifo {char} no restaurable (ausente en tabla draw)',
+        'log.draw.strip.unrestorable': '[draw] ✗ No se pueden restaurar comandos de dibujo: {name} — {retained} glifo(s) no están en la tabla draw, fuente conservada (clic para expandir)',
+        'log.draw.strip.orphan_purge': '[draw] ✓ Sin referencias de dibujo en el script. Todos los glifos huérfanos de {name} eliminados. Fuente removida.',
         'log.rewrite.start': '[ass] Reescribiendo subtítulo...',
         'notice.copyright': '⚠ Derechos de autor: redistribuir fuentes sin permiso puede infringir su licencia. Asegúrate de contar con los derechos de distribución de las fuentes que incrustes.',
         'notice.drawing': '⚠ Nota: la conversión de comandos de dibujo puede causar desplazamientos menores de posición o escala. Siempre verifica el resultado final.',
@@ -2991,6 +3027,12 @@
         'log.font.subset_done': '[font] «{name}» ({weight}): {origKB} КБ → {newKB} КБ (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] Ошибка обработки «{name}»: {error}',
         'log.font.subsetting': '[font] Обработка «{name}» ({weight}, {chars} симв.)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} не содержит таблицу draw (старый шрифт) — шрифт сохранён.',
+        'log.draw.strip.full': '[draw] ✓ Команды рисования полностью восстановлены: {count} глиф(а/ов) из {name} возвращены как инструкции \\p. Шрифт удалён.',
+        'log.draw.strip.partial': '[draw] ⚠ Частичное восстановление: {name} — {restored} глиф(а/ов) восстановлено, {retained} не восстановлено (нажмите для раскрытия)',
+        'log.draw.strip.partial.item': '  - Глиф {char} не восстановлен (отсутствует в таблице draw)',
+        'log.draw.strip.unrestorable': '[draw] ✗ Восстановление невозможно: {name} — {retained} глиф(а/ов) отсутствуют в таблице draw, шрифт сохранён (нажмите для раскрытия)',
+        'log.draw.strip.orphan_purge': '[draw] ✓ Ссылок на рисунки в скрипте нет. Все осиротевшие глифы из {name} удалены. Шрифт удалён.',
         'log.rewrite.start': '[ass] Перезапись скрипта...',
         'notice.copyright': '⚠ Авторские права: распространение шрифтов без лицензии может нарушать авторские права. Убедитесь в наличии прав на распространение встраиваемых шрифтов.',
         'notice.drawing': '⚠ Внимание: после конвертации команд рисования возможны незначительные смещения позиций и размеров эффектов. Обязательно проверьте конечный результат.',
@@ -3171,6 +3213,12 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" falhou: {error}',
         'log.font.subsetting': '[font] Processando "{name}" ({weight}, {chars} caracteres)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} não tem tabela draw (fonte legada) — fonte mantida.',
+        'log.draw.strip.full': '[draw] ✓ Comandos de desenho totalmente restaurados: {count} glifo(s) de {name} recuperados como instruções \\p. Fonte removida.',
+        'log.draw.strip.partial': '[draw] ⚠ Restauração parcial: {name} — {restored} glifo(s) restaurados, {retained} não restauráveis (clique para expandir)',
+        'log.draw.strip.partial.item': '  - Glifo {char} não restaurável (ausente na tabela draw)',
+        'log.draw.strip.unrestorable': '[draw] ✗ Não é possível restaurar: {name} — {retained} glifo(s) ausentes na tabela draw, fonte mantida (clique para expandir)',
+        'log.draw.strip.orphan_purge': '[draw] ✓ Sem referências de desenho no script. Todos os glifos órfãos de {name} removidos. Fonte removida.',
         'log.rewrite.start': '[ass] Reescrevendo legenda...',
         'notice.copyright': '⚠ Direitos autorais: redistribuir fontes sem licença adequada pode constituir infração. Certifique-se de ter permissão para distribuir as fontes que incorporar.',
         'notice.drawing': '⚠ Atenção: a conversão de comandos de desenho pode causar pequenos deslocamentos de posição ou escala. Sempre verifique o resultado final.',
@@ -3351,6 +3399,12 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} كيلوبايت → {newKB} كيلوبايت (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] فشلت معالجة "{name}": {error}',
         'log.font.subsetting': '[font] جارٍ معالجة "{name}" ({weight}، {chars} حرف)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} لا يحتوي على جدول draw (خط قديم) — تم الاحتفاظ بالخط.',
+        'log.draw.strip.full': '[draw] ✓ تمت استعادة أوامر الرسم بالكامل: {count} حرف من {name} استُعيد كتعليمات \\p. تمت إزالة الخط.',
+        'log.draw.strip.partial': '[draw] ⚠ استعادة جزئية: {name} — {restored} حرف مستعاد، {retained} غير قابل للاستعادة (انقر للتوسيع)',
+        'log.draw.strip.partial.item': '  - الحرف {char} غير قابل للاستعادة (غائب عن جدول draw)',
+        'log.draw.strip.unrestorable': '[draw] ✗ تعذّرت الاستعادة: {name} — {retained} حرف غير موجود في جدول draw، تم الاحتفاظ بالخط (انقر للتوسيع)',
+        'log.draw.strip.orphan_purge': '[draw] ✓ لا مراجع رسم في النص. تم حذف جميع الحروف المعزولة من {name}. تمت إزالة الخط.',
         'log.rewrite.start': '[ass] جارٍ إعادة كتابة النص...',
         'notice.copyright': '⚠ حقوق الملكية: قد يُشكّل توزيع الخطوط دون ترخيص انتهاكاً لحقوق النشر. تأكد من امتلاكك حق توزيع الخطوط التي تضمّنها.',
         'notice.drawing': '⚠ ملاحظة: قد يتسبب تحويل أوامر الرسم في انزياحات طفيفة في المواضع والأحجام. تحقق دائماً من النتيجة النهائية.',
@@ -3531,6 +3585,12 @@
         'log.font.subset_done': '[font] "{name}" ({weight}): {origKB} KB → {newKB} KB (−{pct}%){skippedText}',
         'log.font.subset_fail': '[font] "{name}" başarısız: {error}',
         'log.font.subsetting': '[font] "{name}" işleniyor ({weight}, {chars} karakter)...',
+        'log.draw.strip.no_table': '[draw] ⚠ {name} draw tablosu içermiyor (eski font) — font korunuyor.',
+        'log.draw.strip.full': '[draw] ✓ Çizim komutları tamamen geri yüklendi: {name} içindeki {count} glif \\p talimatına dönüştürüldü. Font kaldırıldı.',
+        'log.draw.strip.partial': '[draw] ⚠ Kısmi geri yükleme: {name} — {restored} glif geri yüklendi, {retained} geri yüklenemedi (genişletmek için tıklayın)',
+        'log.draw.strip.partial.item': '  - Glif {char} geri yüklenemedi (draw tablosunda yok)',
+        'log.draw.strip.unrestorable': '[draw] ✗ Geri yükleme yapılamıyor: {name} — {retained} glif draw tablosunda bulunamadı, font korunuyor (genişletmek için tıklayın)',
+        'log.draw.strip.orphan_purge': '[draw] ✓ Scriptte çizim referansı kalmadı. {name} içindeki tüm yalnız glifler temizlendi. Font kaldırıldı.',
         'log.rewrite.start': '[ass] Altyazı yeniden yazılıyor...',
         'notice.copyright': '⚠ Telif hakkı: Lisanssız font dağıtımı telif hakkı ihlali sayılabilir. Gömdüğünüz fontları dağıtma hakkınız olduğundan emin olun.',
         'notice.drawing': '⚠ Dikkat: çizim komutlarının dönüştürülmesi efektlerde küçük konum veya boyut farklılıklarına yol açabilir. Sonucu mutlaka kontrol edin.',
@@ -4613,7 +4673,10 @@
           let unknownRandCount = 0;
           for (const efName of Object.keys(entry.parsed.embeddedFonts)) {
             const baseName = efName.replace(/(_B0|_I0|_BI0|_0)\.ttf$/i, '');
-            if (baseName.toLowerCase().startsWith('assdrawsubset')) continue;
+            if (baseName.toLowerCase().startsWith('assdrawsubset')) {
+              if (entry.parsed.hasDrawTable) strippableCount++;
+              continue;
+            }
             strippableCount++;
             const isUnknownRand = /^[A-Z0-9]{8}$/.test(baseName) && !entry.parsed.randFontMap?.[baseName];
             if (isUnknownRand) unknownRandCount++;
@@ -5272,6 +5335,7 @@
       S.converting = true;
       S.outputBlobs = [];
       S.fontBuffers = [];
+      S.fileFontBuffers = [];
       _convertResultsState = [];
 
       const wantDraw = document.getElementById('opt-draw').checked;
@@ -5354,6 +5418,34 @@
             const doneLine = box.lastElementChild;
             const stripLines = result.stats.strippedNames.map(name => t('log.font.strip.item', { name }));
             logExpandable(t('log.font.strip.expand', { count: result.stats.strippedNames.length }), stripLines, doneLine);
+          }
+
+          if (wantStrip && result.stats.drawRestoreLog) {
+            const dr = result.stats.drawRestoreLog;
+            const box = document.getElementById('log-box');
+            const doneLine = box.lastElementChild;
+            if (dr.type === 'no_table') {
+              const msg = document.createElement('div');
+              msg.className = 'log-line log-warn';
+              msg.textContent = t('log.draw.strip.no_table', { name: dr.name });
+              box.insertBefore(msg, doneLine);
+            } else if (dr.type === 'full') {
+              const msg = document.createElement('div');
+              msg.className = 'log-line log-ok';
+              msg.textContent = t('log.draw.strip.full', { name: dr.name, count: dr.restoredCount });
+              box.insertBefore(msg, doneLine);
+            } else if (dr.type === 'partial') {
+              const lines = dr.retainedChars.map(ch => t('log.draw.strip.partial.item', { char: ch }));
+              logExpandable(t('log.draw.strip.partial', { name: dr.name, restored: dr.restoredCount, retained: dr.retainedCount }), lines, doneLine);
+            } else if (dr.type === 'unrestorable') {
+              const lines = dr.retainedChars.map(ch => t('log.draw.strip.partial.item', { char: ch }));
+              logExpandable(t('log.draw.strip.unrestorable', { name: dr.name, retained: dr.retainedCount }), lines, doneLine);
+            } else if (dr.type === 'orphan_purge') {
+              const msg = document.createElement('div');
+              msg.className = 'log-line log-ok';
+              msg.textContent = t('log.draw.strip.orphan_purge', { name: dr.name });
+              box.insertBefore(msg, doneLine);
+            }
           }
 
           const origKB = (result.origSize / 1024).toFixed(0);
