@@ -2077,47 +2077,42 @@ function restoreDrawingsInLine(line, dataToCharArr, drawFontFamily) {
   if (!dataToCharArr || dataToCharArr.length === 0) return line;
   const charToEntry = new Map();
   for (const e of dataToCharArr) charToEntry.set(e.char, e);
-  const m = line.match(/^([^:]*?:\s*)(.*)$/);
+  const m = line.match(/^([^:]*?:\s*)(.*)$/s);
   if (!m) return line;
   const prefix = m[1];
   const content = m[2];
   const segs = content.split(/(\{[^}]*\})/);
+  const escapedFont = drawFontFamily.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const drawTagRe = new RegExp('\\\\fn' + escapedFont + '\\\\p0', 'i');
   let result = prefix;
-  let inDrawSubset = false;
-  let pendingEntry = null;
-
-  for (let i = 0; i < segs.length; i++) {
+  let i = 0;
+  while (i < segs.length) {
     const seg = segs[i];
-    if (seg.startsWith('{')) {
-      const pm = seg.match(/\\p(\d+)/i);
-      const fnm = seg.match(/\\fn([^\\}]*)/i);
-      const curFont = fnm ? normFont(fnm[1].trim()) : null;
-      if (pm && parseInt(pm[1]) === 0 && curFont && curFont.toLowerCase().startsWith(drawFontFamily.toLowerCase())) {
-        inDrawSubset = true;
-        pendingEntry = null;
+    if (seg.startsWith('{') && drawTagRe.test(seg)) {
+      let glyphText = '';
+      let j = i + 1;
+      if (j < segs.length && !segs[j].startsWith('{')) {
+        glyphText = segs[j];
+        j++;
+      }
+      if (glyphText.length === 0) {
+        result += seg;
+        i++;
         continue;
       }
-      if (inDrawSubset) {
-        result += seg;
-        inDrawSubset = false;
-        pendingEntry = null;
-      } else {
-        result += seg;
-      }
-    } else if (seg && inDrawSubset) {
-      for (const ch of [...seg]) {
+      for (const ch of [...glyphText]) {
         const entry = charToEntry.get(ch);
         if (entry) {
-          const pTag = `{\\p${entry.pLevel}}`;
-          const closeTag = entry.hasExplicitClose ? '{\\p0}' : '';
-          result += pTag + entry.data + closeTag;
+          const restoredTag = seg.replace(drawTagRe, `\\p${entry.pLevel}`);
+          result += restoredTag + entry.data + (entry.hasExplicitClose ? '{\\p0}' : '');
         } else {
-          result += ch;
+          result += seg + ch;
         }
       }
-      inDrawSubset = false;
+      i = j;
     } else {
       result += seg;
+      i++;
     }
   }
   return result;
@@ -2412,13 +2407,11 @@ async function doConvert(data, id) {
           try {
             const buf = assUUDecode(lines);
             const drawTable = extractDrawTable(buf.buffer);
-            if (!drawTable) {
-              drawStripResult = { action: 'keep_all', buf, name, lines };
-            } else {
-              drawStripResult = { action: 'partial', buf, name, lines, drawTable };
-            }
+            drawStripResult = drawTable
+              ? { hasTable: true, buf, name, drawTable }
+              : { hasTable: false, buf, name, lines };
           } catch (_) {
-            drawStripResult = { action: 'keep_all', buf: null, name, lines };
+            drawStripResult = { hasTable: false, buf: null, name, lines };
           }
         }
         continue;
@@ -2439,10 +2432,10 @@ async function doConvert(data, id) {
   }
 
   if (options.wantStrip && !options.wantDraw && drawStripResult) {
-    if (drawStripResult.action === 'keep_all') {
+    if (!drawStripResult.hasTable) {
       if (drawStripResult.buf) {
         retainDrawFont = { name: drawStripResult.name, ttfU8: drawStripResult.buf };
-      } else if (drawStripResult.lines) {
+      } else {
         retainDrawFont = { name: drawStripResult.name, lines: drawStripResult.lines };
       }
     } else {
@@ -2597,7 +2590,7 @@ async function doConvert(data, id) {
     activeRandMap: randFontNames,
     randFontNames: rewriteRandFontNames,
     retainRawFonts,
-    restoreDrawMap: (options.wantStrip && drawingDataToChar && !options.wantDraw) ? drawingDataToChar : null,
+    restoreDrawMap: (options.wantStrip && !options.wantDraw && drawingDataToChar) ? drawingDataToChar : null,
     retainDrawFont: options.wantStrip ? retainDrawFont : null,
   }, id);
 
