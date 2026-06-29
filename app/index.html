@@ -1735,6 +1735,7 @@
             <div class="paths" id="font-paths"></div>
           </details>
           <div id="font-list"></div>
+          <div id="fstype-notice" class="notice notice-warn hidden"></div>
         </div>
       </div>
     </div>
@@ -2025,6 +2026,9 @@
         'analysis.font.rand_missing_warn': '检测到映射表缺失的随机化字体，该字体无法处理。',
         'err.unsupported_archive': '不支持此压缩格式，请改用 ZIP',
         'step4.title': '转换 & 下载',
+        'notice.fstype': '⚠ 以下字体受嵌入许可限制（fsType）。在嵌入前，请确保您拥有合法的分发授权：{fonts}',
+        'err.lib.title': '⚠ 核心库加载失败',
+        'err.lib.desc': '无法初始化 OpenType.js。请检查您的网络连接并刷新页面。',
       },
       'zh-TW': {
         'analysis.draw.label': '繪圖指令（\\p1）',
@@ -2216,6 +2220,9 @@
         'log.font.rand_missing': '[font] ⚠ 偵測到隨機化字型名稱，對照表遺失，無法處理該字型。',
         'err.unsupported_archive': '不支援此壓縮格式，請改用 ZIP',
         'step4.title': '轉換 & 下載',
+        'notice.fstype': '⚠ 以下字型受嵌入授權限制（fsType）。在嵌入前，請確保您擁有合法的分發授權：{fonts}',
+        'err.lib.title': '⚠ 核心庫載入失敗',
+        'err.lib.desc': '無法初始化 OpenType.js。請檢查您的網路連線並重新整理頁面。',
       },
       en: {
         'analysis.draw.label': 'Draw Commands (\\p1)',
@@ -2407,6 +2414,9 @@
         'log.font.rand_missing': '[font] ⚠ Randomized font detected. Mapping table missing — cannot process this font.',
         'err.unsupported_archive': 'Unsupported format. Please use a ZIP archive',
         'step4.title': 'Run & Download',
+        'notice.fstype': '⚠ The following fonts have strict embedding licenses (fsType). Please ensure you have the proper distribution rights before embedding: {fonts}',
+        'err.lib.title': '⚠ Failed to Load Required Library',
+        'err.lib.desc': 'Unable to initialize OpenType.js. Please check your internet connection and reload the page.',
       },
       ja: {
         'analysis.draw.label': '描画コマンド（\\p1）',
@@ -2598,6 +2608,9 @@
         'log.font.rand_missing': '[font] ⚠ ランダム化フォントを検出。マッピングテーブルがなく、処理できません。',
         'err.unsupported_archive': '未対応の形式です。ZIP を使用してください',
         'step4.title': '変換 & ダウンロード',
+        'notice.fstype': '⚠ 以下のフォントは埋め込みライセンス（fsType）により制限されています。埋め込む前に適切な配布権限を持っていることを確認してください：{fonts}',
+        'err.lib.title': '⚠ 必須ライブラリの読み込みに失敗しました',
+        'err.lib.desc': 'OpenType.js を初期化できません。インターネット接続を確認し、ページを再読み込みしてください。',
       },
       ko: {
         'analysis.draw.label': '드로우 명령어 (\\p1)',
@@ -2789,6 +2802,9 @@
         'log.font.rand_missing': '[font] ⚠ 랜덤화된 폰트 발견. 매핑 테이블 누락 — 해당 폰트를 처리할 수 없습니다.',
         'err.unsupported_archive': '지원하지 않는 형식입니다. ZIP 파일을 사용하세요',
         'step4.title': '변환 & 다운로드',
+        'notice.fstype': '⚠ 다음 폰트는 엄격한 임베딩 라이선스(fsType)가 적용되어 있습니다. 임베딩하기 전에 올바른 배포 권한이 있는지 확인하세요: {fonts}',
+        'err.lib.title': '⚠ 필수 라이브러리 로드 실패',
+        'err.lib.desc': 'OpenType.js를 초기화할 수 없습니다. 인터넷 연결을 확인하고 페이지를 새로고침하세요.',
       },
       es: {
         'analysis.draw.label': 'Comandos de dibujo (\\p1)',
@@ -2980,6 +2996,9 @@
         'log.font.rand_missing': '[font] ⚠ Fuente aleatorizada detectada. Tabla de mapeo ausente — no se puede procesar.',
         'err.unsupported_archive': 'Formato no compatible. Usa un archivo ZIP',
         'step4.title': 'Convertir y descargar',
+        'notice.fstype': '⚠ Las siguientes fuentes tienen licencias de incrustación estrictas (fsType). Asegúrese de tener los derechos de distribución adecuados antes de incrustarlas: {fonts}',
+        'err.lib.title': '⚠ Error al cargar la biblioteca requerida',
+        'err.lib.desc': 'No se puede inicializar OpenType.js. Compruebe su conexión a Internet y vuelva a cargar la página.',
       },
       ru: {
         'analysis.draw.label': 'Команды рисования (\\p1)',
@@ -3171,6 +3190,9 @@
         'log.font.rand_missing': '[font] ⚠ Обнаружен рандомизированный шрифт. Таблица соответствия отсутствует — обработка невозможна.',
         'err.unsupported_archive': 'Неподдерживаемый формат. Используйте ZIP',
         'step4.title': 'Обработка и скачивание',
+        'notice.fstype': '⚠ Следующие шрифты имеют строгие лицензии на встраивание (fsType). Перед встраиванием убедитесь, что у вас есть соответствующие права на распространение: {fonts}',
+        'err.lib.title': '⚠ Не удалось загрузить необходимую библиотеку',
+        'err.lib.desc': 'Не удалось инициализировать OpenType.js. Проверьте подключение к Интернету и перезагрузите страницу.',
       },
       'pt-BR': {
         'analysis.draw.label': 'Comandos de desenho (\\p1)',
@@ -3362,6 +3384,9 @@
         'log.font.rand_missing': '[font] ⚠ Fonte aleatorizada detectada. Tabela de mapeamento ausente — não é possível processar.',
         'err.unsupported_archive': 'Formato não suportado. Use um arquivo ZIP',
         'step4.title': 'Executar e baixar',
+        'notice.fstype': '⚠ As seguintes fontes possuem licenças rigorosas de incorporação (fsType). Certifique-se de ter os direitos de distribuição adequados antes de incorporá-las: {fonts}',
+        'err.lib.title': '⚠ Falha ao carregar a biblioteca necessária',
+        'err.lib.desc': 'Não foi possível inicializar o OpenType.js. Verifique sua conexão com a internet e recarregue a página.',
       },
       ar: {
         'analysis.draw.label': 'أوامر الرسم (\\p1)',
@@ -3553,6 +3578,9 @@
         'log.font.rand_missing': '[font] ⚠ تم اكتشاف خط عشوائي. جدول التعيين مفقود — لا يمكن المعالجة.',
         'err.unsupported_archive': 'صيغة غير مدعومة. استخدم ملف ZIP',
         'step4.title': 'تشغيل وتحميل',
+        'notice.fstype': '⚠ الخطوط التالية تخضع لتراخيص تضمين صارمة (fsType). يرجى التأكد من امتلاكك لحقوق التوزيع المناسبة قبل تضمينها: {fonts}',
+        'err.lib.title': '⚠ فشل في تحميل المكتبة المطلوبة',
+        'err.lib.desc': 'تعذر تهيئة OpenType.js. يرجى التحقق من اتصالك بالإنترنت وإعادة تحميل الصفحة.',
       },
       tr: {
         'analysis.draw.label': 'Çizim komutları (\\p1)',
@@ -3744,6 +3772,9 @@
         'log.font.rand_missing': '[font] ⚠ Rastgeleştirilmiş font tespit edildi. Eşleme tablosu eksik — işlenemiyor.',
         'err.unsupported_archive': 'Desteklenmeyen format. Lütfen ZIP kullanın',
         'step4.title': 'Çalıştır ve indir',
+        'notice.fstype': '⚠ Aşağıdaki fontların katı gömme lisansları (fsType) vardır. Gömmek için uygun dağıtım haklarına sahip olduğunuzdan emin olun: {fonts}',
+        'err.lib.title': '⚠ Gerekli Kütüphane Yüklenemedi',
+        'err.lib.desc': 'OpenType.js başlatılamadı. Lütfen internet bağlantınızı kontrol edin ve sayfayı yeniden yükleyin.',
       },
     };
 
@@ -5168,9 +5199,24 @@
                 div.appendChild(rightEl);
         list.appendChild(div);
       }
+      renderFsTypeNotice();
     }
 
-    const WEIGHT_KW = ['heavy', 'black', 'extrabold', 'ultrabold', 'semibold', 'demibold', 'bold', 'medium', 'normal', 'regular', 'light', 'extralight', 'ultralight', 'thin', 'hairline'];
+    function renderFsTypeNotice() {
+      const el = document.getElementById('fstype-notice');
+      if (!el) return;
+      const restricted = [];
+      for (const [, rec] of S.uploadedFonts) {
+        if (!rec.isSystem && rec.fsType && (rec.fsType & 0x000E) !== 0 && (rec.fsType & 0x000E) !== 8) {
+          const name = rec.matchedFor || rec.file?.name || '';
+          if (name && !restricted.includes(name)) restricted.push(name);
+        }
+      }
+      if (!restricted.length) { el.classList.add('hidden'); el.textContent = ''; return; }
+      el.classList.remove('hidden');
+      const separator = currentLang.startsWith('zh') || currentLang === 'ja' ? '、' : ', ';
+      el.textContent = t('notice.fstype', { fonts: restricted.join(separator) });
+    }
     const ITALIC_KW = ['italic', 'oblique', 'slanted'];
 
     function parseVersion(s) {
@@ -5324,6 +5370,7 @@
                 version: match.version || '', lastModified: entry.file.lastModified || 0,
                 size: entry.file.size || entry.buffer.byteLength,
                 allNames: match.allNames || [match.matchedFor],
+                fsType: match.fsType || 0,
               };
               const slotKey = wantMultiWeight
                 ? (match.isItalic && match.weight >= 600 ? 'boldItalic' : match.weight >= 600 ? 'bold' : match.isItalic ? 'italic' : 'normal')
@@ -6297,7 +6344,7 @@
             name.className = 'grp-file-name'; name.textContent = f.file.name.replace(/.*[/\\]/, '');
             row.appendChild(name);
             const tag = document.createElement('span');
-            tag.className = 'grp-file-tag'; tag.textContent = t('grp.embed_target') || '嵌入目标';
+            tag.className = 'grp-file-tag'; tag.textContent = t('grp.embed_target');
             tag.style.visibility = isTarget ? 'visible' : 'hidden';
             row.appendChild(tag);
             const sz = document.createElement('span');
@@ -6757,10 +6804,9 @@
       const el = document.querySelector('.main');
       if (el) {
         el.innerHTML =
-          '<div style="padding:2rem;background:rgba(181,42,28,.08);border-left:4px solid #b52a1c;border-radius:3px;font-family:sans-serif;" role="alert" aria-label="Failed to load required library">' +
-            '<p style="font-size:1rem;font-weight:600;color:#b52a1c;margin:0 0 0.75rem 0;" lang="en">⚠ Failed to Load Required Library</p>' +
-            '<p style="font-size:0.9rem;color:#888;line-height:1.6;margin:0 0 0.5rem 0;" lang="en">Unable to initialize OpenType.js. Please check your internet connection and reload the page.</p>' +
-            '<p style="font-size:0.9rem;color:#888;line-height:1.6;margin:0;" lang="zh">opentype.js 加载失败，请检查网络连接后刷新页面。</p>' +
+          '<div style="padding:2rem;background:rgba(181,42,28,.08);border-left:4px solid #b52a1c;border-radius:3px;font-family:sans-serif;" role="alert">' +
+            '<p style="font-size:1rem;font-weight:600;color:#b52a1c;margin:0 0 0.75rem 0;">' + t('err.lib.title') + '</p>' +
+            '<p style="font-size:0.9rem;color:#888;line-height:1.6;margin:0;">' + t('err.lib.desc') + '</p>' +
           '</div>';
       }
     }

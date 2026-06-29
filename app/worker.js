@@ -1095,7 +1095,7 @@ function extractMetaFromTables(buffer, tables) {
   const view = new DataView(buffer);
   const allNames    = new Set();
   const familyNames = new Set();
-  let weight = 400, isItalic = false, version = '', subfamilyName = '', description = '';
+  let weight = 400, isItalic = false, version = '', subfamilyName = '', description = '', fsType = 0;
 
   if (tables['name']) {
     const raw = readNameTableRaw(buffer, tables['name'].offset);
@@ -1119,13 +1119,14 @@ function extractMetaFromTables(buffer, tables) {
       if (wc) weight = wc;
       const fsSel = view.getUint16(os2 + 62, false);
       isItalic = !!(fsSel & 1);
+      fsType = view.getUint16(os2 + 8, false);
     }
   }
 
   applySubfamilyFallbacks(subfamilyName, weight, isItalic,
     (w) => { weight = w; }, (it) => { isItalic = it; });
 
-  return { allNames, familyNames, weight, isItalic, version, subfamilyName, description };
+  return { allNames, familyNames, weight, isItalic, version, subfamilyName, description, fsType };
 }
 
 function readFontDescriptionRaw(buffer) {
@@ -1159,7 +1160,7 @@ function matchFontBuffer(buffer, requiredFonts, id) {
   const reqLowers = requiredFonts.map(r => r.toLowerCase());
 
   const commitResult = (meta, ttcIndex) => {
-    const { allNames, familyNames, weight, isItalic, version, subfamilyName } = meta;
+    const { allNames, familyNames, weight, isItalic, version, subfamilyName, fsType } = meta;
     const allNamesLower    = new Set([...allNames].map(n => n.toLowerCase()));
     const familyNamesLower = new Set([...familyNames].map(n => n.toLowerCase()));
     const matched = [];
@@ -1174,7 +1175,7 @@ function matchFontBuffer(buffer, requiredFonts, id) {
         matchedFor:    requiredFonts[ri],
         weight, isItalic,
         isFamilyMatch: familyNamesLower.has(reqLowers[ri]),
-        subfamilyName, version,
+        subfamilyName, version, fsType: fsType || 0,
         allNames:    allNamesArr,
         familyNames: familyNamesArr,
         ttcIndex,
@@ -1211,7 +1212,8 @@ function matchFontBuffer(buffer, requiredFonts, id) {
       const isItalic = fsSel !== undefined ? !!(fsSel & 1) : false;
       const sub = (fontObj.names?.preferredSubfamily?.en || fontObj.names?.fontSubfamily?.en || '').trim();
       const ver = (fontObj.names?.version?.en || '').trim();
-      commitResult({ allNames, familyNames, weight, isItalic, version: ver, subfamilyName: sub }, -1);
+      const fsType = fontObj.tables?.os2?.fsType || 0;
+      commitResult({ allNames, familyNames, weight, isItalic, version: ver, subfamilyName: sub, fsType }, -1);
     } else if (magic === MAGIC_TTC) {
       const numFonts = view.getUint32(8, false);
       for (let i = 0; i < numFonts; i++) {
