@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.8.16">
+  <meta name="version" content="2.8.17">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -6280,9 +6280,9 @@
         if (depth > maxDepth) throw new Error('err.folder_depth');
 
         if (entry.isFile) {
+          if (allowedExts && !allowedExts.some(ext => entry.name.toLowerCase().endsWith(ext))) continue;
           try {
             const file = await new Promise((resolve, reject) => entry.file(resolve, reject));
-            if (allowedExts && !allowedExts.some(ext => file.name.toLowerCase().endsWith(ext))) continue;
             files.push(file);
           } catch (e) { }
         } else if (entry.isDirectory) {
