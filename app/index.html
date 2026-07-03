@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.8.15">
+  <meta name="version" content="2.8.16">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -5680,7 +5680,7 @@
           } else {
             result = await workerCall('convert', {
               text: combinedText,
-              forceHasBOM: group.files[0].hasBOM || false,
+              forceHasBOM: isMulti ? false : (group.files[0].hasBOM || false),
               fonts,
               fileName: isMulti ? `Group_${gi + 1}` : group.files[0].file.name,
               detectedNewline: group.files[0].parsed?.detectedNewline || (combinedText.includes('\r\n') ? '\r\n' : '\n'),
@@ -5723,6 +5723,11 @@
                 ? (fontsM ? chunks[0].slice(0, fontsM.index) + chunks[0].slice(fontsM.index + fontsM[0].length) : chunks[0])
                 : chunks[j];
               if (isHost) body = insertFontsBeforeEvents(body, fontsSection);
+              if (!result.isDirect) {
+                const fileNl = f.parsed?.detectedNewline || detNl;
+                if (fileNl !== detNl) body = body.replace(/\r\n|\n/g, fileNl);
+                body = (f.hasBOM ? '\uFEFF' : '') + body.replace(/^\uFEFF/, '');
+              }
               const myBlob = result.isDirect ? new Blob([f.rawBuffer]) : new Blob([body], { type: 'text/plain;charset=utf-8' });
               const fileIndex = S.outputBlobs.length;
               S.fileFontBuffers[fileIndex] = j === hostSortedIdx ? (result.fontBuffers || []) : [];
