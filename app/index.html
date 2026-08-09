@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.8.17">
+  <meta name="version" content="2.8.18">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -4338,10 +4338,12 @@
         if (uint8[0] === 0xFF && uint8[1] === 0xFE) return new TextDecoder('utf-16le').decode(buffer);
         if (uint8[0] === 0xFE && uint8[1] === 0xFF) return new TextDecoder('utf-16be').decode(buffer);
       }
+      const hasUtf8Bom = uint8.length >= 3 && uint8[0] === 0xEF && uint8[1] === 0xBB && uint8[2] === 0xBF;
       const utf8 = new TextDecoder('utf-8', { fatal: true });
       try {
         return utf8.decode(buffer);
       } catch (e) {
+        if (hasUtf8Bom) return new TextDecoder('utf-8').decode(buffer);
         const encodings = ['gbk', 'big5', 'shift-jis', 'euc-kr', 'windows-1251', 'windows-1252', 'iso-8859-1', 'iso-8859-9', 'iso-8859-15', 'windows-1256', 'iso-8859-6'];
         for (const encoding of encodings) {
           try {
@@ -4989,21 +4991,16 @@
         if (!preserveState) {
           cbRN_init.checked = false;
           document.getElementById('opt-row-randname').classList.remove('selected');
+          const anyRandMissing = S.assFiles.some(e => e.parsed.randMapMissing);
+          const anyHasRand = S.assFiles.some(e => e.parsed.hasRandFonts);
+          if (anyHasRand && !anyRandMissing) {
+            cbRN_init.checked = true;
+            document.getElementById('opt-row-randname').classList.add('selected');
+          }
         }
         document.getElementById('randname-notice').classList.toggle('hidden', !anyFont || !cbRN_init.checked);
       }
       if (hasFonts || hasSysFonts) renderFontList();
-      const anyRandMissing = S.assFiles.some(e => e.parsed.randMapMissing);
-      const anyHasRand = S.assFiles.some(e => e.parsed.hasRandFonts);
-      if (anyHasRand && !anyRandMissing) {
-        const cbRN2 = document.getElementById('opt-randname');
-        const rowRN2 = document.getElementById('opt-row-randname');
-        if (cbRN2 && rowRN2) { 
-          cbRN2.checked = true; 
-          rowRN2.classList.add('selected'); 
-          document.getElementById('randname-notice').classList.toggle('hidden', !anyFont);
-        }
-      }
 
       const hasAnyEmbeddedForStep3 = S.assFiles.some(e => e.parsed.embeddedFonts && Object.keys(e.parsed.embeddedFonts).length > 0);
       if (shouldDraw || hasFonts || hasSysFonts || hasStripFonts || hasAnyEmbeddedForStep3) {
