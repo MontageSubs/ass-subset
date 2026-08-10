@@ -81,7 +81,7 @@ const SYSTEM_FONTS = new Set([
   'ebrima', 'leelawadee ui', 'nirmala ui',
   'assdrawsubset_montagesubs', 'assdrawsubset',
 ]);
-const SECTION_SPLIT_RE = /\r?\n(?=\[(?:Script Info|V?\d+(?:\.\d+)*\+?\s+Styles|Styles|Events|Fonts|Graphics|Aegisub\s+(?:Extradata|Project\s+Garbage))\])/i;
+const SECTION_SPLIT_RE = /\r?\n(?=\[(?:Script Info|V?\d+(?:\.\d+)*\+?\s+Styles|Styles|Events|Fonts|Graphics|Aegisub\s+(?:Extradata|Project\s+Garbage)|Assfonts\s+Rename\s+Info)\])/i;
 const isAnyDrawFont = (n) => {
   return n.toLowerCase().startsWith('assdrawsubset');
 };
@@ -2201,6 +2201,14 @@ function applyRandFontNamesInLine(line, randFontNames) {
   }
   return result;
 }
+function embeddedFontSlotSuffix(weightSlot) {
+  return weightSlot === 'bold' ? '_B0.ttf' : weightSlot === 'italic' ? '_I0.ttf' : weightSlot === 'boldItalic' ? '_BI0.ttf' : '_0.ttf';
+}
+function buildEmbeddedFontFilename(name, weightSlot, randOrigByCode) {
+  const baseName = name.replace(/(_B|_I|_BI)$/, '');
+  const orig = randOrigByCode && randOrigByCode.get(baseName.toLowerCase());
+  return (orig ? `${baseName}_${orig}` : baseName) + embeddedFontSlotSuffix(weightSlot);
+}
 function rewriteASS(rawContent, opts, id) {
   const { drawingDataToChar, drawFontFamily, drawTTF, embeddedFonts, drawCharRemap, targetNewline, randFontNames, activeRandMap, wantStrip, wantEmbed, retainRawFonts, restoreDrawMap, retainDrawFont } = opts;
   const nl = targetNewline || '\n';
@@ -2313,10 +2321,7 @@ function rewriteASS(rawContent, opts, id) {
     if (embeddedFonts && embeddedFonts.length > 0) {
       const randOrigByCode = new Map((activeRandMap || []).map(e => [e.rand.toLowerCase(), e.orig]));
       embeddedFonts.forEach(ef => {
-        const slotSuffix = ef.weightSlot === 'bold' ? '_B0.ttf' : ef.weightSlot === 'italic' ? '_I0.ttf' : ef.weightSlot === 'boldItalic' ? '_BI0.ttf' : '_0.ttf';
-        const baseName = ef.name.replace(/(_B|_I|_BI)$/, '');
-        const orig = randOrigByCode.get(baseName.toLowerCase());
-        encodeAndAppend((orig ? `${baseName}_${orig}` : baseName) + slotSuffix, ef.ttf);
+        encodeAndAppend(buildEmbeddedFontFilename(ef.name, ef.weightSlot, randOrigByCode), ef.ttf);
       });
     }
     finalSec = newFontLines.join(nl);
@@ -3016,9 +3021,10 @@ async function doConvert(data, id) {
     embCount: finalEmbeddedFonts.length + (drawTTF ? 1 : 0)
   });
   const fontBuffers = [];
-  if (drawTTF) fontBuffers.push({ name: drawFontFamily, buffer: drawTTF.buffer, isDrawing: true });
+  const randOrigByCode = new Map((randFontNames || []).map(e => [e.rand.toLowerCase(), e.orig]));
+  if (drawTTF) fontBuffers.push({ name: drawFontFamily, buffer: drawTTF.buffer, isDrawing: true, filename: drawFontFamily + '_0.ttf' });
   for (const ef of finalEmbeddedFonts) {
-    fontBuffers.push({ name: ef.name, buffer: ef.ttf.buffer, isDrawing: false, weight: ef.weight, weightSlot: ef.weightSlot || 'normal', subfamilyName: ef.subfamilyName || '', usedChars: ef.usedChars || null });
+    fontBuffers.push({ name: ef.name, buffer: ef.ttf.buffer, isDrawing: false, weight: ef.weight, weightSlot: ef.weightSlot || 'normal', subfamilyName: ef.subfamilyName || '', usedChars: ef.usedChars || null, filename: buildEmbeddedFontFilename(ef.name, ef.weightSlot || 'normal', randOrigByCode) });
   }
   const drawMap = new Map((drawingDataToChar || []).map(e => [e.data, e.char]));
   return {

@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.8.19">
+  <meta name="version" content="2.8.20">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -5853,9 +5853,7 @@
       const files = [];
       const usedNames = new Set();
       for (const fb of (S.fileFontBuffers[i] || [])) {
-        const slotSuffix = { bold: '_Bold', italic: '_Italic', boldItalic: '_BoldItalic' }[fb.weightSlot] || '';
-        const ext = fb.name.match(/\.[^.]+$/) ? '' : '.ttf';
-        let fname = `${fb.name}${slotSuffix}${ext}`;
+        let fname = fb.filename || fb.name + (fb.name.match(/\.[^.]+$/) ? '' : '.ttf');
         if (usedNames.has(fname)) {
           const e = fname.match(/\.[^.]+$/)?.[0] ?? '';
           const stem = fname.slice(0, fname.length - e.length);
@@ -6089,7 +6087,7 @@
         dlBtn.style.padding = '0.2rem 0.6rem';
         dlBtn.style.fontSize = '0.75rem';
         dlBtn.dataset.idx = String(S.fileFontBuffers[fileIdx].indexOf(fb));
-        dlBtn.setAttribute('aria-label', t('aria.preview_dl_font', { name: fb.name }));
+        dlBtn.setAttribute('aria-label', t('aria.preview_dl_font', { name: fb.filename || fb.name }));
         dlBtn.textContent = t('btn.download_font');
         dlBtn.onclick = () => {
           const fontIdx = parseInt(dlBtn.dataset.idx);
@@ -6098,7 +6096,7 @@
           if (!rawBuf) return;
           const wSlot = fbItem.weightSlot || 'normal';
           const nameSuffix = wSlot === 'bold' ? '_B0.ttf' : wSlot === 'italic' ? '_I0.ttf' : wSlot === 'boldItalic' ? '_BI0.ttf' : '_0.ttf';
-          const name = fbItem.name + nameSuffix;
+          const name = fbItem.filename || (fbItem.name + nameSuffix);
           const blob = new Blob([rawBuf], { type: 'font/ttf' });
           downloadBlob(blob, name);
         };
@@ -6162,7 +6160,7 @@
           }
 
           const _finalLabel = document.getElementById('opt-multiweight')?.checked ? subfamilyI18n(fb.subfamilyName) : null;
-          title.textContent = fb.name + (_finalLabel ? ' [' + _finalLabel + ']' : '') + limitMsg;
+          title.textContent = (fb.filename || fb.name) + (_finalLabel ? ' [' + _finalLabel + ']' : '') + limitMsg;
 
           ctx.clearRect(0, 0, logicalW, logicalH);
 
@@ -6200,7 +6198,7 @@
             }
           });
         } catch (e) {
-          title.textContent = fb.name + t('preview.error');
+          title.textContent = (fb.filename || fb.name) + t('preview.error');
           ctx.fillStyle = '#b52a1c';
           ctx.font = '14px sans-serif';
           ctx.fillText(t('preview.draw.error') + e.message, 20, 30);
