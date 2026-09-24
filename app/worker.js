@@ -185,6 +185,16 @@ function assTimeToMs(s) {
   return (parseInt(m[1]) * 3600 + parseInt(m[2]) * 60 + parseFloat(m[3])) * 1000;
 }
 function normFont(name) { return name.replace(/^@/, '').trim(); }
+const DEFAULT_STYLE_NAME = 'Default';
+const UNRESOLVED_STYLE = Object.freeze({ font: '', bold: false, italic: false });
+function stripStyleStars(name) { return name.trim().replace(/^\*+/, ''); }
+function defineStyleName(name) { return stripStyleStars(name) || DEFAULT_STYLE_NAME; }
+function resolveStyleName(name, styles) {
+  const bare = stripStyleStars(name);
+  const key = bare.toLowerCase() === DEFAULT_STYLE_NAME.toLowerCase() ? DEFAULT_STYLE_NAME : bare;
+  return styles.has(key) ? key : DEFAULT_STYLE_NAME;
+}
+function resolveStyle(name, styles) { return styles.get(resolveStyleName(name, styles)) ?? UNRESOLVED_STYLE; }
 function genRandFontName() {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   let r = '';
@@ -205,7 +215,7 @@ function parseASSText(text, id, forceHasBOM) {
   let section = '';
   let evtFmt = null;
   let styleFmt = null;
-  const styles = {};
+  const styles = new Map();
   const fontChars = {};
   const drawings = [];
   let playResX = 0, playResY = 0;
@@ -259,7 +269,7 @@ function parseASSText(text, id, forceHasBOM) {
         const sFont = normFont(parts[styleFmt.fontIdx]?.trim() || 'Arial');
         const sBold = parseInt(parts[styleFmt.boldIdx]?.trim() || '0') !== 0;
         const sItalic = styleFmt.italicIdx >= 0 ? parseInt(parts[styleFmt.italicIdx]?.trim() || '0') !== 0 : false;
-        if (sName) styles[sName] = { font: sFont, bold: sBold, italic: sItalic };
+        if (sName !== undefined) styles.set(defineStyleName(sName), { font: sFont, bold: sBold, italic: sItalic });
       }
     }
     if (section === '[fonts]') {
@@ -289,8 +299,7 @@ function parseASSText(text, id, forceHasBOM) {
       if (/^dialogue\s*:/i.test(t) && evtFmt) {
         const rest = t.replace(/^dialogue\s*:\s*/i, '');
         const parts = rest.split(',');
-        const styleName = parts[evtFmt.styleIdx]?.trim();
-        const styleInfo = styles[styleName] || { font: 'Arial', bold: false };
+        const styleInfo = resolveStyle(parts[evtFmt.styleIdx] ?? '', styles);
         const textPart = parts.slice(evtFmt.textIdx).join(',');
         const tStart = parts[evtFmt.startIdx]?.trim() || '';
         const tEnd = parts[evtFmt.endIdx]?.trim() || '';
@@ -490,7 +499,7 @@ function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
         const rm = inner.match(/\\r([^\\}]*)/);
         if (rm) {
           const sn = rm[1].trim();
-          const s = (sn && styles && styles[sn]) ? styles[sn] : styleInfo;
+          const s = styles.get(sn) ?? styleInfo;
           font = s.font; bold = s.bold ? 700 : 400; italic = s.italic || false;
         }
         const fm = inner.match(/\\fn([^\\}]*)/);
@@ -510,7 +519,7 @@ function parseDialogueText(text, styleInfo, tStart, tEnd, tMs,
             if (!subsetReferencedChars.has(ch)) subsetReferencedChars.set(ch, tMs);
           }
         }
-      } else {
+      } else if (font) {
         const weight = (bold >= 600 && italic) ? 'boldItalic' : (bold >= 600) ? 'bold' : italic ? 'italic' : 'normal';
         if (!fontChars[font]) fontChars[font] = { normal: new Set(), bold: new Set(), italic: new Set(), boldItalic: new Set() };
         const clean = seg.replace(/\\[Nn]/g, '').replace(/\\h/g, ' ').replace(/\\([{}\\])/g, '$1');
@@ -2234,7 +2243,7 @@ function rewriteASS(rawContent, opts, id) {
   const totalBlocks = blocks.length;
   const processedBlocks = [];
   let eventsIndex = -1;
-  const subsetStyles = new Set();
+  const subsetStyles = new Map();
   let styleFmt = null;
   let eventFmt = null;
 
@@ -2273,7 +2282,7 @@ function rewriteASS(rawContent, opts, id) {
           const parts = l.replace(/^style\s*:\s*/i, '').split(',');
           const sName = parts[styleFmt.nameIdx]?.trim();
           const sFont = normFont(parts[styleFmt.fontIdx]?.trim() || '');
-          if (sName && sFont.toLowerCase() === drawFontFamily.toLowerCase()) subsetStyles.add(sName);
+          if (sName !== undefined) subsetStyles.set(defineStyleName(sName), sFont.toLowerCase() === drawFontFamily.toLowerCase());
           if (randFontNames && randFontNames.length > 0) {
             const isRestoring2 = randFontNames.some(e => e.restoring);
             if (isRestoring2) {
@@ -2305,8 +2314,8 @@ function rewriteASS(rawContent, opts, id) {
           if (drawCharRemap && drawCharRemap.size > 0) {
             const rest2 = processed.replace(/^dialogue\s*:/i, '');
             const parts2 = rest2.split(',');
-            const sName2 = parts2[eventFmt.styleIdx]?.trim();
-            processed = renameSubsetCharsInLine(processed, drawCharRemap, drawFontFamily, subsetStyles.has(sName2), subsetStyles);
+            const initialIsSubset = subsetStyles.get(resolveStyleName(parts2[eventFmt.styleIdx] ?? '', subsetStyles)) === true;
+            processed = renameSubsetCharsInLine(processed, drawCharRemap, drawFontFamily, initialIsSubset, subsetStyles);
           }
           if (drawingDataToChar && drawingDataToChar.length > 0) {
             processed = replaceDrawingsInLine(processed, drawingDataToChar, drawFontFamily);
@@ -2394,7 +2403,7 @@ function renameSubsetCharsInLine(line, charRemap, fontFamily, initialIsSubset, s
       const rm = inner.match(/\\r([^\\}]*)/);
       if (rm) {
         const sn = rm[1].trim();
-        isSubsetFont = sn === '' ? !!initialIsSubset : (subsetStyles && subsetStyles.has(sn));
+        isSubsetFont = subsetStyles.has(sn) ? subsetStyles.get(sn) : !!initialIsSubset;
       }
       result += seg;
     } else {
