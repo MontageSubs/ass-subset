@@ -2,7 +2,7 @@
 
 const CACHE_PREFIX = 'ass-subset:';
 const LEGACY_CACHE_PREFIX = 'ass-subset-v';
-const CACHE_NAME = CACHE_PREFIX + 'v2.8.23';
+const CACHE_NAME = CACHE_PREFIX + 'v2.8.24';
 const PRECACHE = [
   '/ass-subset',
   '/ass-subset/',
