@@ -1,6 +1,8 @@
 'use strict';
 
-const CACHE_NAME = 'ass-subset-v2.8.22';
+const CACHE_PREFIX = 'ass-subset:';
+const LEGACY_CACHE_PREFIX = 'ass-subset-v';
+const CACHE_NAME = CACHE_PREFIX + 'v2.8.23';
 const PRECACHE = [
   '/ass-subset',
   '/ass-subset/',
@@ -23,7 +25,7 @@ self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys()
       .then(keys => Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
+        keys.filter(k => k !== CACHE_NAME && (k.startsWith(CACHE_PREFIX) || k.startsWith(LEGACY_CACHE_PREFIX))).map(k => caches.delete(k))
       ))
       .then(() => self.clients.claim())
   );

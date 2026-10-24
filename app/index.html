@@ -21,7 +21,7 @@
   <link rel="alternate" hreflang="ar" href="https://subs.js.org/ass-subset/?lang=ar">
   <link rel="alternate" hreflang="x-default" href="https://subs.js.org/ass-subset/">
   <link rel="icon" type="image/jpeg" href="icons/icon-256.png">
-  <meta name="version" content="2.8.22">
+  <meta name="version" content="2.8.23">
   <meta property="og:type" content="website">
   <meta property="og:title" content="ASS Subsetter · Font Embedding for Subtitles">
   <meta property="og:description" content="Font embedding tool for ASS/SSA subtitles. Subset fonts to compress file size, or embed them fully. Perfect for complex subtitle typesetting with multiple font files.">
@@ -3870,6 +3870,27 @@
     function normFont(name) { return name.replace(/^@/, '').trim(); }
 
     let currentLang = 'en';
+    var STORAGE_NAMESPACE = 'ass-subset';
+    function storageKey(name) { return STORAGE_NAMESPACE + ':' + name; }
+    var LEGACY_STORAGE_KEYS = {
+      'ass-subset-lang': storageKey('lang')
+    };
+    var LEGACY_VALUE_MAPPERS = {};
+    var DISCARDED_STORAGE_KEYS = [];
+    (function migrateLegacyStorage() {
+      try {
+        Object.keys(LEGACY_STORAGE_KEYS).forEach(function (legacyKey) {
+          var value = localStorage.getItem(legacyKey);
+          if (value === null) return;
+          var mapper = LEGACY_VALUE_MAPPERS[legacyKey];
+          var migrated = mapper ? mapper(value) : value;
+          var key = LEGACY_STORAGE_KEYS[legacyKey];
+          if (migrated !== null && localStorage.getItem(key) === null) localStorage.setItem(key, migrated);
+          localStorage.removeItem(legacyKey);
+        });
+        DISCARDED_STORAGE_KEYS.forEach(function (key) { localStorage.removeItem(key); });
+      } catch (_) {}
+    })();
     (function () {
       function normalizeLang(raw) {
         const s = (raw || '').toLowerCase().trim();
@@ -3894,13 +3915,13 @@
           const norm = normalizeLang(urlLang);
           if (norm && VALID[norm]) {
             currentLang = norm;
-            try { localStorage.setItem('ass-subset-lang', norm); } catch(_) {}
+            try { localStorage.setItem(storageKey('lang'), norm); } catch(_) {}
             return;
           }
         }
       } catch(_) {}
       try {
-        const saved = localStorage.getItem('ass-subset-lang');
+        const saved = localStorage.getItem(storageKey('lang'));
         if (saved && VALID[saved]) { currentLang = saved; return; }
       } catch (_) { }
       const nav = (navigator.language || '').toLowerCase();
@@ -3952,7 +3973,7 @@
     function setLang(lang) {
       window.history.replaceState({}, document.title, window.location.pathname + '?lang=' + lang);
       currentLang = lang;
-      try { localStorage.setItem('ass-subset-lang', lang); } catch (_) { }
+      try { localStorage.setItem(storageKey('lang'), lang); } catch (_) { }
       applyI18n();
       renderFontPaths();
       if (S.assFiles.length > 0) {
